@@ -55,8 +55,8 @@ class PongSpeaker:
 
 
 class Pong:
-    HOST = "localhost"
-    PORT = 4223
+    HOST = config.HOST
+    PORT = config.PORT
     UID = config.UID_LED_STRIP_BRICKLET
 
     # Position of R, G and B pixel on LED Pixel
@@ -343,6 +343,7 @@ class Pong:
 
 if __name__ == "__main__":
     pong = Pong()
-    pong.loop()
-    pong.timer.stop()
-    pong.kp.kbi.restore_stdin()
+    if pong.UID != None:
+        pong.loop()
+        pong.timer.stop()
+        pong.kp.kbi.restore_stdin()

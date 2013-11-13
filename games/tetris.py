@@ -97,8 +97,8 @@ class TetrisSpeaker:
 
 
 class Tetris:
-    HOST = "localhost"
-    PORT = 4223
+    HOST = config.HOST
+    PORT = config.PORT
     UID = config.UID_LED_STRIP_BRICKLET
 
     # Position of R, G and B pixel on LED Pixel

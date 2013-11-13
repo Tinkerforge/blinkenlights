@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*
 
+# General Settings
+HOST = 'localhost'
+PORT = 4223
+
 # Optional Bricklets (use None as UID if not connected)
 UID_MULTI_TOUCH_BRICKLET = 'pax'
 UID_DUAL_BUTTON_BRICKLET = ('dbb', 'dbc')
