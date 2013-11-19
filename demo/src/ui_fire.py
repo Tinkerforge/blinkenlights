@@ -1,0 +1,151 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'ui/fire.ui'
+#
+# Created: Tue Nov 19 18:33:46 2013
+#      by: PyQt4 UI code generator 4.10.3
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt4 import QtCore, QtGui
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+
+class Ui_Fire(object):
+    def setupUi(self, Fire):
+        Fire.setObjectName(_fromUtf8("Fire"))
+        Fire.resize(541, 275)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout(Fire)
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.label = QtGui.QLabel(Fire)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.verticalLayout.addWidget(self.label)
+        self.line = QtGui.QFrame(Fire)
+        self.line.setFrameShape(QtGui.QFrame.HLine)
+        self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
+        self.verticalLayout.addWidget(self.line)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.verticalLayout_5 = QtGui.QVBoxLayout()
+        self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
+        self.label_2 = QtGui.QLabel(Fire)
+        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.verticalLayout_5.addWidget(self.label_2)
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
+        self.slider_speed = QtGui.QSlider(Fire)
+        self.slider_speed.setMinimum(10)
+        self.slider_speed.setMaximum(100)
+        self.slider_speed.setProperty("value", 20)
+        self.slider_speed.setOrientation(QtCore.Qt.Vertical)
+        self.slider_speed.setObjectName(_fromUtf8("slider_speed"))
+        self.horizontalLayout_3.addWidget(self.slider_speed)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_3)
+        self.spinbox_speed = QtGui.QSpinBox(Fire)
+        self.spinbox_speed.setMinimum(10)
+        self.spinbox_speed.setMaximum(100)
+        self.spinbox_speed.setProperty("value", 20)
+        self.spinbox_speed.setObjectName(_fromUtf8("spinbox_speed"))
+        self.verticalLayout_5.addWidget(self.spinbox_speed)
+        self.horizontalLayout.addLayout(self.verticalLayout_5)
+        self.verticalLayout_4 = QtGui.QVBoxLayout()
+        self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
+        self.label_3 = QtGui.QLabel(Fire)
+        self.label_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.verticalLayout_4.addWidget(self.label_3)
+        self.horizontalLayout_4 = QtGui.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.slider_hue = QtGui.QSlider(Fire)
+        self.slider_hue.setMinimum(1)
+        self.slider_hue.setMaximum(50)
+        self.slider_hue.setOrientation(QtCore.Qt.Vertical)
+        self.slider_hue.setObjectName(_fromUtf8("slider_hue"))
+        self.horizontalLayout_4.addWidget(self.slider_hue)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_4)
+        self.spinbox_hue = QtGui.QDoubleSpinBox(Fire)
+        self.spinbox_hue.setMinimum(0.1)
+        self.spinbox_hue.setMaximum(5.0)
+        self.spinbox_hue.setSingleStep(0.1)
+        self.spinbox_hue.setProperty("value", 1.0)
+        self.spinbox_hue.setObjectName(_fromUtf8("spinbox_hue"))
+        self.verticalLayout_4.addWidget(self.spinbox_hue)
+        self.horizontalLayout.addLayout(self.verticalLayout_4)
+        self.verticalLayout_3 = QtGui.QVBoxLayout()
+        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
+        self.label_4 = QtGui.QLabel(Fire)
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.verticalLayout_3.addWidget(self.label_4)
+        self.horizontalLayout_5 = QtGui.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
+        self.slider_start = QtGui.QSlider(Fire)
+        self.slider_start.setMaximum(255)
+        self.slider_start.setProperty("value", 64)
+        self.slider_start.setOrientation(QtCore.Qt.Vertical)
+        self.slider_start.setObjectName(_fromUtf8("slider_start"))
+        self.horizontalLayout_5.addWidget(self.slider_start)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
+        self.spinbox_start = QtGui.QSpinBox(Fire)
+        self.spinbox_start.setMinimum(0)
+        self.spinbox_start.setMaximum(255)
+        self.spinbox_start.setProperty("value", 64)
+        self.spinbox_start.setObjectName(_fromUtf8("spinbox_start"))
+        self.verticalLayout_3.addWidget(self.spinbox_start)
+        self.horizontalLayout.addLayout(self.verticalLayout_3)
+        self.verticalLayout_2 = QtGui.QVBoxLayout()
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.label_5 = QtGui.QLabel(Fire)
+        self.label_5.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+        self.verticalLayout_2.addWidget(self.label_5)
+        self.horizontalLayout_6 = QtGui.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.slider_end = QtGui.QSlider(Fire)
+        self.slider_end.setMinimum(1)
+        self.slider_end.setMaximum(255)
+        self.slider_end.setProperty("value", 255)
+        self.slider_end.setOrientation(QtCore.Qt.Vertical)
+        self.slider_end.setObjectName(_fromUtf8("slider_end"))
+        self.horizontalLayout_6.addWidget(self.slider_end)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+        self.spinbox_end = QtGui.QSpinBox(Fire)
+        self.spinbox_end.setMaximum(255)
+        self.spinbox_end.setProperty("value", 255)
+        self.spinbox_end.setObjectName(_fromUtf8("spinbox_end"))
+        self.verticalLayout_2.addWidget(self.spinbox_end)
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.button_default = QtGui.QPushButton(Fire)
+        self.button_default.setObjectName(_fromUtf8("button_default"))
+        self.verticalLayout.addWidget(self.button_default)
+        self.horizontalLayout_2.addLayout(self.verticalLayout)
+
+        self.retranslateUi(Fire)
+        QtCore.QMetaObject.connectSlotsByName(Fire)
+
+    def retranslateUi(self, Fire):
+        Fire.setWindowTitle(_translate("Fire", "Form", None))
+        self.label.setText(_translate("Fire", "Einführungstext", None))
+        self.label_2.setText(_translate("Fire", "Speed (ms)", None))
+        self.label_3.setText(_translate("Fire", "Hue", None))
+        self.label_4.setText(_translate("Fire", "Start", None))
+        self.label_5.setText(_translate("Fire", "End", None))
+        self.button_default.setText(_translate("Fire", "Default", None))
+

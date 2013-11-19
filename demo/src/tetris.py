@@ -30,10 +30,9 @@ class TetrisSegmentDisplay:
               0x39,0x5e,0x79,0x71] # // 0~9,A,b,C,d,E,F
 
     def __init__(self, ipcon):
-        self.line_count = 0
-
         self.ipcon = ipcon
         if self.UID == None:
+            self.sd = None
             print("Not Configured: Segment Display 4x7")
             return
         self.sd = SegmentDisplay4x7(self.UID, self.ipcon)
@@ -45,10 +44,14 @@ class TetrisSegmentDisplay:
             print("Not Found: Segment Display 4x7 ({0})").format(self.UID)
             self.UID = None
             return
+            
 
+        self.line_count = 0
         self.line_count_to_display()
 
     def increase_line_count(self, increase_by):
+        if not self.sd:
+            return
         self.line_count += increase_by
         self.line_count_to_display()
 
@@ -67,6 +70,7 @@ class TetrisSpeaker:
     def __init__(self, ipcon):
         self.ipcon = ipcon
         if self.UID == None:
+            self.speaker = None
             print("Not Configured: Piezo Speaker")
             return
         
@@ -90,16 +94,18 @@ class TetrisSpeaker:
                 time.sleep(0.007)
 
     def beep_input(self):
+        if not self.speaker:
+            return
         self.speaker.beep(10, 500)
 
     def beep_delete_line(self, lines):
+        if not self.speaker:
+            return
+        
         Thread(target=self.sirene, args=(1000*lines,)).start()
 
 
 class Tetris:
-    HOST = config.HOST
-    PORT = config.PORT
-    UID = config.UID_LED_STRIP_BRICKLET
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -195,13 +201,17 @@ class Tetris:
     game_over_position = 0
     is_game_over = False
 
-    def __init__(self):
-        self.ipcon = IPConnection()
+    loop = True
+
+    def __init__(self, ipcon):
+        self.UID = config.UID_LED_STRIP_BRICKLET
+        self.ipcon = ipcon
         if self.UID == None:
+            self.led_strip = None
             print("Not Configured: LED Strip (required)")
+            return
         
         self.led_strip = LEDStrip(self.UID, self.ipcon)
-        self.ipcon.connect(self.HOST, self.PORT)
         
         try:
             self.led_strip.get_frame_duration()
@@ -394,7 +404,7 @@ class Tetris:
     def tetris_loop(self):
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
         i = 0
-        while True:
+        while self.loop:
             key = self.kp.read_single_keypress()
 
             key = key.lower()

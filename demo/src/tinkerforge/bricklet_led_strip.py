@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+#############################################################
+# This file was automatically generated on 2013-09-12.      #
+#                                                           #
+# Bindings Version 2.0.10                                    #
+#                                                           #
+# If you have a bugfix for this file and want to commit it, #
+# please fix the bug in the generator. You can find a link  #
+# to the generator git on tinkerforge.com                   #
+#############################################################
+
+try:
+    from collections import namedtuple
+except ImportError:
+    try:
+        from .ip_connection import namedtuple
+    except ValueError:
+        from ip_connection import namedtuple
+
+try:
+    from .ip_connection import Device, IPConnection, Error
+except ValueError:
+    from ip_connection import Device, IPConnection, Error
+
+GetRGBValues = namedtuple('RGBValues', ['r', 'g', 'b'])
+GetIdentity = namedtuple('Identity', ['uid', 'connected_uid', 'position', 'hardware_version', 'firmware_version', 'device_identifier'])
+
+class BrickletLEDStrip(Device):
+    """
+    Device to control up to 320 RGB LEDs
+    """
+
+    DEVICE_IDENTIFIER = 231
+
+    CALLBACK_FRAME_RENDERED = 6
+
+    FUNCTION_SET_RGB_VALUES = 1
+    FUNCTION_GET_RGB_VALUES = 2
+    FUNCTION_SET_FRAME_DURATION = 3
+    FUNCTION_GET_FRAME_DURATION = 4
+    FUNCTION_GET_SUPPLY_VOLTAGE = 5
+    FUNCTION_GET_IDENTITY = 255
+
+
+    def __init__(self, uid, ipcon):
+        """
+        Creates an object with the unique device ID *uid* and adds it to
+        the IP Connection *ipcon*.
+        """
+        Device.__init__(self, uid, ipcon)
+
+        self.api_version = (2, 0, 0)
+
+        self.response_expected[BrickletLEDStrip.FUNCTION_SET_RGB_VALUES] = BrickletLEDStrip.RESPONSE_EXPECTED_FALSE
+        self.response_expected[BrickletLEDStrip.FUNCTION_GET_RGB_VALUES] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
+        self.response_expected[BrickletLEDStrip.FUNCTION_SET_FRAME_DURATION] = BrickletLEDStrip.RESPONSE_EXPECTED_FALSE
+        self.response_expected[BrickletLEDStrip.FUNCTION_GET_FRAME_DURATION] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
+        self.response_expected[BrickletLEDStrip.FUNCTION_GET_SUPPLY_VOLTAGE] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
+        self.response_expected[BrickletLEDStrip.CALLBACK_FRAME_RENDERED] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_FALSE
+        self.response_expected[BrickletLEDStrip.FUNCTION_GET_IDENTITY] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
+
+        self.callback_formats[BrickletLEDStrip.CALLBACK_FRAME_RENDERED] = 'H'
+
+    def set_rgb_values(self, index, length, r, g, b):
+        """
+        Sets the *rgb* values for the LEDs with the given *length* starting 
+        from *index*.
+        
+        The maximum length is 16, the index goes from 0 to 319 and the rgb values
+        have 8 bits each.
+        
+        Example: If you set index to 5, length to 3, r to [255, 0, 0], 
+        g to [0, 255, 0] and b to [0, 0, 255] the LEDs with index 5, 6
+        and 7 will get the color red, green and blue respectively.
+        
+        The colors will be transfered to actual LEDs when the next
+        frame duration ends, see :func:`SetFrameDuration`.
+        
+        Generic approach: 
+        
+        * Set the frame duration to a value that represents
+          the number of frames per second you want to achieve. 
+        
+        * Set all of the LED colors for one frame.
+        
+        * Wait for the :func:`FrameRendered` callback.
+        
+        * Set all of the LED colors for next frame.
+        
+        * Wait for the :func:`FrameRendered` callback.
+        
+        * and so on.
+        
+        This approach ensures that you can change the LED colors with
+        a fixed frame rate.
+        """
+        self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_SET_RGB_VALUES, (index, length, r, g, b), 'H B 16B 16B 16B', '')
+
+    def get_rgb_values(self, index, length):
+        """
+        Returns the rgb with the given *length* starting from the
+        given *index*.
+        
+        The values are the last values that were set by :func:`SetRGBValues`.
+        """
+        return GetRGBValues(*self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_RGB_VALUES, (index, length), 'H B', '16B 16B 16B'))
+
+    def set_frame_duration(self, duration):
+        """
+        Sets the frame duration in ms.
+        
+        Example: If you want to achieve 20 frames per second, you should
+        set the frame duration to 50ms (50ms * 20 = 1 second). 
+        
+        For an explanation of the general approach see :func:`SetRGBValues`.
+        
+        Default value: 100ms (10 frames per second).
+        """
+        self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_SET_FRAME_DURATION, (duration,), 'H', '')
+
+    def get_frame_duration(self):
+        """
+        Returns the frame duration as set by :func:`SetFrameDuration`.
+        """
+        return self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_FRAME_DURATION, (), '', 'H')
+
+    def get_supply_voltage(self):
+        """
+        Returns the current supply voltage of the LEDs. The voltage is given
+        in mv.
+        """
+        return self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_SUPPLY_VOLTAGE, (), '', 'H')
+
+    def get_identity(self):
+        """
+        Returns the UID, the UID where the Bricklet is connected to, 
+        the position, the hardware and firmware version as well as the
+        device identifier.
+        
+        The position can be 'a', 'b', 'c' or 'd'.
+        
+        The device identifiers can be found :ref:`here <device_identifier>`.
+        
+        .. versionadded:: 2.0.0~(Plugin)
+        """
+        return GetIdentity(*self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_IDENTITY, (), '', '8s 8s c 3B 3B H'))
+
+    def register_callback(self, id, callback):
+        """
+        Registers a callback with ID *id* to the function *callback*.
+        """
+        self.registered_callbacks[id] = callback
+
+LEDStrip = BrickletLEDStrip # for backward compatibility
