@@ -217,7 +217,7 @@ def build_windows_pkg():
                 else: # keep full path
                     data_files.append((os.path.join(dirname) , [os.path.join(dirname, n)]))
     
-    os.path.walk(os.path.normcase("../build_data/Windows/"), visitor, ('y', os.path.normcase("../build_data/Windows/")))
+    os.path.walk(os.path.normcase("../build_data/windows/"), visitor, ('y', os.path.normcase("../build_data/windows/")))
     
     data_files.append( ( os.path.join('.') , [os.path.join('.', 'demo-icon.png')] ) )
 
@@ -264,12 +264,12 @@ def build_windows_pkg():
                     }
                     },
           zipfile = None,
-          windows = [{'script' : 'demo.py', 'icon_resources' : [(0, os.path.normcase("../build_data/Windows/demo-icon.ico"))]}]
+          windows = [{'script' : 'demo.py', 'icon_resources' : [(0, os.path.normcase("../build_data/windows/demo-icon.ico"))]}]
     )
     
     # build nsis
     lines = []
-    for line in file('../build_data/Windows/nsis/demo_installer.nsi', 'rb').readlines():
+    for line in file('../build_data/windows/nsis/demo_installer.nsi', 'rb').readlines():
         line = line.replace('<<DEMO_DOT_VERSION>>', config.DEMO_VERSION)
         line = line.replace('<<DEMO_UNDERSCORE_VERSION>>', config.DEMO_VERSION.replace('.', '_'))
         lines.append(line)
@@ -310,6 +310,7 @@ def build_linux_pkg():
 
     os.system('chown -R root:root starter_kit_blinkenlights_demo/usr')
     os.system('dpkg -b starter_kit_blinkenlights_demo/ starter-kit-blinkenlights-demo-' + config.DEMO_VERSION + '_all.deb')
+    os.system('chown -R `logname`:`logname` starter_kit_blinkenlights_demo/usr')
 
 
 # call python build_pkg.py to build the windows/linux/macosx package

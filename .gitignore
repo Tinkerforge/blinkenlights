@@ -1,1 +1,6 @@
 *.pyc
+ui_*.py
+demo/src/build
+demo/src/dist
+demo/build_data/linux/starter_kit_blinkenlights_demo/usr/share/starter_kit_blinkenlights_demo
+demo/build_data/windows/nsis/demo_installer.nsi
