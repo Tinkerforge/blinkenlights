@@ -95,6 +95,7 @@ def build_macosx_pkg():
             shutil.rmtree(DIST_PATH)
 
     def create_app():
+        os.system("python build_ui.py")
         apps = [
             {
                 "script" : "demo.py",
@@ -207,6 +208,7 @@ def build_windows_pkg():
         shutil.rmtree(DIST_PATH)
 
     import py2exe
+    os.system("python build_ui.py")
     
     data_files = []
     def visitor(arg, dirname, names):
@@ -282,6 +284,8 @@ def build_linux_pkg():
     if os.geteuid() != 0:
         sys.stderr.write("build_pkg for Linux has to be started as root, exiting\n")
         sys.exit(1)
+
+    os.system("python build_ui.py")
 
     src_path = os.getcwd()
     build_dir = 'build_data/linux/starter_kit_blinkenlights_demo/usr/share/starter_kit_blinkenlights_demo'
