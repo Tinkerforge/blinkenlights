@@ -110,6 +110,12 @@ class Fire:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
+    def close(self):
+        try:
+            self.ipcon.disconnect()
+        except:
+            pass
+
     def frame_rendered(self, _):
         self.frame_upload()
         self.frame_prepare_next()
@@ -185,3 +191,5 @@ if __name__ == "__main__":
     fire.frame_rendered(0)
     
     raw_input('Press enter to exit\n') # Use input() in Python 3
+
+    fire.close()
