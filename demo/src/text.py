@@ -6,6 +6,8 @@ from tinkerforge.bricklet_led_strip import LEDStrip
 
 import colorsys
 
+import config
+
 letterforms = '''\
        |       |       |       |       |       |       | |
   XXX  |  XXX  |  XXX  |   X   |       |  XXX  |  XXX  |!|
@@ -150,9 +152,11 @@ class ScrollingText:
         
         self.new_text('Starter Kit: Blinkenlights')
         
+        self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
+            return
         
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         
@@ -238,9 +242,3 @@ class ScrollingText:
                     self.leds[row][col] = (0, 0, 0)
 
         self.text_position += 1
-
-if __name__ == "__main__":
-    st = ScrollingText()
-    st.frame_rendered(0)
-    
-    raw_input('Press enter to exit\n') # Use input() in Python 3

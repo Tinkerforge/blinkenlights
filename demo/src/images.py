@@ -6,6 +6,8 @@ from tinkerforge.bricklet_led_strip import LEDStrip
 
 import traceback
 
+import config
+
 pil_available = True
 try:
     from PIL import Image
@@ -56,10 +58,6 @@ else:
     ImageLoader = ImageLoaderQt
 
 class Images:
-    HOST = 'localhost'
-    PORT = 4223
-    UID = 'abc'
-    
     SPEED = 1000 # in ms per step
 
     # Position of R, G and B pixel on LED Pixel
@@ -87,9 +85,11 @@ class Images:
     image_position = 0
     
     def __init__(self, ipcon):
+        self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
+            return
         
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         
@@ -165,11 +165,3 @@ class Images:
                 self.leds[y][x] = self.files[self.image_position].get_pixel(y, x)
 
         self.image_position = (self.image_position + 1) % len(self.files) 
-
-
-if __name__ == "__main__":
-    images = Images()
-    images.frame_prepare_next()
-    images.frame_rendered(0)
-    
-    raw_input('Press enter to exit\n') # Use input() in Python 3

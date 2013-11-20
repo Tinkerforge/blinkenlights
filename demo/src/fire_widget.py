@@ -93,10 +93,10 @@ class FireWidget(QWidget, Ui_Fire):
 
     def start(self):
         self.fire = Fire(self.app.ipcon)
-        self.default_pressed()
-        self.fire.frame_rendered(0)
-
+        if self.fire.UID != None:
+            self.default_pressed()
+            self.fire.frame_rendered(0)
     
     def stop(self):
-        if self.fire != None:
+        if self.fire.UID != None:
             self.fire.stop_rendering()

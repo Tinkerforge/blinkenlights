@@ -43,10 +43,11 @@ class ImagesWidget(QWidget, Ui_Images):
         self.button_show.pressed.connect(self.show_pressed)
          
     def show_pressed(self):
-        new_images = unicode(self.text_edit_files.toPlainText()).split('\n')
-        self.images.new_images(new_images)
-        self.images.frame_prepare_next()
-        self.images.frame_rendered(0)
+        if self.images.UID != None:
+            new_images = unicode(self.text_edit_files.toPlainText()).split('\n')
+            self.images.new_images(new_images)
+            self.images.frame_prepare_next()
+            self.images.frame_rendered(0)
          
     def choose_pressed(self):
         dialog = QFileDialog()
@@ -71,9 +72,10 @@ class ImagesWidget(QWidget, Ui_Images):
 
     def start(self):
         self.images = Images(self.app.ipcon)
-        self.default_values()
-        self.images.frame_rendered(0)
+        if self.images.UID != None:
+            self.default_values()
+            self.images.frame_rendered(0)
     
     def stop(self):
-        if self.images != None:
+        if self.images.UID != None:
             self.images.stop_rendering()

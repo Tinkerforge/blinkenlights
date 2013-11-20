@@ -424,10 +424,3 @@ class Tetris:
                 self.init_tetris()
             if key == 'q':
                 return
-
-if __name__ == "__main__":
-    tetris = Tetris()
-    if tetris.UID != None:
-        tetris.tetris_loop()
-        tetris.drop_timer.stop()
-        tetris.kp.kbi.restore_stdin()

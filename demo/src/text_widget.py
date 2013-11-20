@@ -77,10 +77,10 @@ class TextWidget(QWidget, Ui_Text):
 
     def start(self):
         self.text = ScrollingText(self.app.ipcon)
-        self.default_values()
-        self.text.frame_rendered(0)
+        if self.text.UID != None:
+            self.default_values()
+            self.text.frame_rendered(0)
 
-    
     def stop(self):
-        if self.text != None:
+        if self.text.UID != None:
             self.text.stop_rendering()

@@ -9,11 +9,9 @@ from tinkerforge.bricklet_led_strip import LEDStrip
 import colorsys
 import random
 
+import config
+
 class Fire:
-    HOST = 'localhost'
-    PORT = 4223
-    UID = 'abc'
-    
     SPEED = 20 # in ms per step
 
     HUE_FACTOR = 1.2
@@ -90,9 +88,11 @@ class Fire:
     percent = 0
 
     def __init__(self, ipcon):
+        self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
+            return
         
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         
@@ -183,9 +183,3 @@ class Fire:
             self.percent = 0
             
         make_frame()
-        
-if __name__ == "__main__":
-    fire = Fire()
-    fire.frame_rendered(0)
-    
-    raw_input('Press enter to exit\n') # Use input() in Python 3

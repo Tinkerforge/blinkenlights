@@ -164,6 +164,7 @@ class Pong:
         self.ipcon = ipcon
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
+            return
         
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         
@@ -340,10 +341,3 @@ class Pong:
                 self.init_pong()
             if key == 'q':
                 return
-
-if __name__ == "__main__":
-    pong = Pong()
-    if pong.UID != None:
-        pong.loop()
-        pong.timer.stop()
-        pong.kp.kbi.restore_stdin()

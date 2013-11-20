@@ -38,12 +38,11 @@ class PongWidget(QWidget, Ui_Pong):
         
         self.setupUi(self)
 
-        self.button_a.pressed.connect(lambda: self.pong.kp.key_queue.put('a'))
-        self.button_s.pressed.connect(lambda: self.pong.kp.key_queue.put('s'))
-        self.button_k.pressed.connect(lambda: self.pong.kp.key_queue.put('k'))
-        self.button_l.pressed.connect(lambda: self.pong.kp.key_queue.put('l'))
-        self.button_r.pressed.connect(lambda: self.pong.kp.key_queue.put('r'))
-        
+        self.button_a.pressed.connect(lambda: self.button_press('a'))
+        self.button_s.pressed.connect(lambda: self.button_press('s'))
+        self.button_k.pressed.connect(lambda: self.button_press('k'))
+        self.button_l.pressed.connect(lambda: self.button_press('l'))
+        self.button_r.pressed.connect(lambda: self.button_press('r'))
 
     def start_pong(self):
         self.pong = Pong(self.app.ipcon)
@@ -60,7 +59,6 @@ class PongWidget(QWidget, Ui_Pong):
         self.thread = Thread(target=self.start_pong)
         self.thread.daemon = True
         self.thread.start()
-
     
     def stop(self):
         if self.pong != None:
