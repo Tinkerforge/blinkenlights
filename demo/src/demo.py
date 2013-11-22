@@ -84,6 +84,7 @@ class Blinkenlights(QApplication):
         super(QApplication, self).__init__(args)
 
         self.error_msg = QErrorMessage()
+        self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)
 
         signal.signal(signal.SIGINT, self.exit_demo)
         signal.signal(signal.SIGTERM, self.exit_demo)
@@ -167,7 +168,10 @@ class Blinkenlights(QApplication):
         self.setup.label_segment_display_uid.setText('None')
         
         if self.ipcon != None:
-            self.ipcon.disconnect()
+            try:
+                self.ipcon.disconnect()
+            except:
+                pass
 
         self.ipcon = IPConnection()
         
