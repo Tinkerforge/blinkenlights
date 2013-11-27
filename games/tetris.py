@@ -22,6 +22,7 @@ from threading import Thread
 from repeated_timer import RepeatedTimer
 from keypress import KeyPress
 
+
 class TetrisSegmentDisplay:
     UID = config.UID_SEGMENT_DISPLAY_4X7_BRICKLET
     DIGITS = [0x3f,0x06,0x5b,0x4f,
@@ -60,6 +61,7 @@ class TetrisSegmentDisplay:
             self.DIGITS[self.line_count/1    % 10]
         )
         self.sd.set_segments(segments, 7, False)
+
 
 class TetrisSpeaker:
     UID = config.UID_PIEZO_SPEAKER_BRICKLET
@@ -282,7 +284,7 @@ class Tetris:
         r = []
         g = []
         b = []
-        for col in range(3, self.FIELD_ROWS-1):
+        for col in reversed(range(3, self.FIELD_ROWS-1)):
             row_range = range(1, self.FIELD_COLS-1)
             if col % 2 == 0:
                 row_range = reversed(row_range)
@@ -305,7 +307,6 @@ class Tetris:
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
             self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
-
 
     def clear_lines(self, rows_to_clear):
         self.drop_timer.stop()
@@ -331,7 +332,6 @@ class Tetris:
             self.playfield[1] = [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]
                 
         self.drop_timer.start()
-
 
     def check_for_line_clears(self):
         rows_to_clear = []
@@ -389,7 +389,6 @@ class Tetris:
                 self.drop_timer.start()
         elif row == 1: # user is at bottom and hits button to go down again
             self.new_tetromino()
-
 
     def tetris_loop(self):
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)

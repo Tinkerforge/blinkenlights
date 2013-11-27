@@ -61,7 +61,7 @@ class Images:
     PORT = 4223
     UID = 'abc'
     
-    SPEED = 1000 # in ms per step
+    SPEED = 1000 # in ms per frame
 
     # Position of R, G and B pixel on LED Pixel
     R = 2

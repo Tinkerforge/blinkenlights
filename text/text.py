@@ -114,7 +114,7 @@ class ScrollingText:
     COLOR = None # = Rainbow
 #    COLOR = (255, 0, 0) # = Red 
 
-    SPEED = 40 # in ms per step
+    SPEED = 40 # in ms per frame
 
     # Position of R, G and B pixel on LED Pixel
     R = 2

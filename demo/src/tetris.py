@@ -292,7 +292,7 @@ class Tetris:
         r = []
         g = []
         b = []
-        for col in range(3, self.FIELD_ROWS-1):
+        for col in reversed(range(3, self.FIELD_ROWS-1)):
             row_range = range(1, self.FIELD_COLS-1)
             if col % 2 == 0:
                 row_range = reversed(row_range)
@@ -399,7 +399,6 @@ class Tetris:
                 self.drop_timer.start()
         elif row == 1: # user is at bottom and hits button to go down again
             self.new_tetromino()
-
 
     def tetris_loop(self):
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)

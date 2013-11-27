@@ -15,7 +15,7 @@ class Fire:
     PORT = 4223
     UID = 'abc'
     
-    SPEED = 20 # in ms per step
+    SPEED = 20 # in ms per frame
 
     HUE_FACTOR = 1.2
     RAND_VALUE_START = 64
