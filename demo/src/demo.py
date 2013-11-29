@@ -47,6 +47,7 @@ from pong_widget import PongWidget
 from fire_widget import FireWidget
 from text_widget import TextWidget
 from images_widget import ImagesWidget
+from rainbow_widget import RainbowWidget
 
 from PyQt4.QtGui import QApplication, QWidget, QErrorMessage, QGridLayout, QIcon
 from PyQt4.QtGui import QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout
@@ -122,6 +123,7 @@ class Blinkenlights(QApplication):
         self.fire = FireWidget(self.tabs, self)
         self.text = TextWidget(self.tabs, self)
         self.images = ImagesWidget(self.tabs, self)
+        self.rainbow = RainbowWidget(self.tabs, self)
 
         self.projects.append(self.setup)
         self.projects.append(self.tetris)
@@ -129,6 +131,7 @@ class Blinkenlights(QApplication):
         self.projects.append(self.fire)
         self.projects.append(self.text)
         self.projects.append(self.images)
+        self.projects.append(self.rainbow)
 
         self.tabs.addTab(self.setup, "Setup")
         self.tabs.addTab(self.tetris, "Tetris")
@@ -136,6 +139,7 @@ class Blinkenlights(QApplication):
         self.tabs.addTab(self.fire, "Fire")
         self.tabs.addTab(self.text, "Scrolling Text")
         self.tabs.addTab(self.images, "Images")
+        self.tabs.addTab(self.rainbow, "Rainbow")
 
         self.active_project = self.projects[0]
 
