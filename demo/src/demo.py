@@ -216,11 +216,11 @@ class Blinkenlights(QApplication):
                 self.setup.label_multi_touch_uid.setText(uid)
             elif device_identifier == DualButton.DEVICE_IDENTIFIER:
                 if config.UID_DUAL_BUTTON_BRICKLET[0] == None:
-                    self.UID_DUAL_BUTTON_BRICKLET = (uid, None)
+                    config.UID_DUAL_BUTTON_BRICKLET = (uid, None)
                     self.setup.label_dual_button1_found.setText('Yes')
                     self.setup.label_dual_button1_uid.setText(uid)
                 else:
-                    config.UID_DUAL_BUTTON_BRICKLET = (self.UID_DUAL_BUTTON_BRICKLET[0], uid)
+                    config.UID_DUAL_BUTTON_BRICKLET = (config.UID_DUAL_BUTTON_BRICKLET[0], uid)
                     self.setup.label_dual_button2_found.setText('Yes')
                     self.setup.label_dual_button2_uid.setText(uid)
             elif device_identifier == PiezoSpeaker.DEVICE_IDENTIFIER:
