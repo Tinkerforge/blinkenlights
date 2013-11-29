@@ -252,8 +252,8 @@ class ScrollingText:
         for col in range(len(self.text)):
             for row in range(self.LED_ROWS):
                 if self.text[col][(self.text_position+row) % len(self.text[0])] == 'X':
-                    self.leds[row][col] = (r, g, b)
+                    self.leds[row][col + 1] = (r, g, b)
                 else:
-                    self.leds[row][col] = (0, 0, 0)
+                    self.leds[row][col + 1] = (0, 0, 0)
 
         self.text_position += 1
