@@ -247,6 +247,12 @@ class Tetris:
 
         self.init_tetris()
 
+    def close(self):
+        try:
+            self.ipcon.disconnect()
+        except:
+            pass
+
     def init_tetris(self):
         self.tetromino_current = 'O'
         self.tetromino_form    = 0
@@ -427,9 +433,7 @@ class Tetris:
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
         i = 0
         while self.loop:
-            key = self.kp.read_single_keypress()
-
-            key = key.lower()
+            key = self.kp.read_single_keypress().lower()
             i += 1
             self.speaker.beep_input()
             if key == 'a':
@@ -445,4 +449,5 @@ class Tetris:
             if key == 'r':
                 self.init_tetris()
             if key == 'q':
+                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
                 return

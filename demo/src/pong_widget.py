@@ -2,6 +2,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
+Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
 
 pong_widget.py: Widget for Pong example
 
@@ -46,7 +47,7 @@ class PongWidget(QWidget, Ui_Pong):
 
     def start_pong(self):
         self.pong = Pong(self.app.ipcon)
-        if self.pong.UID != None:
+        if self.pong.okay:
             self.pong.loop()
             self.pong.timer.stop()
         self.pong = None

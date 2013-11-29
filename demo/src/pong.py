@@ -195,6 +195,13 @@ class Pong:
         self.init_pong()
 
         self.okay = True
+
+    def close(self):
+        try:
+            self.ipcon.disconnect()
+        except:
+            pass
+
     def init_pong(self):
         self.new_ball()
         self.paddle_position_y = [3, 3]
@@ -348,4 +355,5 @@ class Pong:
             if key == 'r':
                 self.init_pong()
             if key == 'q':
+                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
                 return

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-# Tetris implemented according to tetris guidline: 
+# Tetris implemented according to tetris guidline:
 # http://tetris.wikia.com/wiki/Tetris_Guideline
 
 from tinkerforge.ip_connection import IPConnection
@@ -16,7 +16,6 @@ import time
 
 import config
 
-#from Queue import Queue
 from threading import Thread
 
 from repeated_timer import RepeatedTimer
@@ -30,15 +29,15 @@ class TetrisSegmentDisplay:
               0x7f,0x6f,0x77,0x7c,
               0x39,0x5e,0x79,0x71] # // 0~9,A,b,C,d,E,F
 
-    def __init__(self, ipcon):
-        self.line_count = 0
+    line_count = 0
 
+    def __init__(self, ipcon):
         self.ipcon = ipcon
         if self.UID == None:
             print("Not Configured: Segment Display 4x7")
             return
         self.sd = SegmentDisplay4x7(self.UID, self.ipcon)
-        
+
         try:
             self.sd.get_counter_value()
             print("Found: Segment Display 4x7 ({0})").format(self.UID)
@@ -71,9 +70,9 @@ class TetrisSpeaker:
         if self.UID == None:
             print("Not Configured: Piezo Speaker")
             return
-        
+
         self.speaker = PiezoSpeaker(self.UID, self.ipcon)
-        
+
         try:
             self.speaker.get_identity()
             print("Found: Piezo Speaker ({0})").format(self.UID)
@@ -92,9 +91,13 @@ class TetrisSpeaker:
                 time.sleep(0.007)
 
     def beep_input(self):
+        if not self.speaker:
+            return
         self.speaker.beep(10, 500)
 
     def beep_delete_line(self, lines):
+        if not self.speaker:
+            return
         Thread(target=self.sirene, args=(1000*lines,)).start()
 
 
@@ -196,15 +199,17 @@ class Tetris:
     }
     game_over_position = 0
     is_game_over = False
+    loop = True
 
     def __init__(self):
         self.ipcon = IPConnection()
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
-        
+            return
+
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         self.ipcon.connect(self.HOST, self.PORT)
-        
+
         try:
             self.led_strip.get_frame_duration()
             print("Found: LED Strip ({0})").format(self.UID)
@@ -222,7 +227,13 @@ class Tetris:
                                          self.frame_rendered)
 
         self.init_tetris()
-        
+
+    def close(self):
+        try:
+            self.ipcon.disconnect()
+        except:
+            pass
+
     def init_tetris(self):
         self.tetromino_current = 'O'
         self.tetromino_form    = 0
@@ -306,7 +317,10 @@ class Tetris:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
 
     def clear_lines(self, rows_to_clear):
         self.drop_timer.stop()
@@ -325,12 +339,12 @@ class Tetris:
                 for to_clear in rows_to_clear:
                     self.playfield[to_clear] = rows_save[to_clear]
             time.sleep(0.1)
-                
+
         for to_clear in rows_to_clear:
             for row in reversed(range(1, to_clear+1)):
                 self.playfield[row] = self.playfield[row-1]
             self.playfield[1] = [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]
-                
+
         self.drop_timer.start()
 
     def check_for_line_clears(self):
@@ -393,10 +407,8 @@ class Tetris:
     def tetris_loop(self):
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
         i = 0
-        while True:
-            key = self.kp.read_single_keypress()
-
-            key = key.lower()
+        while self.loop:
+            key = self.kp.read_single_keypress().lower()
             i += 1
             self.speaker.beep_input()
             if key == 'a':
@@ -412,6 +424,7 @@ class Tetris:
             if key == 'r':
                 self.init_tetris()
             if key == 'q':
+                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
                 return
 
 if __name__ == "__main__":
@@ -420,3 +433,4 @@ if __name__ == "__main__":
         tetris.tetris_loop()
         tetris.drop_timer.stop()
         tetris.kp.kbi.restore_stdin()
+    tetris.close()

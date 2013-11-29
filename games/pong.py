@@ -158,6 +158,7 @@ class Pong:
     }
 
     write_playfield_counter = 0
+    loop = True
 
     def __init__(self):
         self.ipcon = IPConnection()
@@ -183,6 +184,12 @@ class Pong:
                                          self.frame_rendered)
 
         self.init_pong()
+
+    def close(self):
+        try:
+            self.ipcon.disconnect()
+        except:
+            pass
 
     def init_pong(self):
         self.new_ball()
@@ -224,7 +231,10 @@ class Pong:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
 
     def add_score_to_playfield(self, field):
         for col in range(5):
@@ -258,8 +268,6 @@ class Pong:
 #        self.colors[self.COLOR_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
 #        self.colors[self.COLOR_BALL_TOP] = (0, 255*dy/64, 0)
 #        self.colors[self.COLOR_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
-        
-
 
     def add_paddles_to_playfield(self, field):
         for player in range(2):
@@ -284,7 +292,6 @@ class Pong:
         if self.ball_position[1] < 0 or self.ball_position[1] >= 10:
             self.ball_direction[1] = -self.ball_direction[1]
 
-
         # Wall collision left/right
         def hit_left_right(player):
             self.speaker.beep_sirene()
@@ -299,7 +306,6 @@ class Pong:
 
         if self.ball_position[0] >= 20:
             hit_left_right(0)
-
 
         # Paddle collision
         def hit_paddle(skew):
@@ -324,9 +330,8 @@ class Pong:
     def loop(self):
         self.timer = RepeatedTimer(0.1, self.tick)
         i = 0
-        while True:
-            key = self.kp.read_single_keypress()
-            key = key.lower()
+        while self.loop:
+            key = self.kp.read_single_keypress().lower()
             i += 1
             if key == 'a':
                 self.move_paddle(0, -1)
@@ -339,6 +344,7 @@ class Pong:
             if key == 'r':
                 self.init_pong()
             if key == 'q':
+                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
                 return
 
 if __name__ == "__main__":
@@ -347,3 +353,4 @@ if __name__ == "__main__":
         pong.loop()
         pong.timer.stop()
         pong.kp.kbi.restore_stdin()
+    pong.close()
