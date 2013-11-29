@@ -222,7 +222,10 @@ class ScrollingText:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
 
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]

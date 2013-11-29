@@ -314,8 +314,10 @@ class Tetris:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
-
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
 
     def clear_lines(self, rows_to_clear):
         self.drop_timer.stop()
