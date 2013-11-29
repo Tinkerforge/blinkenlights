@@ -50,6 +50,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="radio_random">
+         <property name="text">
+          <string>Random</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QRadioButton" name="radio_color">
          <property name="text">
           <string>Color</string>

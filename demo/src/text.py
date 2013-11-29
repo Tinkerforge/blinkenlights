@@ -5,6 +5,7 @@ from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 
 import colorsys
+import random
 
 import config
 
@@ -111,11 +112,12 @@ class ScrollingText:
     HOST = 'localhost'
     PORT = 4223
     UID = 'abc'
-    
-    COLOR = None # = Rainbow
-#    COLOR = (255, 0, 0) # = Red 
 
-    SPEED = 40 # in ms per step
+    COLOR = 'rainbow'
+#    COLOR = 'random'
+#    COLOR = (255, 0, 0) # = Red
+
+    SPEED = 40 # in ms per frame
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -241,9 +243,13 @@ class ScrollingText:
 
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]
-        
-        if self.COLOR == None:
+
+        if self.COLOR == 'rainbow':
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
+            r, g, b = int(r*255), int(g*255), int(b*255)
+            self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length
+        elif self.COLOR == 'random':
+            r, g, b = colorsys.hsv_to_rgb(random.random(), 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
             self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length
         else:

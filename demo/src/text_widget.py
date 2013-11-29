@@ -43,14 +43,17 @@ class TextWidget(QWidget, Ui_Text):
         self.edit_text.textChanged.connect(self.text_changed)
         self.button_pick.pressed.connect(self.pick_pressed)
         self.radio_rainbow.pressed.connect(self.rainbow_pressed)
+        self.radio_random.pressed.connect(self.random_pressed)
         self.radio_color.pressed.connect(self.color_pressed)
-        
 
         self.update_colors()
 
     def rainbow_pressed(self):
-        self.text.COLOR = None
-        
+        self.text.COLOR = 'rainbow'
+
+    def random_pressed(self):
+        self.text.COLOR = 'random'
+
     def color_pressed(self):
         self.text.COLOR = (self.r, self.g, self.b)
 
