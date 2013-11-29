@@ -110,9 +110,9 @@ class ScrollingText:
     HOST = 'localhost'
     PORT = 4223
     UID = 'abc'
-    
+
     COLOR = None # = Rainbow
-#    COLOR = (255, 0, 0) # = Red 
+#    COLOR = (255, 0, 0) # = Red
 
     SPEED = 40 # in ms per frame
 
@@ -136,9 +136,9 @@ class ScrollingText:
     ]
 
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-    
+
     text_position = 0
-    
+
     rainbow_length = 32
     rainbow_index = 0
 
@@ -146,7 +146,7 @@ class ScrollingText:
         text_to_display = '   Starter Kit: Blinkenlights'
         if len(sys.argv) > 1:
             text_to_display = '   ' + ' '.join(sys.argv[1:])
-        
+
         table = {}
         for form in letterforms:
             if '|' in form:
@@ -154,31 +154,34 @@ class ScrollingText:
         rows = len(table.values()[0])
 
         self.text = ['','','','','','','']
-            
-            
+
         for row in range(rows):
             for c in text_to_display:
                 try:
                     self.text[row] += table[c][row]
                 except:
                     self.text[row] += ' '
-        
+
+        self.okay = False
         self.ipcon = IPConnection()
+
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
-        
+            return
+
         self.led_strip = LEDStrip(self.UID, self.ipcon)
         self.ipcon.connect(self.HOST, self.PORT)
-        
+
         try:
             self.led_strip.get_frame_duration()
             print("Found: LED Strip ({0})").format(self.UID)
         except:
             print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
             return
 
-        self.led_strip.set_frame_duration(self.SPEED)
+        self.okay = True
+
+        self.update_speed()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
@@ -188,11 +191,20 @@ class ScrollingText:
         except:
             pass
 
+    def update_speed(self):
+        if not self.okay:
+            return
+
+        self.led_strip.set_frame_duration(self.SPEED)
+
     def frame_rendered(self, _):
         self.frame_upload()
         self.frame_prepare_next()
-        
+
     def frame_upload(self):
+        if not self.okay:
+            return
+
         r = []
         g = []
         b = []
@@ -218,11 +230,14 @@ class ScrollingText:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
 
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]
-        
+
         if self.COLOR == None:
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
@@ -242,7 +257,7 @@ class ScrollingText:
 if __name__ == "__main__":
     st = ScrollingText()
     st.frame_rendered(0)
-    
+
     raw_input('Press enter to exit\n') # Use input() in Python 3
 
     st.close()
