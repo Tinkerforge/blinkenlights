@@ -85,8 +85,10 @@ class Images:
     image_position = 0
     
     def __init__(self, ipcon):
+        self.okay = False
         self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
+
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
             return
@@ -98,8 +100,9 @@ class Images:
             print("Found: LED Strip ({0})").format(self.UID)
         except:
             print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
             return
+
+        self.okay = True
 
         self.update_speed()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
@@ -115,9 +118,15 @@ class Images:
         self.image_position = 0
 
     def update_speed(self):
+        if not self.okay:
+            return
+
         self.led_strip.set_frame_duration(self.SPEED)
 
     def stop_rendering(self):
+        if not self.okay:
+            return
+
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          None)
 
@@ -126,6 +135,9 @@ class Images:
         self.frame_prepare_next()
         
     def frame_upload(self):
+        if not self.okay:
+            return
+
         r = []
         g = []
         b = []

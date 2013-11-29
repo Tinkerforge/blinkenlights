@@ -25,8 +25,8 @@ class Fire:
 
     LED_ROWS = 20
     LED_COLS = 10
-    
-    
+
+
     values = [
         [32,  16,  0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 ],
         [64,  32,  16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 , 64 ],
@@ -39,7 +39,7 @@ class Fire:
         [255, 255, 255, 255, 192, 192, 160, 160, 128, 96 , 96 , 128, 160, 160, 192, 192, 255, 255, 255, 255],
         [255, 255, 255, 255, 255, 255, 192, 192, 160, 128, 128, 160, 192, 192, 255, 255, 255, 255, 255, 255]
     ]
-    
+
     hues = [
         [1, 3, 4, 5, 7, 8, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 6, 4, 3, 1],
         [1, 2, 3, 3, 5, 6, 7, 7, 8, 8, 8, 8, 9, 9, 8, 7, 5, 3, 2, 1],
@@ -52,7 +52,7 @@ class Fire:
         [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
-    
+
 
 #    values = [
 #        [32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 ],
@@ -66,7 +66,7 @@ class Fire:
 #        [255, 255, 192, 160, 128, 128, 160, 192, 255, 255],
 #        [255, 255, 255, 192, 160, 160, 192, 255, 255, 255]
 #    ]
-    
+
 #    hues = [
 #        [1, 4, 7, 9, 9, 9, 9, 8, 4, 1],
 #        [1, 3, 5, 7, 8, 8, 9, 7, 3, 1],
@@ -77,48 +77,61 @@ class Fire:
 #        [0, 0, 1, 2, 2, 2, 2, 1, 0, 0],
 #        [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
 #        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-#        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 
+#        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 #    ]
-    
+
     line = [0]*LED_ROWS
     matrix = [x[:] for x in [[0]*LED_COLS]*LED_ROWS]
 
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-    
+
     percent = 0
 
     def __init__(self, ipcon):
+        self.okay = False
         self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
+
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
             return
-        
+
         self.led_strip = LEDStrip(self.UID, self.ipcon)
-        
+
         try:
             self.led_strip.get_frame_duration()
             print("Found: LED Strip ({0})").format(self.UID)
         except:
             print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
             return
+
+        self.okay = True
+
         self.update_speed()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
-        
+
     def stop_rendering(self):
+        if not self.okay:
+            return
+
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          None)
-        
+
     def update_speed(self):
+        if not self.okay:
+            return
+
         self.led_strip.set_frame_duration(self.SPEED)
 
     def frame_rendered(self, _):
         self.frame_upload()
         self.frame_prepare_next()
-        
+
     def frame_upload(self):
+        if not self.okay:
+            return
+
         r = []
         g = []
         b = []
@@ -153,36 +166,35 @@ class Fire:
         def shift_up():
             for y in reversed(range(1, self.LED_COLS)):
                 for x in range(self.LED_ROWS):
-                    self.matrix[x][y] = self.matrix[x][y-1]  
-                    
+                    self.matrix[x][y] = self.matrix[x][y-1]
+
             for x in range(self.LED_ROWS):
                 self.matrix[x][0] = self.line[x]
-                
+
         def generate_line():
             for x in range(self.LED_ROWS):
                 self.line[x] = random.randint(min(self.RAND_VALUE_START, self.RAND_VALUE_END), self.RAND_VALUE_END)
-        
+
         def make_frame():
             def hsv_to_rgb(h, s, v):
                 r, g, b = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
                 return ((int(255*r), int(255*g), int(255*b)))
-                
-                
+
             for y in reversed(range(1, self.LED_COLS)):
                 for x in range(self.LED_ROWS):
-                    self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR, 
+                    self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR,
                                                    255,
                                                    max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
-                    
+
             for x in range(self.LED_ROWS):
                 self.leds[x][self.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*self.HUE_FACTOR,
                                              255,
                                              max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
-        
+
         self.percent += 20
         if self.percent >= 100:
             shift_up()
             generate_line()
             self.percent = 0
-            
+
         make_frame()

@@ -137,9 +137,9 @@ class ScrollingText:
     ]
 
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-    
+
     text_position = 0
-    
+
     rainbow_length = 32
     rainbow_index = 0
 
@@ -149,54 +149,66 @@ class ScrollingText:
             if '|' in form:
                 self.table[form[-2]] = form[:-3].split('|')
         self.rows = len(self.table.values()[0])
-        
+
         self.new_text('Starter Kit: Blinkenlights')
-        
+
+        self.okay = False
         self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
+
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
             return
-        
+
         self.led_strip = LEDStrip(self.UID, self.ipcon)
-        
+
         try:
             self.led_strip.get_frame_duration()
             print("Found: LED Strip ({0})").format(self.UID)
         except:
             print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
             return
+
+        self.okay = True
 
         self.update_speed()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
     def stop_rendering(self):
+        if not self.okay:
+            return
+
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          None)
 
     def new_text(self, text_to_display):
         text_to_display = '   ' + text_to_display
         self.text = ['','','','','','','']
-            
+
         for row in range(self.rows):
             for c in text_to_display:
                 try:
                     self.text[row] += self.table[c][row]
                 except:
                     self.text[row] += ' '
-                    
+
         self.text_position = 0
 
     def update_speed(self):
+        if not self.okay:
+            return
+
         self.led_strip.set_frame_duration(self.SPEED)
 
     def frame_rendered(self, _):
         self.frame_upload()
         self.frame_prepare_next()
-        
+
     def frame_upload(self):
+        if not self.okay:
+            return
+
         r = []
         g = []
         b = []

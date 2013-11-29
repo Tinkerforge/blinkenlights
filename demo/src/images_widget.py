@@ -2,8 +2,9 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
+Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
 
-tetris_widget.py: Widget for Tetris example
+images_widget.py: Widget for images example
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License 
@@ -43,7 +44,7 @@ class ImagesWidget(QWidget, Ui_Images):
         self.button_show.pressed.connect(self.show_pressed)
          
     def show_pressed(self):
-        if self.images.UID != None:
+        if self.images.okay:
             new_images = unicode(self.text_edit_files.toPlainText()).split('\n')
             self.images.new_images(new_images)
             self.images.frame_prepare_next()
@@ -66,16 +67,15 @@ class ImagesWidget(QWidget, Ui_Images):
          
     def slider_speed_changed(self, speed):
         self.spinbox_speed.setValue(speed)
-        if self.images.UID != None:
+        if self.images.okay:
             self.images.SPEED = speed 
             self.images.update_speed()
 
     def start(self):
         self.images = Images(self.app.ipcon)
-        if self.images.UID != None:
-            self.default_values()
-            self.images.frame_rendered(0)
+        self.default_values()
+        self.images.frame_rendered(0)
     
     def stop(self):
-        if self.images.UID != None:
-            self.images.stop_rendering()
+        self.images.stop_rendering()
+        self.images = None

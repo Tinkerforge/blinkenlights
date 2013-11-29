@@ -21,24 +21,29 @@ from keypress import KeyPress
 
 class PongSpeaker:
     def __init__(self, ipcon):
+        self.okay = False
         self.UID = config.UID_PIEZO_SPEAKER_BRICKLET
         self.ipcon = ipcon
+
         if self.UID == None:
-            self.speaker = None
             print("Not Configured: Piezo Speaker")
             return
-        
+
         self.speaker = PiezoSpeaker(self.UID, self.ipcon)
-        
+
         try:
             self.speaker.get_identity()
             print("Found: Piezo Speaker ({0})").format(self.UID)
         except:
             print("Not Found: Piezo Speaker ({0})").format(self.UID)
-            self.UID = None
             return
 
+        self.okay = True
+
     def sirene(self, freq):
+        if not self.okay:
+            return
+
         for j in range(2):
             for i in range(25):
                 self.speaker.beep(10, freq + i*20)
@@ -48,12 +53,16 @@ class PongSpeaker:
                 time.sleep(0.007)
 
     def beep_paddle_hit(self):
-        if self.speaker != None:
-            self.speaker.beep(100, 500)
+        if not self.okay:
+            return
+
+        self.speaker.beep(100, 500)
 
     def beep_sirene(self):
-        if self.speaker != None:
-            Thread(target=self.sirene, args=(1000,)).start()
+        if not self.okay:
+            return
+
+        Thread(target=self.sirene, args=(1000,)).start()
 
 
 class Pong:
@@ -66,7 +75,7 @@ class Pong:
     BALL_COLOR = 4
 
     score = [0, 0]
-    
+
     paddle_size = 3
     paddle_position_x = [4, 15]
     paddle_position_y = [3, 3]
@@ -94,9 +103,9 @@ class Pong:
         (0,   0,   255), # blue
         (255, 0,   150), # violet
         (255, 0,   40),  # purple
-        (0, 0, 0),       # ball top 
-        (0, 0, 0),       # ball left 
-        (0, 0, 0),       # ball right 
+        (0, 0, 0),       # ball top
+        (0, 0, 0),       # ball left
+        (0, 0, 0),       # ball right
         (0, 0, 0)        # ball bottom
     ]
 
@@ -156,24 +165,24 @@ class Pong:
     }
 
     write_playfield_counter = 0
-    
     loop = True
 
     def __init__(self, ipcon):
+        self.okay = False
         self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
+
         if self.UID == None:
             print("Not Configured: LED Strip (required)")
             return
-        
+
         self.led_strip = LEDStrip(self.UID, self.ipcon)
-        
+
         try:
             self.led_strip.get_frame_duration()
             print("Found: LED Strip ({0})").format(self.UID)
         except:
             print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
             return
 
         self.kp = KeyPress(self.ipcon)
@@ -185,6 +194,7 @@ class Pong:
 
         self.init_pong()
 
+        self.okay = True
     def init_pong(self):
         self.new_ball()
         self.paddle_position_y = [3, 3]
@@ -262,8 +272,6 @@ class Pong:
 #        self.colors[self.COLOR_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
 #        self.colors[self.COLOR_BALL_TOP] = (0, 255*dy/64, 0)
 #        self.colors[self.COLOR_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
-        
-
 
     def add_paddles_to_playfield(self, field):
         for player in range(2):
@@ -288,7 +296,6 @@ class Pong:
         if self.ball_position[1] < 0 or self.ball_position[1] >= 10:
             self.ball_direction[1] = -self.ball_direction[1]
 
-
         # Wall collision left/right
         def hit_left_right(player):
             self.speaker.beep_sirene()
@@ -303,7 +310,6 @@ class Pong:
 
         if self.ball_position[0] >= 20:
             hit_left_right(0)
-
 
         # Paddle collision
         def hit_paddle(skew):
@@ -329,8 +335,7 @@ class Pong:
         self.timer = RepeatedTimer(0.1, self.tick)
         i = 0
         while self.loop:
-            key = self.kp.read_single_keypress()
-            key = key.lower()
+            key = self.kp.read_single_keypress().lower()
             i += 1
             if key == 'a':
                 self.move_paddle(0, -1)
