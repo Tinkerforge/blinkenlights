@@ -12,31 +12,34 @@ import random
 import config
 
 class Fire:
-    SPEED = 20 # in ms per step
+    ### Fire Parameters: Begin ###
 
-    HUE_FACTOR = 1.2
-    RAND_VALUE_START = 64
-    RAND_VALUE_END   = 255
+    FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
+    HUE_FACTOR = 1.2 # vaild range: 0.1 - 5.0
+    RAND_VALUE_START = 64 # vaild range: 0 - 255
+    RAND_VALUE_END = 255 # vaild range: 1 - 255
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
     G = 1
     B = 0
 
+    # Size of LED Pixel matrix
     LED_ROWS = 20
     LED_COLS = 10
 
+    #### Fire Parameters: End ####
 
     values = [
-        [32,  16,  0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 ],
-        [64,  32,  16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 , 64 ],
-        [96,  64,  32 , 32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 96 ],
-        [128, 96,  64 , 64 , 32 , 32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 64 , 96 , 128],
-        [160, 128, 96 , 96 , 64 , 64 , 32 , 32 , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 64 , 96 , 96 , 128, 160],
-        [192, 160, 128, 128, 96 , 96 , 64 , 64 , 32 , 0  , 0  , 32 , 64 , 64 , 96 , 96 , 128, 128, 160, 192],
-        [255, 192, 160, 160, 128, 128, 96 , 96 , 64 , 32 , 32 , 64 , 96 , 96 , 128, 128, 160, 160, 192, 255],
-        [255, 255, 192, 192, 160, 160, 128, 128, 96 , 64 , 64 , 96 , 128, 128, 160, 160, 192, 192, 255, 255],
-        [255, 255, 255, 255, 192, 192, 160, 160, 128, 96 , 96 , 128, 160, 160, 192, 192, 255, 255, 255, 255],
+        [ 32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32],
+        [ 64,  32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32,  64],
+        [ 96,  64,  32,  32,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  32,  32,  64,  96],
+        [128,  96,  64,  64,  32,  32,   0,   0,   0,   0,   0,   0,   0,   0,  32,  32,  64,  64,  96, 128],
+        [160, 128,  96,  96,  64,  64,  32,  32,   0,   0,   0,   0,  32,  32,  64,  64,  96,  96, 128, 160],
+        [192, 160, 128, 128,  96,  96,  64,  64,  32,   0,   0,  32,  64,  64,  96,  96, 128, 128, 160, 192],
+        [255, 192, 160, 160, 128, 128,  96,  96,  64,  32,  32,  64,  96,  96, 128, 128, 160, 160, 192, 255],
+        [255, 255, 192, 192, 160, 160, 128, 128,  96,  64,  64,  96, 128, 128, 160, 160, 192, 192, 255, 255],
+        [255, 255, 255, 255, 192, 192, 160, 160, 128,  96,  96, 128, 160, 160, 192, 192, 255, 255, 255, 255],
         [255, 255, 255, 255, 255, 255, 192, 192, 160, 128, 128, 160, 192, 192, 255, 255, 255, 255, 255, 255]
     ]
 
@@ -52,7 +55,6 @@ class Fire:
         [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
-
 
 #    values = [
 #        [32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 ],
@@ -82,32 +84,29 @@ class Fire:
 
     line = [0]*LED_ROWS
     matrix = [x[:] for x in [[0]*LED_COLS]*LED_ROWS]
-
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-
     percent = 0
 
     def __init__(self, ipcon):
         self.okay = False
-        self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
 
-        if self.UID == None:
-            print("Not Configured: LED Strip (required)")
+        if not config.UID_LED_STRIP_BRICKLET:
+            print('Not Configured: LED Strip (required)')
             return
 
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
+            print('Found: LED Strip ({0})').format(config.UID_LED_STRIP_BRICKLET)
         except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
+            print('Not Found: LED Strip ({0})').format(config.UID_LED_STRIP_BRICKLET)
             return
 
         self.okay = True
 
-        self.update_speed()
+        self.update_frame_rate()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
@@ -118,11 +117,11 @@ class Fire:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          None)
 
-    def update_speed(self):
+    def update_frame_rate(self):
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(self.SPEED)
+        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
 
     def frame_rendered(self, _):
         self.frame_upload()
@@ -183,13 +182,13 @@ class Fire:
             for y in reversed(range(1, self.LED_COLS)):
                 for x in range(self.LED_ROWS):
                     self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR,
-                                                   255,
-                                                   max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
+                                                                 255,
+                                                                 max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
 
             for x in range(self.LED_ROWS):
                 self.leds[x][self.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*self.HUE_FACTOR,
-                                             255,
-                                             max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
+                                                           255,
+                                                           max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
 
         self.percent += 20
         if self.percent >= 100:
@@ -198,3 +197,15 @@ class Fire:
             self.percent = 0
 
         make_frame()
+
+
+if __name__ == "__main__":
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    fire = Fire(ipcon)
+    fire.frame_rendered(0)
+
+    raw_input('Press enter to exit\n') # Use input() in Python 3
+
+    ipcon.disconnect()

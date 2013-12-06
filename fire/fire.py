@@ -7,42 +7,42 @@ from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 
 import colorsys
-import sys
 import random
 
-class Fire:
-    HOST = 'localhost'
-    PORT = 4223
-    UID = 'abc'
-    
-    SPEED = 20 # in ms per frame
+import config
 
-    HUE_FACTOR = 1.2
-    RAND_VALUE_START = 64
-    RAND_VALUE_END   = 255
+class Fire:
+    ### Fire Parameters: Begin ###
+
+    FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
+    HUE_FACTOR = 1.2 # vaild range: 0.1 - 5.0
+    RAND_VALUE_START = 64 # vaild range: 0 - 255
+    RAND_VALUE_END = 255 # vaild range: 1 - 255
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
     G = 1
     B = 0
 
+    # Size of LED Pixel matrix
     LED_ROWS = 20
     LED_COLS = 10
-    
-    
+
+    #### Fire Parameters: End ####
+
     values = [
-        [32,  16,  0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 ],
-        [64,  32,  16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 16 , 32 , 64 ],
-        [96,  64,  32 , 32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 96 ],
-        [128, 96,  64 , 64 , 32 , 32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 64 , 96 , 128],
-        [160, 128, 96 , 96 , 64 , 64 , 32 , 32 , 0  , 0  , 0  , 0  , 32 , 32 , 64 , 64 , 96 , 96 , 128, 160],
-        [192, 160, 128, 128, 96 , 96 , 64 , 64 , 32 , 0  , 0  , 32 , 64 , 64 , 96 , 96 , 128, 128, 160, 192],
-        [255, 192, 160, 160, 128, 128, 96 , 96 , 64 , 32 , 32 , 64 , 96 , 96 , 128, 128, 160, 160, 192, 255],
-        [255, 255, 192, 192, 160, 160, 128, 128, 96 , 64 , 64 , 96 , 128, 128, 160, 160, 192, 192, 255, 255],
-        [255, 255, 255, 255, 192, 192, 160, 160, 128, 96 , 96 , 128, 160, 160, 192, 192, 255, 255, 255, 255],
+        [ 32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32],
+        [ 64,  32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32,  64],
+        [ 96,  64,  32,  32,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  32,  32,  64,  96],
+        [128,  96,  64,  64,  32,  32,   0,   0,   0,   0,   0,   0,   0,   0,  32,  32,  64,  64,  96, 128],
+        [160, 128,  96,  96,  64,  64,  32,  32,   0,   0,   0,   0,  32,  32,  64,  64,  96,  96, 128, 160],
+        [192, 160, 128, 128,  96,  96,  64,  64,  32,   0,   0,  32,  64,  64,  96,  96, 128, 128, 160, 192],
+        [255, 192, 160, 160, 128, 128,  96,  96,  64,  32,  32,  64,  96,  96, 128, 128, 160, 160, 192, 255],
+        [255, 255, 192, 192, 160, 160, 128, 128,  96,  64,  64,  96, 128, 128, 160, 160, 192, 192, 255, 255],
+        [255, 255, 255, 255, 192, 192, 160, 160, 128,  96,  96, 128, 160, 160, 192, 192, 255, 255, 255, 255],
         [255, 255, 255, 255, 255, 255, 192, 192, 160, 128, 128, 160, 192, 192, 255, 255, 255, 255, 255, 255]
     ]
-    
+
     hues = [
         [1, 3, 4, 5, 7, 8, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 6, 4, 3, 1],
         [1, 2, 3, 3, 5, 6, 7, 7, 8, 8, 8, 8, 9, 9, 8, 7, 5, 3, 2, 1],
@@ -55,7 +55,6 @@ class Fire:
         [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
-    
 
 #    values = [
 #        [32 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 32 ],
@@ -69,7 +68,7 @@ class Fire:
 #        [255, 255, 192, 160, 128, 128, 160, 192, 255, 255],
 #        [255, 255, 255, 192, 160, 160, 192, 255, 255, 255]
 #    ]
-    
+
 #    hues = [
 #        [1, 4, 7, 9, 9, 9, 9, 8, 4, 1],
 #        [1, 3, 5, 7, 8, 8, 9, 7, 3, 1],
@@ -80,47 +79,58 @@ class Fire:
 #        [0, 0, 1, 2, 2, 2, 2, 1, 0, 0],
 #        [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
 #        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-#        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 
+#        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 #    ]
-    
+
     line = [0]*LED_ROWS
     matrix = [x[:] for x in [[0]*LED_COLS]*LED_ROWS]
-
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-    
     percent = 0
 
-    def __init__(self):
-        self.ipcon = IPConnection()
-        if self.UID == None:
-            print("Not Configured: LED Strip (required)")
-        
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
-        self.ipcon.connect(self.HOST, self.PORT)
-        
-        try:
-            self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
-        except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
+    def __init__(self, ipcon):
+        self.okay = False
+        self.ipcon = ipcon
+
+        if not config.UID_LED_STRIP_BRICKLET:
+            print('Not Configured: LED Strip (required)')
             return
 
-        self.led_strip.set_frame_duration(self.SPEED)
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+
+        try:
+            self.led_strip.get_frame_duration()
+            print('Found: LED Strip ({0})').format(config.UID_LED_STRIP_BRICKLET)
+        except:
+            print('Not Found: LED Strip ({0})').format(config.UID_LED_STRIP_BRICKLET)
+            return
+
+        self.okay = True
+
+        self.update_frame_rate()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
-    def close(self):
-        try:
-            self.ipcon.disconnect()
-        except:
-            pass
+    def stop_rendering(self):
+        if not self.okay:
+            return
+
+        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
+                                         None)
+
+    def update_frame_rate(self):
+        if not self.okay:
+            return
+
+        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
 
     def frame_rendered(self, _):
         self.frame_upload()
         self.frame_prepare_next()
-        
+
     def frame_upload(self):
+        if not self.okay:
+            return
+
         r = []
         g = []
         b = []
@@ -146,50 +156,56 @@ class Fire:
             g_chunk[i].extend([0]*(16-len(g_chunk[i])))
             b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
-        
+            try:
+                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+            except:
+                break
+
     def frame_prepare_next(self):
         def shift_up():
             for y in reversed(range(1, self.LED_COLS)):
                 for x in range(self.LED_ROWS):
-                    self.matrix[x][y] = self.matrix[x][y-1]  
-                    
+                    self.matrix[x][y] = self.matrix[x][y-1]
+
             for x in range(self.LED_ROWS):
                 self.matrix[x][0] = self.line[x]
-                
+
         def generate_line():
             for x in range(self.LED_ROWS):
-                self.line[x] = random.randint(self.RAND_VALUE_START, self.RAND_VALUE_END)
-        
+                self.line[x] = random.randint(min(self.RAND_VALUE_START, self.RAND_VALUE_END), self.RAND_VALUE_END)
+
         def make_frame():
             def hsv_to_rgb(h, s, v):
                 r, g, b = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
                 return ((int(255*r), int(255*g), int(255*b)))
-                
-                
+
             for y in reversed(range(1, self.LED_COLS)):
                 for x in range(self.LED_ROWS):
-                    self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR, 
-                                                   255,
-                                                   max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
-                    
+                    self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR,
+                                                                 255,
+                                                                 max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
+
             for x in range(self.LED_ROWS):
                 self.leds[x][self.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*self.HUE_FACTOR,
-                                             255,
-                                             max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
-        
+                                                           255,
+                                                           max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
+
         self.percent += 20
         if self.percent >= 100:
             shift_up()
             generate_line()
             self.percent = 0
-            
+
         make_frame()
-        
+
+
 if __name__ == "__main__":
-    fire = Fire()
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    fire = Fire(ipcon)
     fire.frame_rendered(0)
-    
+
     raw_input('Press enter to exit\n') # Use input() in Python 3
 
-    fire.close()
+    ipcon.disconnect()
