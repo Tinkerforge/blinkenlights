@@ -4,8 +4,10 @@
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 
-import colorsys
 import sys
+import colorsys
+
+import config
 
 letterforms = '''\
        |       |       |       |       |       |       | |
@@ -107,14 +109,11 @@ X      | X     |  X    |   X   |    X  |     X |      X|\|
 
 
 class ScrollingText:
-    HOST = 'localhost'
-    PORT = 4223
-    UID = 'abc'
+    ### ScrollingText Parameters: Begin ###
 
-    COLOR = None # = Rainbow
-#    COLOR = (255, 0, 0) # = Red
-
-    SPEED = 40 # in ms per frame
+    FRAME_RATE = 25 # in Hz, vaild range: 10 - 100
+    COLOR = None # = rainbow
+#    COLOR = (255, 0, 0) # = red
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -123,6 +122,8 @@ class ScrollingText:
 
     LED_ROWS = 20
     LED_COLS = 10
+
+    #### ScrollingText Parameters: End ####
 
     colors = [
         (10,  10,  10),  # grey
@@ -134,68 +135,67 @@ class ScrollingText:
         (255, 0,   150), # violet
         (255, 0,   40),  # purple
     ]
-
     leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
-
     text_position = 0
-
     rainbow_length = 32
     rainbow_index = 0
 
-    def __init__(self):
-        text_to_display = '   Starter Kit: Blinkenlights'
-        if len(sys.argv) > 1:
-            text_to_display = '   ' + ' '.join(sys.argv[1:])
-
-        table = {}
+    def __init__(self, ipcon):
+        self.table = {}
         for form in letterforms:
             if '|' in form:
-                table[form[-2]] = form[:-3].split('|')
-        rows = len(table.values()[0])
+                self.table[form[-2]] = form[:-3].split('|')
+        self.rows = len(self.table.values()[0])
 
-        self.text = ['','','','','','','']
-
-        for row in range(rows):
-            for c in text_to_display:
-                try:
-                    self.text[row] += table[c][row]
-                except:
-                    self.text[row] += ' '
+        self.new_text('Starter Kit: Blinkenlights')
 
         self.okay = False
-        self.ipcon = IPConnection()
+        self.ipcon = ipcon
 
-        if self.UID == None:
+        if config.UID_LED_STRIP_BRICKLET is None:
             print("Not Configured: LED Strip (required)")
             return
 
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
-        self.ipcon.connect(self.HOST, self.PORT)
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
+            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
         except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
+            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
             return
 
         self.okay = True
 
-        self.update_speed()
+        self.update_frame_rate()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
-    def close(self):
-        try:
-            self.ipcon.disconnect()
-        except:
-            pass
-
-    def update_speed(self):
+    def stop_rendering(self):
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(self.SPEED)
+        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
+                                         None)
+
+    def update_frame_rate(self):
+        if not self.okay:
+            return
+
+        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
+
+    def new_text(self, text_to_display):
+        text_to_display = '   ' + text_to_display
+        self.text = ['','','','','','','']
+
+        for row in range(self.rows):
+            for c in text_to_display:
+                try:
+                    self.text[row] += self.table[c][row]
+                except:
+                    self.text[row] += ' '
+
+        self.text_position = 0
 
     def frame_rendered(self, _):
         self.frame_upload()
@@ -238,7 +238,7 @@ class ScrollingText:
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]
 
-        if self.COLOR == None:
+        if self.COLOR is None:
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
             self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length
@@ -254,10 +254,18 @@ class ScrollingText:
 
         self.text_position += 1
 
+
 if __name__ == "__main__":
-    st = ScrollingText()
-    st.frame_rendered(0)
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    text = ScrollingText(ipcon)
+
+    if len(sys.argv) > 1:
+        text.new_text(' '.join(sys.argv[1:]))
+
+    text.frame_rendered(0)
 
     raw_input('Press enter to exit\n') # Use input() in Python 3
 
-    st.close()
+    ipcon.disconnect()
