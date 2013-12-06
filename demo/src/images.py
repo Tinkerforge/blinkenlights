@@ -4,7 +4,6 @@
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 
-import traceback
 import sys
 
 import config
@@ -126,10 +125,7 @@ class Images:
     def new_images(self, image_urls):
         self.files = []
         for url in image_urls:
-            try:
-                self.files.append(ImageLoader(url))
-            except:
-                traceback.print_exc()
+            self.files.append(ImageLoader(url))
         self.image_position = 0
 
     def frame_rendered(self, _):

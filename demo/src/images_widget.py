@@ -22,11 +22,13 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 
-from PyQt4.QtGui import QWidget, QFileDialog
+from PyQt4.QtGui import QWidget, QFileDialog, QErrorMessage
 from PyQt4.QtCore import QDir, QTimer
 from ui_images import Ui_Images
 
 from images import Images
+
+import config
 
 class ImagesWidget(QWidget, Ui_Images):
     images = None
@@ -36,6 +38,9 @@ class ImagesWidget(QWidget, Ui_Images):
         self.app = app
 
         self.setupUi(self)
+
+        self.error_msg = QErrorMessage()
+        self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)
 
         self.slider_frame_rate.valueChanged.connect(self.slider_frame_rate_changed)
         self.spinbox_frame_rate.valueChanged.connect(self.spinbox_frame_rate_changed)
@@ -68,10 +73,18 @@ class ImagesWidget(QWidget, Ui_Images):
 
     def show_pressed(self):
         if self.images:
-            new_images = unicode(self.text_edit_files.toPlainText()).split('\n')
-            self.images.new_images(new_images)
-            self.images.frame_prepare_next()
-            self.images.frame_rendered(0)
+            files = unicode(self.text_edit_files.toPlainText()).strip()
+
+            if len(files) > 0:
+                new_images = files.split('\n')
+
+                try:
+                    self.images.new_images(new_images)
+                except Exception as e:
+                    self.error_msg.showMessage(str(e))
+
+                self.images.frame_prepare_next()
+                self.images.frame_rendered(0)
 
     def choose_pressed(self):
         dialog = QFileDialog()
