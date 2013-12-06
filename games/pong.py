@@ -20,25 +20,29 @@ from repeated_timer import RepeatedTimer
 from keypress import KeyPress
 
 class PongSpeaker:
-    UID = config.UID_PIEZO_SPEAKER_BRICKLET
-
     def __init__(self, ipcon):
+        self.okay = False
         self.ipcon = ipcon
-        if self.UID == None:
+
+        if not config.UID_PIEZO_SPEAKER_BRICKLET:
             print("Not Configured: Piezo Speaker")
             return
-        
-        self.speaker = PiezoSpeaker(self.UID, self.ipcon)
-        
+
+        self.speaker = PiezoSpeaker(config.UID_PIEZO_SPEAKER_BRICKLET, self.ipcon)
+
         try:
             self.speaker.get_identity()
-            print("Found: Piezo Speaker ({0})").format(self.UID)
+            print("Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
         except:
-            print("Not Found: Piezo Speaker ({0})").format(self.UID)
-            self.UID = None
+            print("Not Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
             return
 
+        self.okay = True
+
     def sirene(self, freq):
+        if not self.okay:
+            return
+
         for j in range(2):
             for i in range(25):
                 self.speaker.beep(10, freq + i*20)
@@ -48,16 +52,20 @@ class PongSpeaker:
                 time.sleep(0.007)
 
     def beep_paddle_hit(self):
+        if not self.okay:
+            return
+
         self.speaker.beep(100, 500)
 
     def beep_sirene(self):
+        if not self.okay:
+            return
+
         Thread(target=self.sirene, args=(1000,)).start()
 
 
 class Pong:
-    HOST = config.HOST
-    PORT = config.PORT
-    UID = config.UID_LED_STRIP_BRICKLET
+    ### Pong Parameters: Begin ###
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -67,17 +75,19 @@ class Pong:
     PLAYER_COLOR = (1, 5)
     BALL_COLOR = 4
 
+    FIELD_ROWS = 20 # 20 rows in playfield
+    FIELD_COLS = 10 # 10 columns in playfield
+
+    #### Pong Parameters: End ####
+
     score = [0, 0]
-    
+
     paddle_size = 3
     paddle_position_x = [4, 15]
     paddle_position_y = [3, 3]
 
     ball_position = [10, 5]
     ball_direction = [0.1, 0.2]
-
-    FIELD_ROWS = 20 # 20 rows in playfield
-    FIELD_COLS = 10 # 10 columns in playfield
 
     timer = None
 
@@ -87,19 +97,19 @@ class Pong:
     COLOR_BALL_BOTTOM = 11
 
     colors = [
-        (0,   0,   0),  # off
-#        (10,  10,  10),  # grey
-        (255, 0,   0),   # red
-        (255, 80,  0),   # orange
-        (255, 255, 0),   # yellow
-        (0,   255, 0),   # green
-        (0,   0,   255), # blue
-        (255, 0,   150), # violet
-        (255, 0,   40),  # purple
-        (0, 0, 0),       # ball top 
-        (0, 0, 0),       # ball left 
-        (0, 0, 0),       # ball right 
-        (0, 0, 0)        # ball bottom
+        (  0,   0,   0), # off
+#       ( 10,  10,  10), # grey
+        (255,   0,   0), # red
+        (255,  80,   0), # orange
+        (255, 255,   0), # yellow
+        (  0, 255,   0), # green
+        (  0,   0, 255), # blue
+        (255,   0, 150), # violet
+        (255,   0,  40), # purple
+        (  0,   0,   0), # ball top
+        (  0,   0,   0), # ball left
+        (  0,   0,   0), # ball right
+        (  0,   0,   0)  # ball bottom
     ]
 
     playfield = [x[:] for x in [[0]*FIELD_COLS]*FIELD_ROWS]
@@ -160,20 +170,21 @@ class Pong:
     write_playfield_counter = 0
     loop = True
 
-    def __init__(self):
-        self.ipcon = IPConnection()
-        if self.UID == None:
+    def __init__(self, ipcon):
+        self.okay = False
+        self.ipcon = ipcon
+
+        if not config.UID_LED_STRIP_BRICKLET:
             print("Not Configured: LED Strip (required)")
-        
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
-        self.ipcon.connect(self.HOST, self.PORT)
-        
+            return
+
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
+            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
         except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
+            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
             return
 
         self.kp = KeyPress(self.ipcon)
@@ -185,11 +196,7 @@ class Pong:
 
         self.init_pong()
 
-    def close(self):
-        try:
-            self.ipcon.disconnect()
-        except:
-            pass
+        self.okay = True
 
     def init_pong(self):
         self.new_ball()
@@ -347,10 +354,18 @@ class Pong:
                 self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
                 return
 
+
 if __name__ == "__main__":
-    pong = Pong()
-    if pong.UID != None:
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    pong = Pong(ipcon)
+
+    if pong.okay:
+        print('Press q to exit')
+
         pong.loop()
         pong.timer.stop()
         pong.kp.kbi.restore_stdin()
-    pong.close()
+
+    ipcon.disconnect()
