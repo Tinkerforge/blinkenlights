@@ -7,8 +7,8 @@ Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
 images_widget.py: Widget for images example
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License 
-as published by the Free Software Foundation; either version 2 
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -23,59 +23,72 @@ Boston, MA 02111-1307, USA.
 """
 
 from PyQt4.QtGui import QWidget, QFileDialog
-from PyQt4.QtCore import QDir
+from PyQt4.QtCore import QDir, QTimer
 from ui_images import Ui_Images
 
 from images import Images
 
 class ImagesWidget(QWidget, Ui_Images):
     images = None
-    thread = None
-    
+
     def __init__(self, parent, app):
         super(QWidget, self).__init__()
         self.app = app
-        
+
         self.setupUi(self)
-        
-        self.slider_speed.valueChanged.connect(self.slider_speed_changed)
-        self.spinbox_speed.valueChanged.connect(self.spinbox_speed_changed)
+
+        self.slider_frame_rate.valueChanged.connect(self.slider_frame_rate_changed)
+        self.spinbox_frame_rate.valueChanged.connect(self.spinbox_frame_rate_changed)
         self.button_choose.pressed.connect(self.choose_pressed)
         self.button_show.pressed.connect(self.show_pressed)
-         
+        self.button_default.pressed.connect(self.default_pressed)
+
+        self.update_frame_rate_timer = QTimer(self)
+        self.update_frame_rate_timer.timeout.connect(self.update_frame_rate)
+
+        self.default_pressed()
+
+    def start(self):
+        self.images = Images(self.app.ipcon)
+
+        self.update_frame_rate()
+
+        self.images.frame_rendered(0)
+
+    def stop(self):
+        self.images.stop_rendering()
+        self.images = None
+
+    def spinbox_frame_rate_changed(self, frame_rate):
+        self.slider_frame_rate.setValue(frame_rate)
+        self.update_frame_rate_timer.start(100)
+
+    def slider_frame_rate_changed(self, frame_rate):
+        self.spinbox_frame_rate.setValue(frame_rate)
+
     def show_pressed(self):
-        if self.images.okay:
+        if self.images:
             new_images = unicode(self.text_edit_files.toPlainText()).split('\n')
             self.images.new_images(new_images)
             self.images.frame_prepare_next()
             self.images.frame_rendered(0)
-         
+
     def choose_pressed(self):
         dialog = QFileDialog()
         dialog.setDirectory(QDir.homePath())
         dialog.setFileMode(QFileDialog.ExistingFiles)
+
         if dialog.exec_():
             filenames = dialog.selectedFiles()
             for filename in filenames:
                 self.text_edit_files.append(filename)
-         
-    def default_values(self):
-        self.slider_speed.setValue(1000)
-         
-    def spinbox_speed_changed(self, speed):
-        self.slider_speed.setValue(speed)
-         
-    def slider_speed_changed(self, speed):
-        self.spinbox_speed.setValue(speed)
-        if self.images.okay:
-            self.images.SPEED = speed 
-            self.images.update_speed()
 
-    def start(self):
-        self.images = Images(self.app.ipcon)
-        self.default_values()
-        self.images.frame_rendered(0)
-    
-    def stop(self):
-        self.images.stop_rendering()
-        self.images = None
+    def default_pressed(self):
+        self.spinbox_frame_rate.setValue(1)
+
+    def update_frame_rate(self):
+        self.update_frame_rate_timer.stop()
+
+        if self.images:
+            self.images.FRAME_RATE = self.spinbox_frame_rate.value()
+            self.images.update_frame_rate()
