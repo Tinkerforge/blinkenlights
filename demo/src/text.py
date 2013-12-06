@@ -152,7 +152,7 @@ class ScrollingText:
         self.okay = False
         self.ipcon = ipcon
 
-        if config.UID_LED_STRIP_BRICKLET is None:
+        if not config.UID_LED_STRIP_BRICKLET:
             print("Not Configured: LED Strip (required)")
             return
 
