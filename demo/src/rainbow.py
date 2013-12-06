@@ -9,12 +9,10 @@ import colorsys
 import config
 
 class Rainbow:
-    HOST = 'localhost'
-    PORT = 4223
-    UID = 'abc'
+    ### Rainbow Parameters: Begin ###
 
-    SPEED = 20 # in ms per frame
-    MOVEMENT = 1 # in steps per frame
+    FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
+    SPEED = 1 # in steps per frame, vaild range: 1 - 20
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -23,26 +21,27 @@ class Rainbow:
 
     LED_COUNT = 200
 
+    ### Rainbow Parameters: End ###
+
     leds = [x[:] for x in [(0, 0, 0)]*LED_COUNT]
     rainbow = [x[:] for x in [(0, 0, 0)]*LED_COUNT]
     rainbow_position = 0
 
     def __init__(self, ipcon):
         self.okay = False
-        self.UID = config.UID_LED_STRIP_BRICKLET
         self.ipcon = ipcon
 
-        if self.UID == None:
+        if config.UID_LED_STRIP_BRICKLET is None:
             print("Not Configured: LED Strip (required)")
             return
 
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
+            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
         except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
+            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
             return
 
         for i in range(self.LED_COUNT):
@@ -51,15 +50,9 @@ class Rainbow:
 
         self.okay = True
 
-        self.update_speed()
+        self.update_frame_rate()
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
-
-    def close(self):
-        try:
-            self.ipcon.disconnect()
-        except:
-            pass
 
     def stop_rendering(self):
         if not self.okay:
@@ -68,11 +61,11 @@ class Rainbow:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          None)
 
-    def update_speed(self):
+    def update_frame_rate(self):
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(self.SPEED)
+        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
 
     def frame_rendered(self, _):
         self.frame_upload()
@@ -82,13 +75,13 @@ class Rainbow:
         if not self.okay:
             return
 
-        r = [0]*self.LED_COUNT
-        g = [0]*self.LED_COUNT
-        b = [0]*self.LED_COUNT
+        r = []
+        g = []
+        b = []
         for i in range(self.LED_COUNT):
-            r[i] = self.leds[i][self.R]
-            g[i] = self.leds[i][self.G]
-            b[i] = self.leds[i][self.B]
+            r.append(self.leds[i][self.R])
+            g.append(self.leds[i][self.G])
+            b.append(self.leds[i][self.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -110,4 +103,16 @@ class Rainbow:
 
     def frame_prepare_next(self):
         self.leds = self.rainbow[self.rainbow_position % self.LED_COUNT:] + self.rainbow[:self.rainbow_position % self.LED_COUNT]
-        self.rainbow_position += self.MOVEMENT
+        self.rainbow_position += self.SPEED
+
+
+if __name__ == "__main__":
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    rainbow = Rainbow(ipcon)
+    rainbow.frame_rendered(0)
+
+    raw_input('Press enter to exit\n') # Use input() in Python 3
+
+    ipcon.disconnect()

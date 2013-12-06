@@ -37,27 +37,56 @@ class RainbowWidget(QWidget, Ui_Rainbow):
 
         self.setupUi(self)
 
+        self.slider_frame_rate.valueChanged.connect(self.slider_frame_rate_changed)
         self.slider_speed.valueChanged.connect(self.slider_speed_changed)
-        self.slider_movement.valueChanged.connect(self.slider_movement_changed)
 
-        self.speed_timer = QTimer(self)
-        self.speed_timer.timeout.connect(self.apply_speed)
+        self.spinbox_frame_rate.valueChanged.connect(self.spinbox_frame_rate_changed)
+        self.spinbox_speed.valueChanged.connect(self.spinbox_speed_changed)
 
-    def slider_speed_changed(self, speed):
-        self.speed_timer.start(100)
+        self.button_default.pressed.connect(self.default_pressed)
 
-    def apply_speed(self):
-        self.speed_timer.stop()
-        self.rainbow.SPEED = self.slider_speed.value()
-        self.rainbow.update_speed()
+        self.update_frame_rate_timer = QTimer(self)
+        self.update_frame_rate_timer.timeout.connect(self.update_frame_rate)
 
-    def slider_movement_changed(self, value):
-        self.rainbow.MOVEMENT = value
+        self.default_pressed()
 
     def start(self):
         self.rainbow = Rainbow(self.app.ipcon)
+
+        self.update_frame_rate()
+        self.update_speed()
+
         self.rainbow.frame_rendered(0)
 
     def stop(self):
         self.rainbow.stop_rendering()
         self.rainbow = None
+
+    def spinbox_frame_rate_changed(self, frame_rate):
+        self.slider_frame_rate.setValue(frame_rate)
+        self.update_frame_rate_timer.start(100)
+
+    def spinbox_speed_changed(self, speed):
+        self.slider_speed.setValue(speed)
+        self.update_speed()
+
+    def slider_frame_rate_changed(self, frame_rate):
+        self.spinbox_frame_rate.setValue(frame_rate)
+
+    def slider_speed_changed(self, speed):
+        self.spinbox_speed.setValue(speed)
+
+    def default_pressed(self):
+        self.spinbox_frame_rate.setValue(50)
+        self.spinbox_speed.setValue(1)
+
+    def update_frame_rate(self):
+        self.update_frame_rate_timer.stop()
+
+        if self.rainbow:
+            self.rainbow.FRAME_RATE = self.spinbox_frame_rate.value()
+            self.rainbow.update_frame_rate()
+
+    def update_speed(self):
+        if self.rainbow:
+            self.rainbow.SPEED = self.spinbox_speed.value()
