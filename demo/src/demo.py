@@ -7,8 +7,8 @@ Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
 demo.py: Entry file for Demo
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License 
-as published by the Free Software Foundation; either version 2 
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app, parent=None):
         super(QMainWindow, self).__init__(parent)
         self.app = app
-        
+
     def keyPressEvent(self, event):
         try:
             button = event.text().toAscii()[0]
@@ -89,7 +89,7 @@ class Blinkenlights(QApplication):
 
         signal.signal(signal.SIGINT, self.exit_demo)
         signal.signal(signal.SIGTERM, self.exit_demo)
-        
+
         self.make_gui()
         self.connect()
 
@@ -105,18 +105,17 @@ class Blinkenlights(QApplication):
 
     def make_gui(self):
         self.main = MainWindow(self)
-        self.main.setFixedSize(600, 400)
         self.main.setWindowIcon(QIcon(os.path.join(ProgramPath.program_path(), "demo-icon.png")))
-        
+
         self.tabs = QTabWidget()
-        
+
         widget = QWidget()
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)
         widget.setLayout(layout)
 
         self.main.setCentralWidget(widget)
-        
+
         self.setup = SetupWidget(self.tabs, self)
         self.tetris = TetrisWidget(self.tabs, self)
         self.pong = PongWidget(self.tabs, self)
@@ -170,7 +169,7 @@ class Blinkenlights(QApplication):
         config.UID_SEGMENT_DISPLAY_4X7_BRICKLET = None
         self.setup.label_segment_display_found.setText('No')
         self.setup.label_segment_display_uid.setText('None')
-        
+
         if self.ipcon != None:
             try:
                 self.ipcon.disconnect()
@@ -178,7 +177,7 @@ class Blinkenlights(QApplication):
                 pass
 
         self.ipcon = IPConnection()
-        
+
         host = self.setup.edit_host.text()
         port = self.setup.spinbox_port.value()
         try:
@@ -194,7 +193,7 @@ class Blinkenlights(QApplication):
                                      self.cb_enumerate)
         self.ipcon.register_callback(IPConnection.CALLBACK_CONNECTED,
                                      self.cb_connected)
-        
+
         # Wait for a second to give user visual feedback
         timer = QTimer(self)
         timer.setSingleShot(True)
