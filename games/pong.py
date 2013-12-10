@@ -334,25 +334,27 @@ class Pong:
                     paddle_skew = (self.paddle_position_y[1] + self.paddle_size/2.0 - self.ball_position[1])/10.0
                     hit_paddle(paddle_skew)
 
-    def loop(self):
+    def pong_loop(self):
         self.timer = RepeatedTimer(0.1, self.tick)
-        i = 0
+
         while self.loop:
             key = self.kp.read_single_keypress().lower()
-            i += 1
+
             if key == 'a':
                 self.move_paddle(0, -1)
-            if key == 's':
+            elif key == 's':
                 self.move_paddle(0, 1)
-            if key == 'k':
+            elif key == 'k':
                 self.move_paddle(1, -1)
-            if key == 'l':
+            elif key == 'l':
                 self.move_paddle(1, 1)
-            if key == 'r':
+            elif key == 'r':
                 self.init_pong()
-            if key == 'q':
-                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
-                return
+            elif key == 'q':
+                break
+
+        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
+        self.timer.stop()
 
 
 if __name__ == "__main__":
@@ -364,8 +366,7 @@ if __name__ == "__main__":
     if pong.okay:
         print('Press q to exit')
 
-        pong.loop()
-        pong.timer.stop()
+        pong.pong_loop()
         pong.kp.kbi.restore_stdin()
 
     ipcon.disconnect()

@@ -50,7 +50,7 @@ class TetrisWidget(QWidget, Ui_Tetris):
         self.tetris = Tetris(self.app.ipcon)
         if self.tetris.led_strip != None:
             self.tetris.tetris_loop()
-            self.tetris.drop_timer.stop()
+
         self.tetris = None
         
     def button_press(self, button):

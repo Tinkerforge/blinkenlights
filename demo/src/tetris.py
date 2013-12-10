@@ -431,23 +431,25 @@ class Tetris:
 
     def tetris_loop(self):
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
-        i = 0
+
         while self.loop:
             key = self.kp.read_single_keypress().lower()
-            i += 1
             self.speaker.beep_input()
+
             if key == 'a':
                 self.move_tetromino(0, -1, self.tetromino_form)
-            if key == 'd':
+            elif key == 'd':
                 self.move_tetromino(0, 1, self.tetromino_form)
-            if key == 's':
+            elif key == 's':
                 self.move_tetromino(1, 0, self.tetromino_form)
-            if key == 'k':
+            elif key == 'k':
                 self.move_tetromino(0, 0, (self.tetromino_form-1) % 4)
-            if key == 'l':
+            elif key == 'l':
                 self.move_tetromino(0, 0, (self.tetromino_form+1) % 4)
-            if key == 'r':
+            elif key == 'r':
                 self.init_tetris()
-            if key == 'q':
-                self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
-                return
+            elif key == 'q':
+                break
+
+        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
+        self.drop_timer.stop()

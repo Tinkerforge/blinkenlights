@@ -32,11 +32,11 @@ from threading import Thread
 class PongWidget(QWidget, Ui_Pong):
     pong = None
     thread = None
-    
+
     def __init__(self, parent, app):
         super(QWidget, self).__init__()
         self.app = app
-        
+
         self.setupUi(self)
 
         self.button_a.pressed.connect(lambda: self.button_press('a'))
@@ -47,9 +47,10 @@ class PongWidget(QWidget, Ui_Pong):
 
     def start_pong(self):
         self.pong = Pong(self.app.ipcon)
+
         if self.pong.okay:
-            self.pong.loop()
-            self.pong.timer.stop()
+            self.pong.pong_loop()
+
         self.pong = None
 
     def button_press(self, button):
