@@ -23,7 +23,6 @@ from keypress import KeyPress
 
 
 class TetrisSegmentDisplay:
-    UID = config.UID_SEGMENT_DISPLAY_4X7_BRICKLET
     DIGITS = [0x3f,0x06,0x5b,0x4f,
               0x66,0x6d,0x7d,0x07,
               0x7f,0x6f,0x77,0x7c,
@@ -32,27 +31,37 @@ class TetrisSegmentDisplay:
     line_count = 0
 
     def __init__(self, ipcon):
+        self.okay = False
         self.ipcon = ipcon
-        if self.UID == None:
+
+        if not config.UID_SEGMENT_DISPLAY_4X7_BRICKLET:
             print("Not Configured: Segment Display 4x7")
             return
-        self.sd = SegmentDisplay4x7(self.UID, self.ipcon)
+
+        self.sd = SegmentDisplay4x7(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET, self.ipcon)
 
         try:
             self.sd.get_counter_value()
-            print("Found: Segment Display 4x7 ({0})").format(self.UID)
+            print("Found: Segment Display 4x7 ({0})").format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET)
         except:
-            print("Not Found: Segment Display 4x7 ({0})").format(self.UID)
-            self.UID = None
+            print("Not Found: Segment Display 4x7 ({0})").format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET)
             return
+
+        self.okay = True
 
         self.line_count_to_display()
 
     def increase_line_count(self, increase_by):
+        if not self.okay:
+            return
+
         self.line_count += increase_by
         self.line_count_to_display()
 
     def line_count_to_display(self):
+        if not self.okay:
+            return
+
         segments = (
             self.DIGITS[self.line_count/1000 % 10],
             self.DIGITS[self.line_count/100  % 10],
@@ -63,11 +72,11 @@ class TetrisSegmentDisplay:
 
 
 class TetrisSpeaker:
-    UID = config.UID_PIEZO_SPEAKER_BRICKLET
-
     def __init__(self, ipcon):
+        self.okay = False
         self.ipcon = ipcon
-        if self.UID == None:
+
+        if not config.UID_PIEZO_SPEAKER_BRICKLET:
             print("Not Configured: Piezo Speaker")
             return
 
@@ -75,13 +84,17 @@ class TetrisSpeaker:
 
         try:
             self.speaker.get_identity()
-            print("Found: Piezo Speaker ({0})").format(self.UID)
+            print("Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
         except:
-            print("Not Found: Piezo Speaker ({0})").format(self.UID)
-            self.UID = None
+            print("Not Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
             return
 
+        self.okay = True
+
     def sirene(self, freq):
+        if not self.okay:
+            return
+
         for j in range(2):
             for i in range(25):
                 self.speaker.beep(10, freq + i*20)
@@ -91,20 +104,20 @@ class TetrisSpeaker:
                 time.sleep(0.007)
 
     def beep_input(self):
-        if not self.speaker:
+        if not self.okay:
             return
+
         self.speaker.beep(10, 500)
 
     def beep_delete_line(self, lines):
-        if not self.speaker:
+        if not self.okay:
             return
+
         Thread(target=self.sirene, args=(1000*lines,)).start()
 
 
 class Tetris:
-    HOST = config.HOST
-    PORT = config.PORT
-    UID = config.UID_LED_STRIP_BRICKLET
+    ### Tetris Parameters: Begin ###
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -116,6 +129,8 @@ class Tetris:
 
     FIELD_ROW_START = 2
     FIELD_COL_START = 4
+
+    #### Tetris Parameters: End ####
 
     drop_timer = None
 
@@ -201,38 +216,34 @@ class Tetris:
     is_game_over = False
     loop = True
 
-    def __init__(self):
-        self.ipcon = IPConnection()
-        if self.UID == None:
+    def __init__(self, ipcon):
+        self.okay = False
+        self.ipcon = ipcon
+
+        if not config.UID_LED_STRIP_BRICKLET:
             print("Not Configured: LED Strip (required)")
             return
 
-        self.led_strip = LEDStrip(self.UID, self.ipcon)
-        self.ipcon.connect(self.HOST, self.PORT)
+        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(self.UID)
+            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
         except:
-            print("Not Found: LED Strip ({0})").format(self.UID)
-            self.UID = None
+            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
             return
 
         self.kp = KeyPress(self.ipcon)
         self.display = TetrisSegmentDisplay(self.ipcon)
         self.speaker = TetrisSpeaker(self.ipcon)
 
+        self.okay = True
+
         self.led_strip.set_frame_duration(40)
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
         self.init_tetris()
-
-    def close(self):
-        try:
-            self.ipcon.disconnect()
-        except:
-            pass
 
     def init_tetris(self):
         self.tetromino_current = 'O'
@@ -251,7 +262,7 @@ class Tetris:
         # initialize current tetronimo randomly
         self.tetromino_current = self.get_random_tetromino()
         self.is_game_over = False
-        if self.drop_timer != None:
+        if self.drop_timer:
             self.drop_timer.interval = 1
 
     def frame_rendered(self, length):
@@ -288,6 +299,9 @@ class Tetris:
         return True
 
     def write_playfield(self):
+        if not self.okay:
+            return
+
         field = copy.deepcopy(self.playfield)
         if not self.is_game_over:
             self.add_tetromino_to_field(field, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current)
@@ -323,6 +337,9 @@ class Tetris:
                 break
 
     def clear_lines(self, rows_to_clear):
+        if not self.okay:
+            return
+
         self.drop_timer.stop()
         rows_save = {}
         for to_clear in rows_to_clear:
@@ -429,9 +446,18 @@ class Tetris:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
         self.drop_timer.stop()
 
+
 if __name__ == "__main__":
-    tetris = Tetris()
-    if tetris.UID != None:
+    ipcon = IPConnection()
+    ipcon.connect(config.HOST, config.PORT)
+
+    tetris = Tetris(ipcon)
+    tetris.frame_rendered(0)
+
+    if tetris.okay:
+        print('Press q to exit')
+
         tetris.tetris_loop()
         tetris.kp.kbi.restore_stdin()
-    tetris.close()
+
+    ipcon.disconnect()

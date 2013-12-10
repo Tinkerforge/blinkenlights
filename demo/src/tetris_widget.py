@@ -7,8 +7,8 @@ Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
 tetris_widget.py: Widget for Tetris example
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License 
-as published by the Free Software Foundation; either version 2 
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -32,13 +32,13 @@ from threading import Thread
 class TetrisWidget(QWidget, Ui_Tetris):
     tetris = None
     thread = None
-    
+
     def __init__(self, parent, app):
         super(QWidget, self).__init__()
         self.app = app
-        
+
         self.setupUi(self)
-        
+
         self.button_a.pressed.connect(lambda: self.button_press('a'))
         self.button_s.pressed.connect(lambda: self.button_press('s'))
         self.button_d.pressed.connect(lambda: self.button_press('d'))
@@ -48,13 +48,14 @@ class TetrisWidget(QWidget, Ui_Tetris):
 
     def start_tetris(self):
         self.tetris = Tetris(self.app.ipcon)
-        if self.tetris.led_strip != None:
+
+        if self.tetris.okay:
             self.tetris.tetris_loop()
 
         self.tetris = None
-        
+
     def button_press(self, button):
-        if self.tetris != None:
+        if self.tetris:
             self.tetris.kp.key_queue.put(button)
 
     def start(self):
@@ -63,6 +64,6 @@ class TetrisWidget(QWidget, Ui_Tetris):
         self.thread.start()
 
     def stop(self):
-        if self.tetris != None:
-            self.tetris.kp.key_queue.put('q')
+        if self.tetris:
             self.tetris.loop = False
+            self.tetris.kp.key_queue.put('q')
