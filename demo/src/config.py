@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-DEMO_VERSION = "1.0.0"
+DEMO_VERSION = '1.0.0'
 
 UID_MULTI_TOUCH_BRICKLET = None
 UID_DUAL_BUTTON_BRICKLET = (None, None)

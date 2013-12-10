@@ -329,7 +329,7 @@ class Pong:
                     hit_paddle(paddle_skew)
 
         if self.ball_direction[0] > 0:
-            if  self.paddle_position_x[1] - 0.5 <= self.ball_position[0] <= self.paddle_position_x[1] + 0.5:
+            if self.paddle_position_x[1] - 0.5 <= self.ball_position[0] <= self.paddle_position_x[1] + 0.5:
                 if self.paddle_position_y[1] - 0.5 <= self.ball_position[1] <= self.paddle_position_y[1] + self.paddle_size + 0.5:
                     paddle_skew = (self.paddle_position_y[1] + self.paddle_size/2.0 - self.ball_position[1])/10.0
                     hit_paddle(paddle_skew)
