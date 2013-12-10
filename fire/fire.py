@@ -12,24 +12,6 @@ import random
 import config
 
 class Fire:
-    ### Fire Parameters: Begin ###
-
-    FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
-    HUE_FACTOR = 1.2 # vaild range: 0.1 - 5.0
-    RAND_VALUE_START = 64 # vaild range: 0 - 255
-    RAND_VALUE_END = 255 # vaild range: 1 - 255
-
-    # Position of R, G and B pixel on LED Pixel
-    R = 2
-    G = 1
-    B = 0
-
-    # Size of LED Pixel matrix
-    LED_ROWS = 20
-    LED_COLS = 10
-
-    #### Fire Parameters: End ####
-
     values = [
         [ 32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32],
         [ 64,  32,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  16,  32,  64],
@@ -82,9 +64,9 @@ class Fire:
 #        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 #    ]
 
-    line = [0]*LED_ROWS
-    matrix = [x[:] for x in [[0]*LED_COLS]*LED_ROWS]
-    leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
+    line = [0]*config.LED_ROWS
+    matrix = [x[:] for x in [[0]*config.LED_COLS]*config.LED_ROWS]
+    leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
     percent = 0
 
     def __init__(self, ipcon):
@@ -121,7 +103,7 @@ class Fire:
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
+        self.led_strip.set_frame_duration(1000.0 / config.FIRE_FRAME_RATE)
 
     def frame_rendered(self, _):
         self.frame_upload()
@@ -134,14 +116,14 @@ class Fire:
         r = []
         g = []
         b = []
-        for col in range(self.LED_ROWS):
-            row_range = range(self.LED_COLS)
+        for col in range(config.LED_ROWS):
+            row_range = range(config.LED_COLS)
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.leds[col][row][self.R])
-                g.append(self.leds[col][row][self.G])
-                b.append(self.leds[col][row][self.B])
+                r.append(self.leds[col][row][config.R])
+                g.append(self.leds[col][row][config.G])
+                b.append(self.leds[col][row][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -163,32 +145,32 @@ class Fire:
 
     def frame_prepare_next(self):
         def shift_up():
-            for y in reversed(range(1, self.LED_COLS)):
-                for x in range(self.LED_ROWS):
+            for y in reversed(range(1, config.LED_COLS)):
+                for x in range(config.LED_ROWS):
                     self.matrix[x][y] = self.matrix[x][y-1]
 
-            for x in range(self.LED_ROWS):
+            for x in range(config.LED_ROWS):
                 self.matrix[x][0] = self.line[x]
 
         def generate_line():
-            for x in range(self.LED_ROWS):
-                self.line[x] = random.randint(min(self.RAND_VALUE_START, self.RAND_VALUE_END), self.RAND_VALUE_END)
+            for x in range(config.LED_ROWS):
+                self.line[x] = random.randint(min(config.FIRE_RAND_VALUE_START, config.FIRE_RAND_VALUE_END), config.FIRE_RAND_VALUE_END)
 
         def make_frame():
             def hsv_to_rgb(h, s, v):
                 r, g, b = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
                 return ((int(255*r), int(255*g), int(255*b)))
 
-            for y in reversed(range(1, self.LED_COLS)):
-                for x in range(self.LED_ROWS):
-                    self.leds[x][self.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*self.HUE_FACTOR,
-                                                                 255,
-                                                                 max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
+            for y in reversed(range(1, config.LED_COLS)):
+                for x in range(config.LED_ROWS):
+                    self.leds[x][config.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*config.FIRE_HUE_FACTOR,
+                                                                   255,
+                                                                   max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
 
-            for x in range(self.LED_ROWS):
-                self.leds[x][self.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*self.HUE_FACTOR,
-                                                           255,
-                                                           max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
+            for x in range(config.LED_ROWS):
+                self.leds[x][config.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*config.FIRE_HUE_FACTOR,
+                                                             255,
+                                                             max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
 
         self.percent += 20
         if self.percent >= 100:

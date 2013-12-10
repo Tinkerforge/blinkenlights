@@ -27,6 +27,8 @@ from ui_tetris import Ui_Tetris
 
 from tetris import Tetris
 
+import config
+
 from threading import Thread
 
 class TetrisWidget(QWidget, Ui_Tetris):

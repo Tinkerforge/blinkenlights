@@ -117,20 +117,11 @@ class TetrisSpeaker:
 
 
 class Tetris:
-    ### Tetris Parameters: Begin ###
-
-    # Position of R, G and B pixel on LED Pixel
-    R = 2
-    G = 1
-    B = 0
-
-    FIELD_ROWS = 24 # 22 rows in playfield, with only 20 columns visible and 2 coloms border
-    FIELD_COLS = 12 # 10 columns in playfield, 2 column border
+    FIELD_ROWS = config.LED_ROWS+4 # 22 rows in playfield, with only 20 columns visible and 2 coloms border
+    FIELD_COLS = config.LED_COLS+2 # 10 columns in playfield, 2 column border
 
     FIELD_ROW_START = 2
     FIELD_COL_START = 4
-
-    #### Tetris Parameters: End ####
 
     drop_timer = None
 
@@ -314,9 +305,9 @@ class Tetris:
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.colors[field[col][row]][self.R])
-                g.append(self.colors[field[col][row]][self.G])
-                b.append(self.colors[field[col][row]][self.B])
+                r.append(self.colors[field[col][row]][config.R])
+                g.append(self.colors[field[col][row]][config.G])
+                b.append(self.colors[field[col][row]][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -422,6 +413,8 @@ class Tetris:
             self.new_tetromino()
 
     def tetris_loop(self):
+        self.frame_rendered(0)
+
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
 
         while self.loop:
@@ -452,7 +445,6 @@ if __name__ == "__main__":
     ipcon.connect(config.HOST, config.PORT)
 
     tetris = Tetris(ipcon)
-    tetris.frame_rendered(0)
 
     if tetris.okay:
         print('Press q to exit')

@@ -65,21 +65,6 @@ class PongSpeaker:
 
 
 class Pong:
-    ### Pong Parameters: Begin ###
-
-    # Position of R, G and B pixel on LED Pixel
-    R = 2
-    G = 1
-    B = 0
-
-    PLAYER_COLOR = (1, 5)
-    BALL_COLOR = 4
-
-    FIELD_ROWS = 20 # 20 rows in playfield
-    FIELD_COLS = 10 # 10 columns in playfield
-
-    #### Pong Parameters: End ####
-
     score = [0, 0]
 
     paddle_size = 3
@@ -91,10 +76,10 @@ class Pong:
 
     timer = None
 
-    COLOR_BALL_TOP = 8
-    COLOR_BALL_LEFT = 9
-    COLOR_BALL_RIGHT = 10
-    COLOR_BALL_BOTTOM = 11
+    #PONG_COLOR_INDEX_BALL_TOP = 8
+    #PONG_COLOR_INDEX_BALL_LEFT = 9
+    #PONG_COLOR_INDEX_BALL_RIGHT = 10
+    #PONG_COLOR_INDEX_BALL_BOTTOM = 11
 
     colors = [
         (  0,   0,   0), # off
@@ -112,7 +97,7 @@ class Pong:
         (  0,   0,   0)  # ball bottom
     ]
 
-    playfield = [x[:] for x in [[0]*FIELD_COLS]*FIELD_ROWS]
+    playfield = [x[:] for x in [[0]*config.LED_COLS]*config.LED_ROWS]
 
     score_font = {
         0: ["222",
@@ -219,14 +204,14 @@ class Pong:
         r = []
         g = []
         b = []
-        for col in range(self.FIELD_ROWS):
-            row_range = range(self.FIELD_COLS)
+        for col in range(config.LED_ROWS):
+            row_range = range(config.LED_COLS)
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.colors[field[col][row]][self.R])
-                g.append(self.colors[field[col][row]][self.G])
-                b.append(self.colors[field[col][row]][self.B])
+                r.append(self.colors[field[col][row]][config.R])
+                g.append(self.colors[field[col][row]][config.G])
+                b.append(self.colors[field[col][row]][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -255,34 +240,34 @@ class Pong:
     def add_ball_to_playfield(self, field):
         x = max(0, min(19, int(self.ball_position[0])))
         y = max(0, min(9, int(self.ball_position[1])))
-        field[x][y] = self.BALL_COLOR
+        field[x][y] = config.PONG_COLOR_INDEX_BALL
 
 # Antialased ball?
 #        x = max(0, min(19, self.ball_position[0]))
 #        y = max(0, min(9, self.ball_position[1]))
 #        ix = int(x)
 #        iy = int(y)
-#        field[ix][iy] = self.BALL_COLOR
-#        if ix + 1 < self.FIELD_ROWS:
-#            field[ix+1][iy] = self.COLOR_BALL_RIGHT
+#        field[ix][iy] = config.PONG_COLOR_INDEX_BALL
+#        if ix + 1 < config.LED_ROWS:
+#            field[ix+1][iy] = config.PONG_COLOR_INDEX_BALL_RIGHT
 #        if ix - 1 > 0:
-#            field[ix-1][iy] = self.COLOR_BALL_LEFT
-#        if iy + 1 < self.FIELD_COLS:
-#            field[ix][iy+1] = self.COLOR_BALL_TOP
+#            field[ix-1][iy] = config.PONG_COLOR_INDEX_BALL_LEFT
+#        if iy + 1 < config.LED_COLS:
+#            field[ix][iy+1] = config.PONG_COLOR_INDEX_BALL_TOP
 #        if iy - 1 > 0:
-#            field[ix][iy-1] = self.COLOR_BALL_BOTTOM
+#            field[ix][iy-1] = config.PONG_COLOR_INDEX_BALL_BOTTOM
 #
 #        dx = x - int(x)
 #        dy = x - int(x)
-#        self.colors[self.COLOR_BALL_RIGHT] = (0, 255*dx/64, 0)
-#        self.colors[self.COLOR_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
-#        self.colors[self.COLOR_BALL_TOP] = (0, 255*dy/64, 0)
-#        self.colors[self.COLOR_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
+#        self.colors[config.PONG_COLOR_INDEX_BALL_RIGHT] = (0, 255*dx/64, 0)
+#        self.colors[config.PONG_COLOR_INDEX_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
+#        self.colors[config.PONG_COLOR_INDEX_BALL_TOP] = (0, 255*dy/64, 0)
+#        self.colors[config.PONG_COLOR_INDEX_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
 
     def add_paddles_to_playfield(self, field):
         for player in range(2):
             for i in range(self.paddle_size):
-                field[self.paddle_position_x[player]][self.paddle_position_y[player]+i] = self.PLAYER_COLOR[player]
+                field[self.paddle_position_x[player]][self.paddle_position_y[player]+i] = config.PONG_COLOR_INDEX_PLAYER[player]
 
     def move_paddle(self, player, change):
         new_pos = self.paddle_position_y[player] + change
@@ -338,6 +323,8 @@ class Pong:
                     hit_paddle(paddle_skew)
 
     def pong_loop(self):
+        self.frame_rendered(0)
+
         self.timer = RepeatedTimer(0.1, self.tick)
 
         while self.loop:
@@ -365,7 +352,6 @@ if __name__ == "__main__":
     ipcon.connect(config.HOST, config.PORT)
 
     pong = Pong(ipcon)
-    pong.frame_rendered(0)
 
     if pong.okay:
         print('Press q to exit')

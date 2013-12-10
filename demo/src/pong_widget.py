@@ -27,6 +27,8 @@ from ui_pong import Ui_Pong
 
 from pong import Pong
 
+import config
+
 from threading import Thread
 
 class PongWidget(QWidget, Ui_Pong):

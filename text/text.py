@@ -108,23 +108,7 @@ X      | X     |  X    |   X   |    X  |     X |      X|\|
 '''.splitlines()
 
 
-class ScrollingText:
-    ### ScrollingText Parameters: Begin ###
-
-    FRAME_RATE = 25 # in Hz, vaild range: 10 - 100
-    COLOR = None # = rainbow
-#    COLOR = (255, 0, 0) # = red
-
-    # Position of R, G and B pixel on LED Pixel
-    R = 2
-    G = 1
-    B = 0
-
-    LED_ROWS = 20
-    LED_COLS = 10
-
-    #### ScrollingText Parameters: End ####
-
+class Text:
     colors = [
         (10,  10,  10),  # grey
         (255, 0,   0),   # red
@@ -135,7 +119,7 @@ class ScrollingText:
         (255, 0,   150), # violet
         (255, 0,   40),  # purple
     ]
-    leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
+    leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
     text_position = 0
     rainbow_length = 32
     rainbow_index = 0
@@ -182,7 +166,7 @@ class ScrollingText:
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
+        self.led_strip.set_frame_duration(1000.0 / config.TEXT_FRAME_RATE)
 
     def new_text(self, text_to_display):
         text_to_display = '   ' + text_to_display
@@ -208,14 +192,14 @@ class ScrollingText:
         r = []
         g = []
         b = []
-        for col in range(self.LED_ROWS):
-            row_range = range(self.LED_COLS)
+        for col in range(config.LED_ROWS):
+            row_range = range(config.LED_COLS)
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.leds[col][row][self.R])
-                g.append(self.leds[col][row][self.G])
-                b.append(self.leds[col][row][self.B])
+                r.append(self.leds[col][row][config.R])
+                g.append(self.leds[col][row][config.G])
+                b.append(self.leds[col][row][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -236,17 +220,17 @@ class ScrollingText:
                 break
 
     def frame_prepare_next(self):
-        self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]
+        self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
 
-        if self.COLOR is None:
+        if config.TEXT_COLOR is None:
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
             self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length
         else:
-            r, g, b = self.COLOR
+            r, g, b = config.TEXT_COLOR
 
         for col in range(len(self.text)):
-            for row in range(self.LED_ROWS):
+            for row in range(config.LED_ROWS):
                 if self.text[col][(self.text_position+row) % len(self.text[0])] == 'X':
                     self.leds[row][col + 1] = (r, g, b)
                 else:
@@ -259,7 +243,7 @@ if __name__ == "__main__":
     ipcon = IPConnection()
     ipcon.connect(config.HOST, config.PORT)
 
-    text = ScrollingText(ipcon)
+    text = Text(ipcon)
 
     if len(sys.argv) > 1:
         text.new_text(' '.join(sys.argv[1:]))

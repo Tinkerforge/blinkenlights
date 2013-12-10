@@ -26,7 +26,9 @@ from PyQt4.QtGui import QWidget, QColorDialog, QColor
 from PyQt4.QtCore import QTimer
 from ui_text import Ui_Text
 
-from text import ScrollingText
+from text import Text
+
+import config
 
 class TextWidget(QWidget, Ui_Text):
     text = None
@@ -55,7 +57,7 @@ class TextWidget(QWidget, Ui_Text):
         self.default_pressed()
 
     def start(self):
-        self.text = ScrollingText(self.app.ipcon)
+        self.text = Text(self.app.ipcon)
 
         self.update_frame_rate()
         self.update_color()
@@ -100,16 +102,16 @@ class TextWidget(QWidget, Ui_Text):
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
 
+        config.TEXT_FRAME_RATE = self.spinbox_frame_rate.value()
+
         if self.text:
-            self.text.FRAME_RATE = self.spinbox_frame_rate.value()
             self.text.update_frame_rate()
 
     def update_color(self):
         s = '(' + str(self.r) + ', ' + str(self.g) + ', ' + str(self.b) + ')'
         self.label_color.setText(s)
 
-        if self.text:
-            if self.color_mode == 'rainbow':
-                self.text.COLOR = None
-            else:
-                self.text.COLOR = (self.r, self.g, self.b)
+        if self.color_mode == 'rainbow':
+            config.COLOR = None
+        else:
+            config.COLOR = (self.r, self.g, self.b)

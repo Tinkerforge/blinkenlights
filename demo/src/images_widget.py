@@ -102,6 +102,7 @@ class ImagesWidget(QWidget, Ui_Images):
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
 
+        config.IMAGES_FRAME_RATE = self.spinbox_frame_rate.value()
+
         if self.images:
-            self.images.FRAME_RATE = self.spinbox_frame_rate.value()
             self.images.update_frame_rate()

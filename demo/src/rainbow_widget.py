@@ -28,6 +28,8 @@ from ui_rainbow import Ui_Rainbow
 
 from rainbow import Rainbow
 
+import config
+
 class RainbowWidget(QWidget, Ui_Rainbow):
     rainbow = None
 
@@ -83,10 +85,10 @@ class RainbowWidget(QWidget, Ui_Rainbow):
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
 
+        config.RAINBOW_FRAME_RATE = self.spinbox_frame_rate.value()
+
         if self.rainbow:
-            self.rainbow.FRAME_RATE = self.spinbox_frame_rate.value()
             self.rainbow.update_frame_rate()
 
     def update_speed(self):
-        if self.rainbow:
-            self.rainbow.SPEED = self.spinbox_speed.value() / 100.0
+        config.RAINBOW_SPEED = self.spinbox_speed.value() / 100.0

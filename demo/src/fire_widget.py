@@ -28,6 +28,8 @@ from ui_fire import Ui_Fire
 
 from fire import Fire
 
+import config
+
 class FireWidget(QWidget, Ui_Fire):
     fire = None
 
@@ -105,18 +107,16 @@ class FireWidget(QWidget, Ui_Fire):
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
 
+        config.FIRE_FRAME_RATE = self.spinbox_frame_rate.value()
+
         if self.fire:
-            self.fire.FRAME_RATE = self.spinbox_frame_rate.value()
             self.fire.update_frame_rate()
 
     def update_hue(self):
-        if self.fire:
-            self.fire.HUE_FACTOR = self.spinbox_hue.value()
+        config.FIRE_HUE_FACTOR = self.spinbox_hue.value()
 
     def update_start(self):
-        if self.fire:
-            self.fire.RAND_VALUE_START = self.spinbox_start.value()
+        config.FIRE_RAND_VALUE_START = self.spinbox_start.value()
 
     def update_end(self):
-        if self.fire:
-            self.fire.RAND_VALUE_END = self.spinbox_end.value()
+        config.FIRE_RAND_VALUE_END = self.spinbox_end.value()

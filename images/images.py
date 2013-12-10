@@ -57,20 +57,6 @@ else:
     ImageLoader = ImageLoaderQt
 
 class Images:
-    ### Images Parameters: Begin ###
-
-    FRAME_RATE = 1 # in Hz, vaild range: 1 - 100
-
-    # Position of R, G and B pixel on LED Pixel
-    R = 2
-    G = 1
-    B = 0
-
-    LED_ROWS = 20
-    LED_COLS = 10
-
-    #### Images Parameters: End ####
-
     colors = [
         (10,  10,  10),  # grey
         (255, 0,   0),   # red
@@ -82,7 +68,7 @@ class Images:
         (255, 0,   40),  # purple
     ]
 
-    leds = [x[:] for x in [[(0, 0, 0)]*LED_COLS]*LED_ROWS]
+    leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
     files = []
     image_position = 0
 
@@ -120,7 +106,7 @@ class Images:
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(1000.0 / self.FRAME_RATE)
+        self.led_strip.set_frame_duration(1000.0 / config.IMAGES_FRAME_RATE)
 
     def new_images(self, image_urls):
         self.files = []
@@ -139,14 +125,14 @@ class Images:
         r = []
         g = []
         b = []
-        for col in range(self.LED_ROWS):
-            row_range = range(self.LED_COLS)
+        for col in range(config.LED_ROWS):
+            row_range = range(config.LED_COLS)
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.leds[col][row][self.R])
-                g.append(self.leds[col][row][self.G])
-                b.append(self.leds[col][row][self.B])
+                r.append(self.leds[col][row][config.R])
+                g.append(self.leds[col][row][config.G])
+                b.append(self.leds[col][row][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -172,9 +158,9 @@ class Images:
 
         h, w = self.files[self.image_position].get_size()
 
-        self.leds = [x[:] for x in [[(0, 0, 0)]*self.LED_COLS]*self.LED_ROWS]
-        for x in range(min(self.LED_COLS, w)):
-            for y in range(min(self.LED_ROWS, h)):
+        self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
+        for x in range(min(config.LED_COLS, w)):
+            for y in range(min(config.LED_ROWS, h)):
                 self.leds[y][x] = self.files[self.image_position].get_pixel(y, x)
 
         self.image_position = (self.image_position + 1) % len(self.files)

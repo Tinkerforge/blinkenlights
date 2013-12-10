@@ -136,7 +136,7 @@ class Blinkenlights(QApplication):
         self.tabs.addTab(self.tetris, "Tetris")
         self.tabs.addTab(self.pong, "Pong")
         self.tabs.addTab(self.fire, "Fire")
-        self.tabs.addTab(self.text, "Scrolling Text")
+        self.tabs.addTab(self.text, "Text")
         self.tabs.addTab(self.images, "Images")
         self.tabs.addTab(self.rainbow, "Rainbow")
 
