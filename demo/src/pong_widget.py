@@ -54,15 +54,15 @@ class PongWidget(QWidget, Ui_Pong):
         self.pong = None
 
     def button_press(self, button):
-        if self.pong != None:
+        if self.pong:
             self.pong.kp.key_queue.put(button)
 
     def start(self):
         self.thread = Thread(target=self.start_pong)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self):
-        if self.pong != None:
+        if self.pong:
             self.pong.loop = False
             self.pong.kp.key_queue.put('q')

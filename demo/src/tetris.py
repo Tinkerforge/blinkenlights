@@ -452,6 +452,7 @@ if __name__ == "__main__":
     ipcon.connect(config.HOST, config.PORT)
 
     tetris = Tetris(ipcon)
+    tetris.frame_rendered(0)
 
     if tetris.okay:
         print('Press q to exit')

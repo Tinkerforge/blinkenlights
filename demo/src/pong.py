@@ -190,13 +190,13 @@ class Pong:
         self.kp = KeyPress(self.ipcon)
         self.speaker = PongSpeaker(self.ipcon)
 
+        self.okay = True
+
         self.led_strip.set_frame_duration(40)
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
         self.init_pong()
-
-        self.okay = True
 
     def init_pong(self):
         self.new_ball()
@@ -207,6 +207,9 @@ class Pong:
         self.write_playfield()
 
     def write_playfield(self):
+        if not self.okay:
+            return
+
         field = copy.deepcopy(self.playfield)
 
         self.add_score_to_playfield(field)
@@ -362,6 +365,7 @@ if __name__ == "__main__":
     ipcon.connect(config.HOST, config.PORT)
 
     pong = Pong(ipcon)
+    pong.frame_rendered(0)
 
     if pong.okay:
         print('Press q to exit')
