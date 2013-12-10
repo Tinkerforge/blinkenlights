@@ -89,4 +89,4 @@ class RainbowWidget(QWidget, Ui_Rainbow):
 
     def update_speed(self):
         if self.rainbow:
-            self.rainbow.SPEED = self.spinbox_speed.value()
+            self.rainbow.SPEED = self.spinbox_speed.value() / 100.0

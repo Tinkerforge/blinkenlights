@@ -46,7 +46,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Speed:</string>
+        <string>Speed (%):</string>
        </property>
       </widget>
      </item>
@@ -75,10 +75,10 @@
      <item row="1" column="1">
       <widget class="QSlider" name="slider_speed">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>20</number>
+        <number>100</number>
        </property>
        <property name="pageStep">
         <number>5</number>
@@ -110,10 +110,10 @@
      <item row="1" column="2">
       <widget class="QSpinBox" name="spinbox_speed">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>20</number>
+        <number>100</number>
        </property>
       </widget>
      </item>

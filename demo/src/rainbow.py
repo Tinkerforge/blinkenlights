@@ -5,6 +5,7 @@ from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 
 import colorsys
+import math
 
 import config
 
@@ -12,7 +13,7 @@ class Rainbow:
     ### Rainbow Parameters: Begin ###
 
     FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
-    SPEED = 1 # in steps per frame, vaild range: 1 - 20
+    SPEED = 0.01 # vaild range: 0.01 - 1.0
 
     # Position of R, G and B pixel on LED Pixel
     R = 2
@@ -102,8 +103,8 @@ class Rainbow:
                 break
 
     def frame_prepare_next(self):
-        self.leds = self.rainbow[self.rainbow_position % self.LED_COUNT:] + self.rainbow[:self.rainbow_position % self.LED_COUNT]
-        self.rainbow_position += self.SPEED
+        self.leds = self.rainbow[int(self.rainbow_position) % self.LED_COUNT:] + self.rainbow[:int(self.rainbow_position) % self.LED_COUNT]
+        self.rainbow_position += self.LED_COUNT * self.SPEED / 4.0
 
 
 if __name__ == "__main__":
