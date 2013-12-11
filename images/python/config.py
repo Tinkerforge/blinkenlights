@@ -17,4 +17,4 @@ G = 1
 B = 0
 
 # Images Parameters
-IMAGES_FRAME_RATE = 1 # in Hz, vaild range: 1 - 100
+IMAGES_FRAME_RATE = 1 # in Hz, valid range: 1 - 100

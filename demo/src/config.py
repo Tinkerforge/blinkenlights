@@ -41,19 +41,19 @@ KEYMAP_DUAL_BUTTON = {
 }
 
 # Fire Parameters
-FIRE_FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
-FIRE_HUE_FACTOR = 1.2 # vaild range: 0.1 - 5.0
-FIRE_RAND_VALUE_START = 64 # vaild range: 0 - 255
-FIRE_RAND_VALUE_END = 255 # vaild range: 1 - 255
+FIRE_FRAME_RATE = 50 # in Hz, valid range: 10 - 100
+FIRE_HUE_FACTOR = 1.2 # valid range: 0.1 - 5.0
+FIRE_RAND_VALUE_START = 64 # valid range: 0 - 255
+FIRE_RAND_VALUE_END = 255 # valid range: 1 - 255
 
 # Text Parameters
-TEXT_FRAME_RATE = 25 # in Hz, vaild range: 10 - 100
+TEXT_FRAME_RATE = 25 # in Hz, valid range: 10 - 100
 TEXT_COLOR = None # = rainbow
 #TEXT_COLOR = (255, 0, 0) # = red
 
 # Images Parameters
-IMAGES_FRAME_RATE = 1 # in Hz, vaild range: 1 - 100
+IMAGES_FRAME_RATE = 1 # in Hz, valid range: 1 - 100
 
 # Rainbow Parameters
-RAINBOW_FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
-RAINBOW_SPEED = 0.01 # vaild range: 0.0 - 1.0
+RAINBOW_FRAME_RATE = 50 # in Hz, valid range: 10 - 100
+RAINBOW_SPEED = 0.01 # valid range: 0.0 - 1.0

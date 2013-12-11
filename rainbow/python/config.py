@@ -17,5 +17,5 @@ G = 1
 B = 0
 
 # Rainbow Parameters
-RAINBOW_FRAME_RATE = 50 # in Hz, vaild range: 10 - 100
-RAINBOW_SPEED = 0.01 # vaild range: 0.0 - 1.0
+RAINBOW_FRAME_RATE = 50 # in Hz, valid range: 10 - 100
+RAINBOW_SPEED = 0.01 # valid range: 0.0 - 1.0
