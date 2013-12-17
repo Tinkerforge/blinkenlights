@@ -269,9 +269,9 @@ class Tetris:
 
         return self.random_bag[self.random_bag_index]
 
-    def add_tetromino_to_field(self, field, pos_row, pos_col, tetromino):
+    def add_tetromino_to_field(self, field, pos_row, pos_col, tetromino, form):
         for index_col, col in enumerate(self.tetromino[tetromino]):
-            for index_row, color in enumerate(col[self.tetromino_form]):
+            for index_row, color in enumerate(col[form]):
                 if color != 0:
                     row = pos_row + index_row
                     col = pos_col + index_col
@@ -295,7 +295,7 @@ class Tetris:
 
         field = copy.deepcopy(self.playfield)
         if not self.is_game_over:
-            self.add_tetromino_to_field(field, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current)
+            self.add_tetromino_to_field(field, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form)
 
         r = []
         g = []
@@ -371,7 +371,7 @@ class Tetris:
             self.clear_lines(rows_to_clear)
 
     def new_tetromino(self):
-        self.add_tetromino_to_field(self.playfield, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current)
+        self.add_tetromino_to_field(self.playfield, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form)
         self.tetromino_current = None
         self.check_for_line_clears()
         self.tetromino_current = self.get_random_tetromino()
@@ -400,7 +400,7 @@ class Tetris:
             self.new_tetromino()
 
     def move_tetromino(self, row, col, form):
-        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+row, self.tetromino_pos_col+col, self.tetromino_current, self.tetromino_form):
+        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+row, self.tetromino_pos_col+col, self.tetromino_current, form):
             self.tetromino_pos_row += row
             self.tetromino_pos_col += col
             self.tetromino_form = form
