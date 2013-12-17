@@ -116,14 +116,14 @@ class Fire:
         r = []
         g = []
         b = []
-        for col in range(config.LED_ROWS):
-            row_range = range(config.LED_COLS)
-            if col % 2 == 0:
-                row_range = reversed(row_range)
-            for row in row_range:
-                r.append(self.leds[col][row][config.R])
-                g.append(self.leds[col][row][config.G])
-                b.append(self.leds[col][row][config.B])
+        for row in range(config.LED_ROWS):
+            col_range = range(config.LED_COLS)
+            if row % 2 == 0:
+                col_range = reversed(col_range)
+            for col in col_range:
+                r.append(self.leds[row][col][config.R])
+                g.append(self.leds[row][col][config.G])
+                b.append(self.leds[row][col][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]

@@ -126,19 +126,19 @@ class Tetris:
     drop_timer = None
 
     tetromino_current = 'O'
-    tetromino_form    = 0
+    tetromino_form = 0
     tetromino_pos_row = FIELD_ROW_START
     tetromino_pos_col = FIELD_COL_START
 
     colors = [
-        (10,  10,  10),  # grey
-        (255, 0,   0),   # red
-        (255, 80,  0),   # orange
-        (255, 255, 0),   # yellow
-        (0,   255, 0),   # green
-        (0,   0,   255), # blue
-        (255, 0,   150), # violet
-        (255, 0,   40),  # purple
+        ( 10,  10,  10), # grey
+        (255,   0,   0), # red
+        (255,  80,   0), # orange
+        (255, 255,   0), # yellow
+        (  0, 255,   0), # green
+        (  0,   0, 255), # blue
+        (255,   0, 150), # violet
+        (255,   0,  40), # purple
     ]
 
     playfield = [x[:] for x in [[0]*FIELD_COLS]*FIELD_ROWS]
@@ -176,7 +176,7 @@ class Tetris:
             [[0,0,0], [0,4,0], [0,4,4], [4,0,0]]]
     }
 
-    random_bag       = ['O', 'I', 'S', 'Z', 'L', 'J', 'T']
+    random_bag = ['O', 'I', 'S', 'Z', 'L', 'J', 'T']
     random_bag_index = len(random_bag)-1
 
     game_over = [
@@ -238,7 +238,7 @@ class Tetris:
 
     def init_tetris(self):
         self.tetromino_current = 'O'
-        self.tetromino_form    = 0
+        self.tetromino_form = 0
         self.tetromino_pos_row = self.FIELD_ROW_START
         self.tetromino_pos_col = self.FIELD_COL_START
 
@@ -300,14 +300,14 @@ class Tetris:
         r = []
         g = []
         b = []
-        for col in reversed(range(3, self.FIELD_ROWS-1)):
-            row_range = range(1, self.FIELD_COLS-1)
-            if col % 2 == 0:
-                row_range = reversed(row_range)
-            for row in row_range:
-                r.append(self.colors[field[col][row]][config.R])
-                g.append(self.colors[field[col][row]][config.G])
-                b.append(self.colors[field[col][row]][config.B])
+        for row in reversed(range(3, self.FIELD_ROWS-1)):
+            col_range = range(1, self.FIELD_COLS-1)
+            if row % 2 == 0:
+                col_range = reversed(col_range)
+            for col in col_range:
+                r.append(self.colors[field[row][col]][config.R])
+                g.append(self.colors[field[row][col]][config.G])
+                b.append(self.colors[field[row][col]][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -333,6 +333,7 @@ class Tetris:
 
         self.drop_timer.stop()
         rows_save = {}
+
         for to_clear in rows_to_clear:
             rows_save[to_clear] = self.playfield[to_clear]
 
@@ -346,11 +347,13 @@ class Tetris:
             else:
                 for to_clear in rows_to_clear:
                     self.playfield[to_clear] = rows_save[to_clear]
+
             time.sleep(0.1)
 
         for to_clear in rows_to_clear:
             for row in reversed(range(1, to_clear+1)):
                 self.playfield[row] = self.playfield[row-1]
+
             self.playfield[1] = [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]
 
         self.drop_timer.start()
@@ -360,10 +363,12 @@ class Tetris:
 
         for row_index, col in enumerate(self.playfield[1:-1]):
             to_clear = True
+
             for color in col[1:-1]:
                 if color == 0:
                     to_clear = False
                     break
+
             if to_clear:
                 rows_to_clear.append(row_index+1)
 
@@ -377,16 +382,17 @@ class Tetris:
         self.tetromino_current = self.get_random_tetromino()
         self.tetromino_pos_row = self.FIELD_ROW_START
         self.tetromino_pos_col = self.FIELD_COL_START
-        self.tetromino_form    = 0
+        self.tetromino_form = 0
+
         if not self.tetromino_fits(self.playfield, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form):
             self.is_game_over = True
             self.game_over_position = 0
             self.drop_timer.interval = 0.15
 
     def next_game_over_step(self):
-        for col in range(len(self.game_over)):
-            for row in range(10):
-                self.playfield[7+col][row] = self.game_over_to_color[self.game_over[col][(self.game_over_position+row) % len(self.game_over[0])]]
+        for row in range(len(self.game_over)):
+            for col in range(config.LED_COLS):
+                self.playfield[7+row][col] = self.game_over_to_color[self.game_over[row][(self.game_over_position+col) % len(self.game_over[0])]]
 
         self.game_over_position += 1
 
@@ -394,6 +400,7 @@ class Tetris:
         if self.is_game_over:
             self.next_game_over_step()
             return
+
         if self.tetromino_fits(self.playfield, self.tetromino_pos_row+1, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form):
             self.tetromino_pos_row += 1
         else:
