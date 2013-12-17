@@ -407,6 +407,9 @@ class Tetris:
             self.new_tetromino()
 
     def move_tetromino(self, row, col, form):
+        if self.is_game_over:
+            return
+
         if self.tetromino_fits(self.playfield, self.tetromino_pos_row+row, self.tetromino_pos_col+col, self.tetromino_current, form):
             self.tetromino_pos_row += row
             self.tetromino_pos_col += col
