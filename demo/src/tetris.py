@@ -343,7 +343,7 @@ class Tetris:
         for i in range(6):
             if i % 2 == 0:
                 for to_clear in rows_to_clear:
-                    self.playfield[to_clear] = [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]
+                    self.playfield[to_clear] = [255] + [0]*(self.FIELD_COLS-2) + [255]
             else:
                 for to_clear in rows_to_clear:
                     self.playfield[to_clear] = rows_save[to_clear]
@@ -354,7 +354,7 @@ class Tetris:
             for row in reversed(range(1, to_clear+1)):
                 self.playfield[row] = self.playfield[row-1]
 
-            self.playfield[1] = [255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]
+            self.playfield[1] = [255] + [0]*(self.FIELD_COLS-2) + [255]
 
         self.drop_timer.start()
 
