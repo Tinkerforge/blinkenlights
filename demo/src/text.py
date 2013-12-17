@@ -9,7 +9,7 @@ import colorsys
 
 import config
 
-letterforms = '''\
+letter_forms = '''\
        |       |       |       |       |       |       | |
   XXX  |  XXX  |  XXX  |   X   |       |  XXX  |  XXX  |!|
   X  X |  X  X |  X  X |       |       |       |       |"|
@@ -125,11 +125,11 @@ class Text:
     rainbow_index = 0
 
     def __init__(self, ipcon):
-        self.table = {}
-        for form in letterforms:
+        self.letter_table = {}
+
+        for form in letter_forms:
             if '|' in form:
-                self.table[form[-2]] = form[:-3].split('|')
-        self.rows = len(self.table.values()[0])
+                self.letter_table[form[-2]] = form[:-3].split('|')
 
         self.new_text('Starter Kit: Blinkenlights')
 
@@ -168,16 +168,16 @@ class Text:
 
         self.led_strip.set_frame_duration(1000.0 / config.TEXT_FRAME_RATE)
 
-    def new_text(self, text_to_display):
-        text_to_display = '   ' + text_to_display
-        self.text = ['','','','','','','']
+    def new_text(self, text):
+        text = '   ' + text
+        self.text_cols = ['','','','','','','']
 
-        for row in range(self.rows):
-            for c in text_to_display:
+        for col in range(len(self.text_cols)):
+            for c in text:
                 try:
-                    self.text[row] += self.table[c][row]
+                    self.text_cols[col] += self.letter_table[c][col]
                 except:
-                    self.text[row] += ' '
+                    self.text_cols[col] += ' '
 
         self.text_position = 0
 
@@ -192,14 +192,14 @@ class Text:
         r = []
         g = []
         b = []
-        for col in range(config.LED_ROWS):
-            row_range = range(config.LED_COLS)
-            if col % 2 == 0:
-                row_range = reversed(row_range)
-            for row in row_range:
-                r.append(self.leds[col][row][config.R])
-                g.append(self.leds[col][row][config.G])
-                b.append(self.leds[col][row][config.B])
+        for row in range(config.LED_ROWS):
+            col_range = range(config.LED_COLS)
+            if row % 2 == 0:
+                col_range = reversed(col_range)
+            for col in col_range:
+                r.append(self.leds[row][col][config.R])
+                g.append(self.leds[row][col][config.G])
+                b.append(self.leds[row][col][config.B])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -222,16 +222,16 @@ class Text:
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
 
-        if config.TEXT_COLOR is None:
+        if not config.TEXT_COLOR:
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
             self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length
         else:
             r, g, b = config.TEXT_COLOR
 
-        for col in range(len(self.text)):
+        for col in range(len(self.text_cols)):
             for row in range(config.LED_ROWS):
-                if self.text[col][(self.text_position+row) % len(self.text[0])] == 'X':
+                if self.text_cols[col][(self.text_position+row) % len(self.text_cols[0])] == 'X':
                     self.leds[row][col + 1] = (r, g, b)
                 else:
                     self.leds[row][col + 1] = (0, 0, 0)
