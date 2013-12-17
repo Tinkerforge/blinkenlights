@@ -67,8 +67,9 @@ class FireWidget(QWidget, Ui_Fire):
         self.fire.frame_rendered(0)
 
     def stop(self):
-        self.fire.stop_rendering()
-        self.fire = None
+        if self.fire:
+            self.fire.stop_rendering()
+            self.fire = None
 
     def spinbox_frame_rate_changed(self, frame_rate):
         self.slider_frame_rate.setValue(frame_rate)

@@ -61,8 +61,9 @@ class ImagesWidget(QWidget, Ui_Images):
         self.images.frame_rendered(0)
 
     def stop(self):
-        self.images.stop_rendering()
-        self.images = None
+        if self.images:
+            self.images.stop_rendering()
+            self.images = None
 
     def spinbox_frame_rate_changed(self, frame_rate):
         self.slider_frame_rate.setValue(frame_rate)

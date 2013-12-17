@@ -61,8 +61,9 @@ class RainbowWidget(QWidget, Ui_Rainbow):
         self.rainbow.frame_rendered(0)
 
     def stop(self):
-        self.rainbow.stop_rendering()
-        self.rainbow = None
+        if self.rainbow:
+            self.rainbow.stop_rendering()
+            self.rainbow = None
 
     def spinbox_frame_rate_changed(self, frame_rate):
         self.slider_frame_rate.setValue(frame_rate)

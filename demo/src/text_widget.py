@@ -65,8 +65,9 @@ class TextWidget(QWidget, Ui_Text):
         self.text.frame_rendered(0)
 
     def stop(self):
-        self.text.stop_rendering()
-        self.text = None
+        if self.text:
+            self.text.stop_rendering()
+            self.text = None
 
     def slider_frame_rate_changed(self, frame_rate):
         self.spinbox_frame_rate.setValue(frame_rate)
