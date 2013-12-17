@@ -80,7 +80,7 @@ class ImagesWidget(QWidget, Ui_Images):
                 new_images = files.split('\n')
 
                 try:
-                    self.images.new_images(new_images)
+                    self.images.set_new_images(new_images)
                 except Exception as e:
                     self.error_msg.showMessage(str(e))
 

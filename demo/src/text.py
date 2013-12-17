@@ -121,7 +121,7 @@ class Text:
             if '|' in form:
                 self.letter_table[form[-2]] = form[:-3].split('|')
 
-        self.new_text('Starter Kit: Blinkenlights')
+        self.set_new_text('Starter Kit: Blinkenlights')
 
         self.okay = False
         self.ipcon = ipcon
@@ -158,7 +158,7 @@ class Text:
 
         self.led_strip.set_frame_duration(1000.0 / config.TEXT_FRAME_RATE)
 
-    def new_text(self, text):
+    def set_new_text(self, text):
         text = '   ' + text
         self.text_cols = ['','','','','','','']
 
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     text = Text(ipcon)
 
     if len(sys.argv) > 1:
-        text.new_text(' '.join(sys.argv[1:]))
+        text.set_new_text(' '.join(sys.argv[1:]))
 
     text.frame_rendered(0)
 

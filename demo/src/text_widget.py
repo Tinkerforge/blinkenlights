@@ -91,7 +91,7 @@ class TextWidget(QWidget, Ui_Text):
         self.radio_color.click()
 
     def text_changed(self, text):
-        self.text.new_text(str(text))
+        self.text.set_new_text(str(text))
 
     def default_pressed(self):
         self.r, self.g, self.b = (255, 0, 0)

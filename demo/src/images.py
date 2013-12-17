@@ -108,7 +108,7 @@ class Images:
 
         self.led_strip.set_frame_duration(1000.0 / config.IMAGES_FRAME_RATE)
 
-    def new_images(self, image_urls):
+    def set_new_images(self, image_urls):
         self.files = []
         for url in image_urls:
             self.files.append(ImageLoader(url))
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     images = Images(ipcon)
 
-    images.new_images(sys.argv[1:])
+    images.set_new_images(sys.argv[1:])
     images.frame_rendered(0)
 
     raw_input('Press enter to exit\n') # Use input() in Python 3
