@@ -97,7 +97,7 @@ int main(void) {
 	}
 	// Don't use device before ipcon is connected
 
-	// Call a getter to check that Bricklet is avialable
+	// Call a getter to check that the Bricklet is avialable
 	uint16_t frame_duration;
 	if(led_strip_get_frame_duration(&led_strip, &frame_duration) < 0) {
 		fprintf(stderr, "Not Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
