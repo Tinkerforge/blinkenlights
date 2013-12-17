@@ -19,6 +19,7 @@ from threading import Thread
 from repeated_timer import RepeatedTimer
 from keypress import KeyPress
 
+
 class PongSpeaker:
     def __init__(self, ipcon):
         self.okay = False
@@ -76,10 +77,11 @@ class Pong:
 
     timer = None
 
-    #PONG_COLOR_INDEX_BALL_TOP = 8
-    #PONG_COLOR_INDEX_BALL_LEFT = 9
-    #PONG_COLOR_INDEX_BALL_RIGHT = 10
-    #PONG_COLOR_INDEX_BALL_BOTTOM = 11
+# Antialased ball?
+#    PONG_COLOR_INDEX_BALL_TOP = 8
+#    PONG_COLOR_INDEX_BALL_LEFT = 9
+#    PONG_COLOR_INDEX_BALL_RIGHT = 10
+#    PONG_COLOR_INDEX_BALL_BOTTOM = 11
 
     colors = [
         (  0,   0,   0), # off
@@ -204,14 +206,14 @@ class Pong:
         r = []
         g = []
         b = []
-        for col in range(config.LED_ROWS):
-            row_range = range(config.LED_COLS)
-            if col % 2 == 0:
-                row_range = reversed(row_range)
-            for row in row_range:
-                r.append(self.colors[field[col][row]][config.R])
-                g.append(self.colors[field[col][row]][config.G])
-                b.append(self.colors[field[col][row]][config.B])
+        for row in range(config.LED_ROWS):
+            col_range = range(config.LED_COLS)
+            if row % 2 == 0:
+                col_range = reversed(col_range)
+            for col in col_range:
+                r.append(self.colors[field[row][col]][config.R_INDEX])
+                g.append(self.colors[field[row][col]][config.G_INDEX])
+                b.append(self.colors[field[row][col]][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -232,8 +234,8 @@ class Pong:
                 break
 
     def add_score_to_playfield(self, field):
-        for col in range(5):
-            for row in range(3):
+        for row in range(3):
+            for col in range(5):
                 field[row][col+1] = int(self.score_font[self.score[0]][col][row])
                 field[row+17][col+1] = int(self.score_font[self.score[1]][col][row])
 
