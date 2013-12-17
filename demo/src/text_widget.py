@@ -112,6 +112,6 @@ class TextWidget(QWidget, Ui_Text):
         self.label_color.setText(s)
 
         if self.color_mode == 'rainbow':
-            config.COLOR = None
+            config.TEXT_COLOR = None
         else:
-            config.COLOR = (self.r, self.g, self.b)
+            config.TEXT_COLOR = (self.r, self.g, self.b)
