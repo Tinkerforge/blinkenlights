@@ -109,16 +109,6 @@ X      | X     |  X    |   X   |    X  |     X |      X|\|
 
 
 class Text:
-    colors = [
-        (10,  10,  10),  # grey
-        (255, 0,   0),   # red
-        (255, 80,  0),   # orange
-        (255, 255, 0),   # yellow
-        (0,   255, 0),   # green
-        (0,   0,   255), # blue
-        (255, 0,   150), # violet
-        (255, 0,   40),  # purple
-    ]
     leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
     text_position = 0
     rainbow_length = 32
