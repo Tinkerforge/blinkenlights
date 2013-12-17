@@ -130,9 +130,9 @@ class Images:
             if col % 2 == 0:
                 row_range = reversed(row_range)
             for row in row_range:
-                r.append(self.leds[col][row][config.R])
-                g.append(self.leds[col][row][config.G])
-                b.append(self.leds[col][row][config.B])
+                r.append(self.leds[col][row][config.R_INDEX])
+                g.append(self.leds[col][row][config.G_INDEX])
+                b.append(self.leds[col][row][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]

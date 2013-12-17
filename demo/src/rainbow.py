@@ -66,9 +66,9 @@ class Rainbow:
         g = []
         b = []
         for i in range(config.LED_ROWS*config.LED_COLS):
-            r.append(self.leds[i][config.R])
-            g.append(self.leds[i][config.G])
-            b.append(self.leds[i][config.B])
+            r.append(self.leds[i][config.R_INDEX])
+            g.append(self.leds[i][config.G_INDEX])
+            b.append(self.leds[i][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]

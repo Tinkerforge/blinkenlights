@@ -305,9 +305,9 @@ class Tetris:
             if row % 2 == 0:
                 col_range = reversed(col_range)
             for col in col_range:
-                r.append(self.colors[field[row][col]][config.R])
-                g.append(self.colors[field[row][col]][config.G])
-                b.append(self.colors[field[row][col]][config.B])
+                r.append(self.colors[field[row][col]][config.R_INDEX])
+                g.append(self.colors[field[row][col]][config.G_INDEX])
+                b.append(self.colors[field[row][col]][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
