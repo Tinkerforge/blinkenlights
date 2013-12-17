@@ -297,6 +297,7 @@ class Tetris:
         if not self.is_game_over:
             self.add_tetromino_to_field(field, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form)
 
+        # Reorder LED data into R, G and B channel
         r = []
         g = []
         b = []

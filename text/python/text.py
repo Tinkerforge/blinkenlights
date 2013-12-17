@@ -179,6 +179,7 @@ class Text:
         if not self.okay:
             return
 
+        # Reorder LED data into R, G and B channel
         r = []
         g = []
         b = []

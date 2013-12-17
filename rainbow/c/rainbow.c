@@ -48,6 +48,7 @@ void frame_upload(LEDStrip *led_strip) {
 	uint8_t b_chunk[CHUNK_SIZE];
 	int i, k;
 
+	// Reorder LED data into R, G and B channel and make chunks of size 16
 	for(i = 0; i < LED_ROWS*LED_COLS; i += CHUNK_SIZE) {
 		for(k = 0; k < CHUNK_SIZE && i + k < LED_ROWS*LED_COLS; ++k) {
 			r_chunk[k] = leds[i + k][R_INDEX];

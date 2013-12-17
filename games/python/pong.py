@@ -203,6 +203,7 @@ class Pong:
         self.add_paddles_to_playfield(field)
         self.add_ball_to_playfield(field)
 
+        # Reorder LED data into R, G and B channel
         r = []
         g = []
         b = []
