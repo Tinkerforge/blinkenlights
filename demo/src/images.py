@@ -12,64 +12,43 @@ pil_available = True
 try:
     from PIL import Image
     class ImageLoaderPIL:
-        image = None
         def __init__(self, f):
             self.image = Image.open(f).convert('RGB')
-            size = self.get_size()
-            if size != (20, 10):
-                self.image = self.image.resize((20, 10), Image.ANTIALIAS)
 
-        def get_size(self):
-            if self.image == None:
-                return (0, 0)
-
-            return self.image.size
+            if self.image.size != (config.LED_ROWS, config.LED_COLS):
+                self.image = self.image.resize((config.LED_ROWS, config.LED_COLS), Image.ANTIALIAS)
 
         def get_pixel(self, x, y):
-            if self.image == None:
-                return (0, 0, 0)
-
             return self.image.getpixel((x, y))
 except:
     pil_available = False
 
     from PyQt4.QtGui import QImage, QColor
     class ImageLoaderQt:
-        image = None
         def __init__(self, f):
             self.image = QImage(f)
-            if self.get_size() != (20, 10):
-                self.image = self.image.scaled(20, 10)
 
-        def get_size(self):
-            size = self.image.size()
-            return (size.width(), size.height())
+            width = self.image.size().width()
+            height = self.image.size().height()
+
+            if width != config.LED_ROWS or height != config.LED_COLS:
+                self.image = self.image.scaled(config.LED_ROWS, config.LED_COLS)
 
         def get_pixel(self, x, y):
             r, g, b, _ = QColor(self.image.pixel(x, y)).getRgbF()
-            r, g, b = int(255*r), int(255*g), int(255*b)
-            return r, g, b
-
+            return int(255*r), int(255*g), int(255*b)
 
 if pil_available:
+    print('Using PIL for image handling')
     ImageLoader = ImageLoaderPIL
 else:
+    print('Using Qt for image handling')
     ImageLoader = ImageLoaderQt
 
-class Images:
-    colors = [
-        (10,  10,  10),  # grey
-        (255, 0,   0),   # red
-        (255, 80,  0),   # orange
-        (255, 255, 0),   # yellow
-        (0,   255, 0),   # green
-        (0,   0,   255), # blue
-        (255, 0,   150), # violet
-        (255, 0,   40),  # purple
-    ]
 
+class Images:
     leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
-    files = []
+    images = []
     image_position = 0
 
     def __init__(self, ipcon):
@@ -109,9 +88,18 @@ class Images:
         self.led_strip.set_frame_duration(1000.0 / config.IMAGES_FRAME_RATE)
 
     def set_new_images(self, image_urls):
-        self.files = []
+        self.images = []
+
         for url in image_urls:
-            self.files.append(ImageLoader(url))
+            loader = ImageLoader(url)
+            image = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
+
+            for y in range(config.LED_ROWS):
+                for x in range(config.LED_COLS):
+                    image[y][x] = loader.get_pixel(y, x)
+
+            self.images.append(image)
+
         self.image_position = 0
 
     def frame_rendered(self, _):
@@ -126,14 +114,14 @@ class Images:
         r = []
         g = []
         b = []
-        for col in range(config.LED_ROWS):
-            row_range = range(config.LED_COLS)
-            if col % 2 == 0:
-                row_range = reversed(row_range)
-            for row in row_range:
-                r.append(self.leds[col][row][config.R_INDEX])
-                g.append(self.leds[col][row][config.G_INDEX])
-                b.append(self.leds[col][row][config.B_INDEX])
+        for row in range(config.LED_ROWS):
+            col_range = range(config.LED_COLS)
+            if row % 2 == 0:
+                col_range = reversed(col_range)
+            for col in col_range:
+                r.append(self.leds[row][col][config.R_INDEX])
+                g.append(self.leds[row][col][config.G_INDEX])
+                b.append(self.leds[row][col][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -154,17 +142,11 @@ class Images:
                 break
 
     def frame_prepare_next(self):
-        if len(self.files) == 0:
+        if len(self.images) == 0:
             return
 
-        h, w = self.files[self.image_position].get_size()
-
-        self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
-        for x in range(min(config.LED_COLS, w)):
-            for y in range(min(config.LED_ROWS, h)):
-                self.leds[y][x] = self.files[self.image_position].get_pixel(y, x)
-
-        self.image_position = (self.image_position + 1) % len(self.files)
+        self.leds = self.images[self.image_position]
+        self.image_position = (self.image_position + 1) % len(self.images)
 
 
 if __name__ == "__main__":
