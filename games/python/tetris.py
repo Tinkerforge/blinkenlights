@@ -452,9 +452,11 @@ class Tetris:
 
 
 if __name__ == "__main__":
+    # Create IP Connection and connect it
     ipcon = IPConnection()
     ipcon.connect(config.HOST, config.PORT)
 
+    # Create Tetris object and start game loop
     tetris = Tetris(ipcon)
 
     if tetris.okay:

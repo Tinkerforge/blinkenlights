@@ -96,7 +96,6 @@ int main(void) {
 		fprintf(stderr, "Could not connect\n");
 		exit(1);
 	}
-	// Don't use device before ipcon is connected
 
 	// Call a getter to check that the Bricklet is avialable
 	uint16_t frame_duration;

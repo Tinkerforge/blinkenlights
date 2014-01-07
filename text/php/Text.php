@@ -296,9 +296,11 @@ class Text
     }
 }
 
-$ipcon = new IPConnection(); // Create IP connection
-$ipcon->connect(Config\HOST, Config\PORT); // Connect to brickd
+// Create IP Connection and connect it
+$ipcon = new IPConnection();
+$ipcon->connect(Config\HOST, Config\PORT);
 
+// Create Text object and start rendering
 $text = new Text($ipcon);
 
 if (isset($argv) && count($argv) > 1) {

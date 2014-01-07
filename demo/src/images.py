@@ -168,9 +168,11 @@ class Images:
 
 
 if __name__ == "__main__":
+    # Create IP Connection and connect it
     ipcon = IPConnection()
     ipcon.connect(config.HOST, config.PORT)
 
+    # Create Images object and start rendering
     images = Images(ipcon)
 
     images.set_new_images(sys.argv[1:])

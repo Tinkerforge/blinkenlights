@@ -231,9 +231,11 @@ class Text:
 
 
 if __name__ == "__main__":
+    # Create IP Connection and connect it
     ipcon = IPConnection()
     ipcon.connect(config.HOST, config.PORT)
 
+    # Create Text object and start rendering
     text = Text(ipcon)
 
     if len(sys.argv) > 1:

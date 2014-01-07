@@ -130,6 +130,7 @@ public class Images {
 	}
 
 	public static void main(String args[]) throws Exception {
+		// Create IP Connection and connect it
 		ipcon = new IPConnection();
 		ipcon.connect(Config.HOST, Config.PORT);
 
@@ -145,6 +146,7 @@ public class Images {
 			images[i] = readImage(args[i]);
 		}
 
+		// Set up listener and start rendering
 		imagesListener = new ImagesListener(ledStrip, images);
 		ledStrip.addFrameRenderedListener(imagesListener);
 

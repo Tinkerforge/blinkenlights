@@ -95,9 +95,11 @@ class Rainbow:
 
 
 if __name__ == "__main__":
+    # Create IP Connection and connect it
     ipcon = IPConnection()
     ipcon.connect(config.HOST, config.PORT)
 
+    # Create Rainbow object and start rendering
     rainbow = Rainbow(ipcon)
     rainbow.frame_rendered(0)
 
