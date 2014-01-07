@@ -154,24 +154,43 @@ class Fire:
                 self.matrix[x][0] = self.line[x]
 
         def generate_line():
+            start = min(config.FIRE_RAND_VALUE_START, config.FIRE_RAND_VALUE_END)
+            end = config.FIRE_RAND_VALUE_END
+
             for x in range(config.LED_ROWS):
-                self.line[x] = random.randint(min(config.FIRE_RAND_VALUE_START, config.FIRE_RAND_VALUE_END), config.FIRE_RAND_VALUE_END)
+                self.line[x] = random.randint(start, end)
 
         def make_frame():
             def hsv_to_rgb(h, s, v):
                 r, g, b = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
                 return ((int(255*r), int(255*g), int(255*b)))
 
+            def interpolate2(x, y):
+                p0 = 100.0 - self.percent
+                p1 = self.percent
+                m0 = self.matrix[x][y]
+                m1 = self.matrix[x][y-1]
+
+                return (p0*m0 + p1*m1) / 100.0
+
+            def interpolate1(x):
+                p0 = 100.0 - self.percent
+                p1 = self.percent
+                m0 = self.matrix[x][0]
+                m1 = self.line[x]
+
+                return (p0*m0 + p1*m1) / 100.0
+
             for y in reversed(range(1, config.LED_COLS)):
                 for x in range(config.LED_ROWS):
-                    self.leds[x][config.LED_COLS-1-y] = hsv_to_rgb(self.hues[y][x]*config.FIRE_HUE_FACTOR,
-                                                                   255,
-                                                                   max(0, (((100.0-self.percent)*self.matrix[x][y] + self.percent*self.matrix[x][y-1])/100.0) - self.values[y][x]))
+                    rgb = hsv_to_rgb(self.hues[y][x]*config.FIRE_HUE_FACTOR, 255,
+                                     max(0, interpolate2(x, y) - self.values[y][x]))
+                    self.leds[x][config.LED_COLS-1-y] = rgb
 
             for x in range(config.LED_ROWS):
-                self.leds[x][config.LED_COLS-1] = hsv_to_rgb(self.hues[0][x]*config.FIRE_HUE_FACTOR,
-                                                             255,
-                                                             max(0, ((100.0-self.percent)*self.matrix[x][0] + self.percent*self.line[x])/100.0))
+                rgb = hsv_to_rgb(self.hues[0][x]*config.FIRE_HUE_FACTOR, 255,
+                                 max(0, interpolate1(x)))
+                self.leds[x][config.LED_COLS-1] = rgb
 
         self.percent += 20
         if self.percent >= 100:
