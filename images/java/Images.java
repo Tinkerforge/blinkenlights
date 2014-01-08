@@ -23,8 +23,6 @@ class ImagesListener implements BrickletLEDStrip.FrameRenderedListener {
 	}
 
 	private void frameUpload() {
-		System.out.println("f1");
-
 		// Reorder LED data into R, G and B channel
 		short[] r = new short[Config.LED_ROWS*Config.LED_COLS];
 		short[] g = new short[Config.LED_ROWS*Config.LED_COLS];
@@ -64,14 +62,11 @@ class ImagesListener implements BrickletLEDStrip.FrameRenderedListener {
 				rChunk[k] = r[i + k];
 				gChunk[k] = g[i + k];
 				bChunk[k] = b[i + k];
-
-				//System.out.println("f2 " + i + " " + rChunk);
 			}
 
 			try {
 				ledStrip.setRGBValues(i, (short)k, rChunk, gChunk, bChunk);
 			} catch (TinkerforgeException e) {
-				e.printStackTrace();
 				break;
 			}
 		}
@@ -116,13 +111,9 @@ public class Images {
 			for (int col = 0; col < Config.LED_COLS; ++col) {
 				long rgb = image.getRGB(row, col);
 
-				System.out.println(rgb);
-
 				pixel[row][col][0] = (short)((rgb >> 16) & 0xFF);
 				pixel[row][col][1] = (short)((rgb >>  8) & 0xFF);
 				pixel[row][col][2] = (short)( rgb        & 0xFF);
-
-				System.out.println(pixel[row][col][0] + " " + pixel[row][col][1] + " " + pixel[row][col][1]);
 			}
 		}
 
@@ -136,13 +127,19 @@ public class Images {
 
 		// Call a getter to check that the Bricklet is avialable
 		ledStrip = new BrickletLEDStrip(Config.UID_LED_STRIP_BRICKLET, ipcon);
-		ledStrip.getFrameDuration();
+
+		try {
+			ledStrip.getFrameDuration();
+			System.out.println("Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+		} catch (TinkerforgeException e) {
+			System.out.println("FNot ound: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			return;
+		}
 
 		// Read images
 		images = new short[args.length][][][];
 
 		for (int i = 0; i < args.length; ++i) {
-			System.out.println(args[i]);
 			images[i] = readImage(args[i]);
 		}
 
