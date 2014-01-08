@@ -166,6 +166,7 @@ class Text
             return;
         }
 
+        // Call a getter to check that the Bricklet is avialable
         $this->ledStrip = new BrickletLEDStrip(Config\UID_LED_STRIP_BRICKLET, $this->ipcon);
 
         try {
@@ -308,7 +309,6 @@ if (isset($argv) && count($argv) > 1) {
     $text->setNewText(implode(' ', $argv));
 }
 
-// Set initial rgb values to get started
 $text->cb_frameRendered(0);
 
 echo "Press ctrl+c to exit\n";

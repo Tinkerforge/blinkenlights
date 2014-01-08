@@ -106,7 +106,6 @@ int main(void) {
 
 	printf("Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
 
-	// Set frame duration to 20ms (50 frames per second)
 	led_strip_set_frame_duration(&led_strip, 1000 / RAINBOW_FRAME_RATE);
 
 	// Register frame rendered callback to function cb_frame_rendered
@@ -120,7 +119,7 @@ int main(void) {
 		hsv_to_rgb(255 * i / (LED_ROWS*LED_COLS), 255, 25, &rainbow[i][0], &rainbow[i][1], &rainbow[i][2]);
 	}
 
-	// Set initial rgb values to get started
+	// Start rendering
 	cb_frame_rendered(0, (void *)&led_strip);
 
 	printf("Press key to exit\n");
