@@ -23,6 +23,10 @@ class ImagesListener implements BrickletLEDStrip.FrameRenderedListener {
 	}
 
 	private void frameUpload() {
+		if (images.length == 0) {
+			return;
+		}
+
 		// Reorder LED data into R, G and B channel
 		short[] r = new short[Config.LED_ROWS*Config.LED_COLS];
 		short[] g = new short[Config.LED_ROWS*Config.LED_COLS];
@@ -132,7 +136,7 @@ public class Images {
 			ledStrip.getFrameDuration();
 			System.out.println("Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
 		} catch (TinkerforgeException e) {
-			System.out.println("FNot ound: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			System.out.println("Not Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
 			return;
 		}
 
@@ -144,6 +148,8 @@ public class Images {
 		}
 
 		// Set up listener and start rendering
+		ledStrip.setFrameDuration(1000 / Config.IMAGES_FRAME_RATE);
+
 		imagesListener = new ImagesListener(ledStrip, images);
 		ledStrip.addFrameRenderedListener(imagesListener);
 
