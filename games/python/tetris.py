@@ -295,7 +295,10 @@ class Tetris:
 
         field = copy.deepcopy(self.playfield)
         if not self.is_game_over:
-            self.add_tetromino_to_field(field, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form)
+            self.add_tetromino_to_field(field, self.tetromino_pos_row,
+                                        self.tetromino_pos_col,
+                                        self.tetromino_current,
+                                        self.tetromino_form)
 
         # Reorder LED data into R, G and B channel
         r = []
@@ -377,7 +380,9 @@ class Tetris:
             self.clear_lines(rows_to_clear)
 
     def new_tetromino(self):
-        self.add_tetromino_to_field(self.playfield, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form)
+        self.add_tetromino_to_field(self.playfield, self.tetromino_pos_row,
+                                    self.tetromino_pos_col, self.tetromino_current,
+                                    self.tetromino_form)
         self.tetromino_current = None
         self.check_for_line_clears()
         self.tetromino_current = self.get_random_tetromino()
@@ -385,7 +390,9 @@ class Tetris:
         self.tetromino_pos_col = self.FIELD_COL_START
         self.tetromino_form = 0
 
-        if not self.tetromino_fits(self.playfield, self.tetromino_pos_row, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form):
+        if not self.tetromino_fits(self.playfield, self.tetromino_pos_row,
+                                   self.tetromino_pos_col, self.tetromino_current,
+                                   self.tetromino_form):
             self.is_game_over = True
             self.game_over_position = 0
             self.drop_timer.interval = 0.15
@@ -393,7 +400,8 @@ class Tetris:
     def next_game_over_step(self):
         for row in range(len(self.game_over)):
             for col in range(config.LED_COLS):
-                self.playfield[7+row][col] = self.game_over_to_color[self.game_over[row][(self.game_over_position+col) % len(self.game_over[0])]]
+                k = (self.game_over_position+col) % len(self.game_over[0])
+                self.playfield[7+row][col] = self.game_over_to_color[self.game_over[row][k]]
 
         self.game_over_position += 1
 
@@ -402,7 +410,9 @@ class Tetris:
             self.next_game_over_step()
             return
 
-        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+1, self.tetromino_pos_col, self.tetromino_current, self.tetromino_form):
+        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+1,
+                               self.tetromino_pos_col, self.tetromino_current,
+                               self.tetromino_form):
             self.tetromino_pos_row += 1
         else:
             self.new_tetromino()
@@ -411,7 +421,8 @@ class Tetris:
         if self.is_game_over:
             return
 
-        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+row, self.tetromino_pos_col+col, self.tetromino_current, form):
+        if self.tetromino_fits(self.playfield, self.tetromino_pos_row+row,
+                               self.tetromino_pos_col+col, self.tetromino_current, form):
             self.tetromino_pos_row += row
             self.tetromino_pos_col += col
             self.tetromino_form = form

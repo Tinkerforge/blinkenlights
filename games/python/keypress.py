@@ -63,9 +63,6 @@ class MultiTouchInput:
 
         self.state_to_queue(changed_state & self.current_state)
 
-    def read_single_keypress(self):
-        return self.key_queue.get()
-
 class DualButtonInput:
     current_state = 0
     current_state_counter = [0]*4
@@ -150,9 +147,6 @@ class DualButtonInput:
                 state |= (1 << i)
 
         self.state_to_queue(state)
-
-    def read_single_keypress(self):
-        return self.key_queue.get()
 
 class KeyBoardInput:
     def __init__(self, key_queue):

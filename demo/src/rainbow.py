@@ -26,9 +26,9 @@ class Rainbow:
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
+            print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
         except:
-            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
+            print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
             return
 
         for i in range(config.LED_ROWS*config.LED_COLS):

@@ -33,9 +33,9 @@ class PongSpeaker:
 
         try:
             self.speaker.get_identity()
-            print("Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
+            print("Found: Piezo Speaker ({0})".format(config.UID_PIEZO_SPEAKER_BRICKLET))
         except:
-            print("Not Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
+            print("Not Found: Piezo Speaker ({0})".format(config.UID_PIEZO_SPEAKER_BRICKLET))
             return
 
         self.okay = True
@@ -169,9 +169,9 @@ class Pong:
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
+            print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
         except:
-            print("Not Found: LED Strip ({0})").format(config.UID_LED_STRIP_BRICKLET)
+            print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
             return
 
         self.kp = KeyPress(self.ipcon)

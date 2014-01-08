@@ -63,9 +63,6 @@ class MultiTouchInput:
 
         self.state_to_queue(changed_state & self.current_state)
 
-    def read_single_keypress(self):
-        return self.key_queue.get()
-
 class DualButtonInput:
     current_state = 0
     current_state_counter = [0]*4
@@ -151,9 +148,6 @@ class DualButtonInput:
 
         self.state_to_queue(state)
 
-    def read_single_keypress(self):
-        return self.key_queue.get()
-
 class KeyBoardInput:
     def __init__(self, key_queue):
         self.key_queue = key_queue
@@ -176,7 +170,7 @@ class KeyBoardInput:
 
         # iflag
         attrs[0] &= ~(termios.IGNBRK | termios.BRKINT | termios.PARMRK
-                      | termios.ISTRIP | termios.INLCR | termios. IGNCR
+                      | termios.ISTRIP | termios.INLCR | termios.IGNCR
                       | termios.ICRNL | termios.IXON )
 
         # cflag
