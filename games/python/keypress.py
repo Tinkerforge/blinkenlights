@@ -176,7 +176,7 @@ class KeyBoardInput:
 
         # iflag
         attrs[0] &= ~(termios.IGNBRK | termios.BRKINT | termios.PARMRK
-                      | termios.ISTRIP | termios.INLCR | termios. IGNCR
+                      | termios.ISTRIP | termios.INLCR | termios.IGNCR
                       | termios.ICRNL | termios.IXON )
 
         # cflag
