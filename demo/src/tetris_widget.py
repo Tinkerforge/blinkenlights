@@ -2,7 +2,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
-Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
+Copyright (C) 2013-2014 Matthias Bolte <matthias@tinkerforge.com>
 
 tetris_widget.py: Widget for Tetris example
 
@@ -52,7 +52,7 @@ class TetrisWidget(QWidget, Ui_Tetris):
         self.tetris = Tetris(self.app.ipcon)
 
         if self.tetris.okay:
-            self.tetris.tetris_loop()
+            self.tetris.run_game_loop()
 
         self.tetris = None
 

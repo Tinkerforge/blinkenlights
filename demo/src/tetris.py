@@ -234,9 +234,9 @@ class Tetris:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
-        self.init_tetris()
+        self.init_game()
 
-    def init_tetris(self):
+    def init_game(self):
         self.tetromino_current = 'O'
         self.tetromino_form = 0
         self.tetromino_pos_row = self.FIELD_ROW_START
@@ -362,7 +362,7 @@ class Tetris:
 
         self.drop_timer.start()
 
-    def check_for_line_clears(self):
+    def check_for_lines_to_clear(self):
         rows_to_clear = []
 
         for row_index, col in enumerate(self.playfield[1:-1]):
@@ -376,7 +376,7 @@ class Tetris:
             if to_clear:
                 rows_to_clear.append(row_index+1)
 
-        if rows_to_clear != []:
+        if len(rows_to_clear) > 0:
             self.clear_lines(rows_to_clear)
 
     def new_tetromino(self):
@@ -384,7 +384,9 @@ class Tetris:
                                     self.tetromino_pos_col, self.tetromino_current,
                                     self.tetromino_form)
         self.tetromino_current = None
-        self.check_for_line_clears()
+
+        self.check_for_lines_to_clear()
+
         self.tetromino_current = self.get_random_tetromino()
         self.tetromino_pos_row = self.FIELD_ROW_START
         self.tetromino_pos_col = self.FIELD_COL_START
@@ -434,7 +436,7 @@ class Tetris:
         elif row == 1: # user is at bottom and hits button to go down again
             self.new_tetromino()
 
-    def tetris_loop(self):
+    def run_game_loop(self):
         self.frame_rendered(0)
 
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
@@ -454,7 +456,7 @@ class Tetris:
             elif key == 'l':
                 self.move_tetromino(0, 0, (self.tetromino_form+1) % 4)
             elif key == 'r':
-                self.init_tetris()
+                self.init_game()
             elif key == 'q':
                 break
 
@@ -473,7 +475,7 @@ if __name__ == "__main__":
     if tetris.okay:
         print('Press q to exit')
 
-        tetris.tetris_loop()
+        tetris.run_game_loop()
         tetris.kp.kbi.restore_stdin()
 
     ipcon.disconnect()

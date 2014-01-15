@@ -183,9 +183,9 @@ class Pong:
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
                                          self.frame_rendered)
 
-        self.init_pong()
+        self.init_game()
 
-    def init_pong(self):
+    def init_game(self):
         self.new_ball()
         self.paddle_position_y = [3, 3]
         self.score = [0, 0]
@@ -325,7 +325,7 @@ class Pong:
                     paddle_skew = (self.paddle_position_y[1] + self.paddle_size/2.0 - self.ball_position[1])/10.0
                     hit_paddle(paddle_skew)
 
-    def pong_loop(self):
+    def run_game_loop(self):
         self.frame_rendered(0)
 
         self.timer = RepeatedTimer(0.1, self.tick)
@@ -342,7 +342,7 @@ class Pong:
             elif key == 'l':
                 self.move_paddle(1, 1)
             elif key == 'r':
-                self.init_pong()
+                self.init_game()
             elif key == 'q':
                 break
 
@@ -361,7 +361,7 @@ if __name__ == "__main__":
     if pong.okay:
         print('Press q to exit')
 
-        pong.pong_loop()
+        pong.run_game_loop()
         pong.kp.kbi.restore_stdin()
 
     ipcon.disconnect()
