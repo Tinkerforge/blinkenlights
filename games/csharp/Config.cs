@@ -11,7 +11,7 @@ class Config
 
 	// Optional Bricklets (use null as UID if not connected)
 	public static string UID_MULTI_TOUCH_BRICKLET = "itS";
-	public static string[] UID_DUAL_BUTTON_BRICKLET = new string[] {"dbb", null};
+	public static string[] UID_DUAL_BUTTON_BRICKLET = new string[] {"zgh", "j2M"};
 	public static string UID_SEGMENT_DISPLAY_4X7_BRICKLET = "ioiu";
 	public static string UID_PIEZO_SPEAKER_BRICKLET = "XYZ";
 

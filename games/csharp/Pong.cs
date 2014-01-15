@@ -457,7 +457,7 @@ class Pong
 				MovePaddle(0, -1);
 				break;
 
-			case 'd':
+			case 's':
 				MovePaddle(0, 1);
 				break;
 
