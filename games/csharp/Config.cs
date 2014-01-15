@@ -25,8 +25,8 @@ class Config
 	public static int B_INDEX = 0;
 
 	// Pong Parameters
-	public static int[] PONG_COLOR_INDEX_PLAYER = new int[] {1, 5};
-	public static int PONG_COLOR_INDEX_BALL = 4;
+	public static byte[] PONG_COLOR_INDEX_PLAYER = new byte[] {1, 5};
+	public static byte PONG_COLOR_INDEX_BALL = 4;
 
 	// Keymaps
 	public static Hashtable KEYMAP_MULTI_TOUCH = new Hashtable()
