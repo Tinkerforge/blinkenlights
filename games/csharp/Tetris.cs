@@ -313,6 +313,7 @@ class Tetris
 	private int randomBagIndex = 0;
 	private bool gameOver = false;
 	private int gameOverPosition = 0;
+	private KeyPress keyPress = null;
 	private TetrisSpeaker speaker = null;
 	private TetrisSegmentDisplay display = null;
 
@@ -339,6 +340,7 @@ class Tetris
 			return;
 		}
 
+		keyPress = new KeyPress(ipcon);
 		speaker = new TetrisSpeaker(ipcon);
 		display = new TetrisSegmentDisplay(ipcon);
 		okay = true;
@@ -754,7 +756,7 @@ class Tetris
 
 		while (loop)
 		{
-			char key = System.Char.ToLower(System.Console.ReadKey(true).KeyChar);
+			char key = keyPress.ReadSingleKeypress();
 
 			speaker.BeepInput();
 

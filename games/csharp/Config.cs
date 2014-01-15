@@ -1,3 +1,5 @@
+using System.Collections;
+
 class Config
 {
 	// General
@@ -8,7 +10,7 @@ class Config
 	public static string UID_LED_STRIP_BRICKLET = "abc";
 
 	// Optional Bricklets (use null as UID if not connected)
-	public static string UID_MULTI_TOUCH_BRICKLET = "pax";
+	public static string UID_MULTI_TOUCH_BRICKLET = "itS";
 	public static string[] UID_DUAL_BUTTON_BRICKLET = new string[] {"dbb", null};
 	public static string UID_SEGMENT_DISPLAY_4X7_BRICKLET = "ioiu";
 	public static string UID_PIEZO_SPEAKER_BRICKLET = "XYZ";
@@ -27,20 +29,21 @@ class Config
 	public static int PONG_COLOR_INDEX_BALL = 4;
 
 	// Keymaps
-/*KEYMAP_MULTI_TOUCH = {
-    0: 'a',
-    1: 's',
-    2: 'd',
-    3: 'k',
-    4: 'l',
-    5: 'q'
-}
+	public static Hashtable KEYMAP_MULTI_TOUCH = new Hashtable()
+	{
+		{0, 'a'},
+		{1, 's'},
+		{2, 'd'},
+		{3, 'k'},
+		{4, 'l'},
+		{5, 'q'}
+	};
 
-KEYMAP_DUAL_BUTTON = {
-    0: 'a',
-    1: 's',
-    2: 'k',
-    3: 'l'
-}*/
-
+	public static Hashtable KEYMAP_DUAL_BUTTON = new Hashtable()
+	{
+		{0, 'a'},
+		{1, 's'},
+		{2, 'k'},
+		{3, 'l'}
+	};
 }
