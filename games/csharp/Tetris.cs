@@ -21,7 +21,7 @@ class TetrisSegmentDisplay
 	{
 		if (Config.UID_SEGMENT_DISPLAY_4X7_BRICKLET == null)
 		{
-			System.Console.WriteLine("Not Configured: Segment Display 4x7");;
+			System.Console.WriteLine("Not Configured: Segment Display 4x7");
 			return;
 		}
 

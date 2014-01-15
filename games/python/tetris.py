@@ -123,14 +123,7 @@ class Tetris:
     FIELD_ROW_START = 2
     FIELD_COL_START = 4
 
-    drop_timer = None
-
-    tetromino_current = 'O'
-    tetromino_form = 0
-    tetromino_pos_row = FIELD_ROW_START
-    tetromino_pos_col = FIELD_COL_START
-
-    colors = [
+    COLORS = [
         ( 10,  10,  10), # grey
         (255,   0,   0), # red
         (255,  80,   0), # orange
@@ -141,45 +134,40 @@ class Tetris:
         (255,   0,  40), # purple
     ]
 
-    playfield = [x[:] for x in [[0]*FIELD_COLS]*FIELD_ROWS]
+    TETROMINOS = {
+        None: [[[0], [0], [0], [0]]],
 
-    tetromino = {
-      None: [[[0], [0], [0], [0]]],
+        'I': [[[0,0,0,0], [0,0,2,0], [0,0,0,0], [0,2,0,0]],
+              [[2,2,2,2], [0,0,2,0], [0,0,0,0], [0,2,0,0]],
+              [[0,0,0,0], [0,0,2,0], [2,2,2,2], [0,2,0,0]],
+              [[0,0,0,0], [0,0,2,0], [0,0,0,0], [0,2,0,0]]],
 
-      'I': [[[0,0,0,0], [0,0,2,0], [0,0,0,0], [0,2,0,0]],
-            [[2,2,2,2], [0,0,2,0], [0,0,0,0], [0,2,0,0]],
-            [[0,0,0,0], [0,0,2,0], [2,2,2,2], [0,2,0,0]],
-            [[0,0,0,0], [0,0,2,0], [0,0,0,0], [0,2,0,0]]],
+        'J': [[[6,0,0], [0,6,6], [0,0,0], [0,6,0]],
+              [[6,6,6], [0,6,0], [6,6,6], [0,6,0]],
+              [[0,0,0], [0,6,0], [0,0,6], [6,6,0]]],
 
-      'J': [[[6,0,0], [0,6,6], [0,0,0], [0,6,0]],
-            [[6,6,6], [0,6,0], [6,6,6], [0,6,0]],
-            [[0,0,0], [0,6,0], [0,0,6], [6,6,0]]],
+        'L': [[[0,0,5], [0,5,0], [0,0,0], [5,5,0]],
+              [[5,5,5], [0,5,0], [5,5,5], [0,5,0]],
+              [[0,0,0], [0,5,5], [5,0,0], [0,5,0]]],
 
-      'L': [[[0,0,5], [0,5,0], [0,0,0], [5,5,0]],
-            [[5,5,5], [0,5,0], [5,5,5], [0,5,0]],
-            [[0,0,0], [0,5,5], [5,0,0], [0,5,0]]],
+        'O': [[[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]],
+              [[0,1,1,0], [0,1,1,0], [0,1,1,0], [0,1,1,0]],
+              [[0,1,1,0], [0,1,1,0], [0,1,1,0], [0,1,1,0]]],
 
-      'O': [[[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]],
-            [[0,1,1,0], [0,1,1,0], [0,1,1,0], [0,1,1,0]],
-            [[0,1,1,0], [0,1,1,0], [0,1,1,0], [0,1,1,0]]],
+        'S': [[[0,3,3], [0,3,0], [0,0,0], [3,0,0]],
+              [[3,3,0], [0,3,3], [0,3,3], [3,3,0]],
+              [[0,0,0], [0,0,3], [3,3,0], [0,3,0]]],
 
-      'S': [[[0,3,3], [0,3,0], [0,0,0], [3,0,0]],
-            [[3,3,0], [0,3,3], [0,3,3], [3,3,0]],
-            [[0,0,0], [0,0,3], [3,3,0], [0,3,0]]],
+        'T': [[[0,7,0], [0,7,0], [0,0,0], [0,7,0]],
+              [[7,7,7], [0,7,7], [7,7,7], [7,7,0]],
+              [[0,0,0], [0,7,0], [0,7,0], [0,7,0]]],
 
-      'T': [[[0,7,0], [0,7,0], [0,0,0], [0,7,0]],
-            [[7,7,7], [0,7,7], [7,7,7], [7,7,0]],
-            [[0,0,0], [0,7,0], [0,7,0], [0,7,0]]],
-
-      'Z': [[[4,4,0], [0,0,4], [0,0,0], [0,4,0]],
-            [[0,4,4], [0,4,4], [4,4,0], [4,4,0]],
-            [[0,0,0], [0,4,0], [0,4,4], [4,0,0]]]
+        'Z': [[[4,4,0], [0,0,4], [0,0,0], [0,4,0]],
+              [[0,4,4], [0,4,4], [4,4,0], [4,4,0]],
+              [[0,0,0], [0,4,0], [0,4,4], [4,0,0]]]
     }
 
-    random_bag = ['O', 'I', 'S', 'Z', 'L', 'J', 'T']
-    random_bag_index = len(random_bag)-1
-
-    game_over = [
+    GAME_OVER_TEXT = [
         "GameOverGameOverGameOverGameOverGameOverGameOverGameOve",
         "                                                       ",
         "         GGGG                      OO                  ",
@@ -193,7 +181,8 @@ class Tetris:
         "                                                       ",
         "GameOverGameOverGameOverGameOverGameOverGameOverGameOve"
     ]
-    game_over_to_color = {
+
+    GAME_OVER_COLORS = {
         ' ': 0,
         'G': 1,
         'a': 2,
@@ -203,6 +192,15 @@ class Tetris:
         'v': 6,
         'r': 7
     }
+
+    drop_timer = None
+    tetromino_current = 'O'
+    tetromino_form = 0
+    tetromino_pos_row = FIELD_ROW_START
+    tetromino_pos_col = FIELD_COL_START
+    playfield = [x[:] for x in [[0]*FIELD_COLS]*FIELD_ROWS]
+    random_bag = ['O', 'I', 'S', 'Z', 'L', 'J', 'T']
+    random_bag_index = len(random_bag)-1
     game_over_position = 0
     is_game_over = False
     loop = True
@@ -270,7 +268,7 @@ class Tetris:
         return self.random_bag[self.random_bag_index]
 
     def add_tetromino_to_field(self, field, pos_row, pos_col, tetromino, form):
-        for index_col, col in enumerate(self.tetromino[tetromino]):
+        for index_col, col in enumerate(self.TETROMINOS[tetromino]):
             for index_row, color in enumerate(col[form]):
                 if color != 0:
                     row = pos_row + index_row
@@ -279,7 +277,7 @@ class Tetris:
                         field[row][col] = color
 
     def tetromino_fits(self, field, pos_row, pos_col, tetromino, form):
-        for index_col, col in enumerate(self.tetromino[tetromino]):
+        for index_col, col in enumerate(self.TETROMINOS[tetromino]):
             for index_row, color in enumerate(col[form]):
                 if color != 0:
                     row = pos_row + index_row
@@ -309,9 +307,9 @@ class Tetris:
             if row % 2 == 0:
                 col_range = reversed(col_range)
             for col in col_range:
-                r.append(self.colors[field[row][col]][config.R_INDEX])
-                g.append(self.colors[field[row][col]][config.G_INDEX])
-                b.append(self.colors[field[row][col]][config.B_INDEX])
+                r.append(self.COLORS[field[row][col]][config.R_INDEX])
+                g.append(self.COLORS[field[row][col]][config.G_INDEX])
+                b.append(self.COLORS[field[row][col]][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -400,10 +398,10 @@ class Tetris:
             self.drop_timer.interval = 0.15
 
     def next_game_over_step(self):
-        for row in range(len(self.game_over)):
+        for row in range(len(self.GAME_OVER_TEXT)):
             for col in range(config.LED_COLS):
-                k = (self.game_over_position+col) % len(self.game_over[0])
-                self.playfield[7+row][col] = self.game_over_to_color[self.game_over[row][k]]
+                k = (self.game_over_position+col) % len(self.GAME_OVER_TEXT[0])
+                self.playfield[7+row][col] = self.GAME_OVER_COLORS[self.GAME_OVER_TEXT[row][k]]
 
         self.game_over_position += 1
 
@@ -442,7 +440,7 @@ class Tetris:
         self.drop_timer = RepeatedTimer(1.0, self.drop_tetromino)
 
         while self.loop:
-            key = self.kp.read_single_keypress().lower()
+            key = self.kp.read_single_keypress()
             self.speaker.beep_input()
 
             if key == 'a':

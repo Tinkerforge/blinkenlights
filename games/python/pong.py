@@ -66,16 +66,7 @@ class PongSpeaker:
 
 
 class Pong:
-    score = [0, 0]
-
-    paddle_size = 3
-    paddle_position_x = [4, 15]
-    paddle_position_y = [3, 3]
-
-    ball_position = [10, 5]
-    ball_direction = [0.1, 0.2]
-
-    timer = None
+    PADDLE_SIZE = 3
 
 # Antialased ball?
 #    PONG_COLOR_INDEX_BALL_TOP = 8
@@ -83,7 +74,7 @@ class Pong:
 #    PONG_COLOR_INDEX_BALL_RIGHT = 10
 #    PONG_COLOR_INDEX_BALL_BOTTOM = 11
 
-    colors = [
+    COLORS = [
         (  0,   0,   0), # off
 #       ( 10,  10,  10), # grey
         (255,   0,   0), # red
@@ -99,9 +90,7 @@ class Pong:
         (  0,   0,   0)  # ball bottom
     ]
 
-    playfield = [x[:] for x in [[0]*config.LED_COLS]*config.LED_ROWS]
-
-    score_font = {
+    SCORE_FONT = {
         0: ["222",
             "202",
             "202",
@@ -154,6 +143,13 @@ class Pong:
             "002"],
     }
 
+    playfield = [x[:] for x in [[0]*config.LED_COLS]*config.LED_ROWS]
+    score = [0, 0]
+    paddle_position_x = [4, 15]
+    paddle_position_y = [3, 3]
+    ball_position = [10, 5]
+    ball_direction = [0.1, 0.2]
+    timer = None
     write_playfield_counter = 0
     loop = True
 
@@ -212,9 +208,9 @@ class Pong:
             if row % 2 == 0:
                 col_range = reversed(col_range)
             for col in col_range:
-                r.append(self.colors[field[row][col]][config.R_INDEX])
-                g.append(self.colors[field[row][col]][config.G_INDEX])
-                b.append(self.colors[field[row][col]][config.B_INDEX])
+                r.append(self.COLORS[field[row][col]][config.R_INDEX])
+                g.append(self.COLORS[field[row][col]][config.G_INDEX])
+                b.append(self.COLORS[field[row][col]][config.B_INDEX])
 
         # Make chunks of size 16
         r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
@@ -237,8 +233,8 @@ class Pong:
     def add_score_to_playfield(self, field):
         for row in range(3):
             for col in range(5):
-                field[row][col+1] = int(self.score_font[self.score[0]][col][row])
-                field[row+17][col+1] = int(self.score_font[self.score[1]][col][row])
+                field[row][col+1] = int(self.SCORE_FONT[self.score[0]][col][row])
+                field[row+17][col+1] = int(self.SCORE_FONT[self.score[1]][col][row])
 
     def add_ball_to_playfield(self, field):
         x = max(0, min(19, int(self.ball_position[0])))
@@ -252,29 +248,29 @@ class Pong:
 #        iy = int(y)
 #        field[ix][iy] = config.PONG_COLOR_INDEX_BALL
 #        if ix + 1 < config.LED_ROWS:
-#            field[ix+1][iy] = config.PONG_COLOR_INDEX_BALL_RIGHT
+#            field[ix+1][iy] = PONG_COLOR_INDEX_BALL_RIGHT
 #        if ix - 1 > 0:
-#            field[ix-1][iy] = config.PONG_COLOR_INDEX_BALL_LEFT
+#            field[ix-1][iy] = PONG_COLOR_INDEX_BALL_LEFT
 #        if iy + 1 < config.LED_COLS:
-#            field[ix][iy+1] = config.PONG_COLOR_INDEX_BALL_TOP
+#            field[ix][iy+1] = PONG_COLOR_INDEX_BALL_TOP
 #        if iy - 1 > 0:
-#            field[ix][iy-1] = config.PONG_COLOR_INDEX_BALL_BOTTOM
+#            field[ix][iy-1] = PONG_COLOR_INDEX_BALL_BOTTOM
 #
 #        dx = x - int(x)
 #        dy = x - int(x)
-#        self.colors[config.PONG_COLOR_INDEX_BALL_RIGHT] = (0, 255*dx/64, 0)
-#        self.colors[config.PONG_COLOR_INDEX_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
-#        self.colors[config.PONG_COLOR_INDEX_BALL_TOP] = (0, 255*dy/64, 0)
-#        self.colors[config.PONG_COLOR_INDEX_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
+#        self.COLORS[PONG_COLOR_INDEX_BALL_RIGHT] = (0, 255*dx/64, 0)
+#        self.COLORS[PONG_COLOR_INDEX_BALL_LEFT] = (0, 255*(1-dx)/64, 0)
+#        self.COLORS[PONG_COLOR_INDEX_BALL_TOP] = (0, 255*dy/64, 0)
+#        self.COLORS[PONG_COLOR_INDEX_BALL_BOTTOM] = (0, 255*(1-dy)/64, 0)
 
     def add_paddles_to_playfield(self, field):
         for player in range(2):
-            for i in range(self.paddle_size):
+            for i in range(self.PADDLE_SIZE):
                 field[self.paddle_position_x[player]][self.paddle_position_y[player]+i] = config.PONG_COLOR_INDEX_PLAYER[player]
 
     def move_paddle(self, player, change):
         new_pos = self.paddle_position_y[player] + change
-        if new_pos >= 0 and new_pos <= 10 - self.paddle_size:
+        if new_pos >= 0 and new_pos <= 10 - self.PADDLE_SIZE:
             self.paddle_position_y[player] = new_pos
 
     def new_ball(self):
@@ -315,14 +311,14 @@ class Pong:
 
         if self.ball_direction[0] < 0:
             if self.paddle_position_x[0] + 0.5 <= self.ball_position[0] <= self.paddle_position_x[0] + 1.5:
-                if self.paddle_position_y[0] - 0.5 <= self.ball_position[1] <= self.paddle_position_y[0] + self.paddle_size + 0.5:
-                    paddle_skew = (self.paddle_position_y[0] + self.paddle_size/2.0 - self.ball_position[1])/10.0
+                if self.paddle_position_y[0] - 0.5 <= self.ball_position[1] <= self.paddle_position_y[0] + self.PADDLE_SIZE + 0.5:
+                    paddle_skew = (self.paddle_position_y[0] + self.PADDLE_SIZE/2.0 - self.ball_position[1])/10.0
                     hit_paddle(paddle_skew)
 
         if self.ball_direction[0] > 0:
             if self.paddle_position_x[1] - 0.5 <= self.ball_position[0] <= self.paddle_position_x[1] + 0.5:
-                if self.paddle_position_y[1] - 0.5 <= self.ball_position[1] <= self.paddle_position_y[1] + self.paddle_size + 0.5:
-                    paddle_skew = (self.paddle_position_y[1] + self.paddle_size/2.0 - self.ball_position[1])/10.0
+                if self.paddle_position_y[1] - 0.5 <= self.ball_position[1] <= self.paddle_position_y[1] + self.PADDLE_SIZE + 0.5:
+                    paddle_skew = (self.paddle_position_y[1] + self.PADDLE_SIZE/2.0 - self.ball_position[1])/10.0
                     hit_paddle(paddle_skew)
 
     def run_game_loop(self):

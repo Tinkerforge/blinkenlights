@@ -55,7 +55,8 @@ class MultiTouchInput:
             if self.current_state_counter[i] > 5:
                 state |= (1 << i)
 
-        self.state_to_queue(state)
+        if state != 0:
+            self.state_to_queue(state)
 
     def cb_touch_state(self, state):
         changed_state = self.current_state ^ state
@@ -193,7 +194,7 @@ class KeyBoardInput:
     def keyboard_loop(self):
         while self.loop:
             try:
-                self.key_queue.put(sys.stdin.read(1)) # read single character
+                self.key_queue.put(sys.stdin.read(1).lower()) # read single character
             except KeyboardInterrupt:
                 pass
 
