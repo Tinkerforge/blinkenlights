@@ -150,7 +150,6 @@ class Pong:
     ball_position = [10, 5]
     ball_direction = [0.1, 0.2]
     timer = None
-    write_playfield_counter = 0
     loop = True
 
     def __init__(self, ipcon):
@@ -270,11 +269,11 @@ class Pong:
 
     def move_paddle(self, player, change):
         new_pos = self.paddle_position_y[player] + change
-        if new_pos >= 0 and new_pos <= 10 - self.PADDLE_SIZE:
+        if new_pos >= 0 and new_pos <= config.LED_COLS - self.PADDLE_SIZE:
             self.paddle_position_y[player] = new_pos
 
     def new_ball(self):
-        self.ball_position = [9.5, 4.5]
+        self.ball_position = [(config.LED_ROWS - 1.0) / 2.0, (config.LED_COLS - 1.0) / 2.0]
         self.ball_direction = [random.choice([-0.2, 0.2]), random.choice([random.randrange(1, 9)/10.0, random.randrange(-9, -1)/10.0])]
 
     def tick(self):
@@ -283,7 +282,7 @@ class Pong:
             self.ball_position[i] += self.ball_direction[i]
 
         # Wall collision top/bottom
-        if self.ball_position[1] < 0 or self.ball_position[1] >= 10:
+        if self.ball_position[1] < 0 or self.ball_position[1] >= config.LED_COLS:
             self.ball_direction[1] = -self.ball_direction[1]
 
         # Wall collision left/right
@@ -298,7 +297,7 @@ class Pong:
         if self.ball_position[0] < 0:
             hit_left_right(1)
 
-        if self.ball_position[0] >= 20:
+        if self.ball_position[0] >= config.LED_ROWS:
             hit_left_right(0)
 
         # Paddle collision
