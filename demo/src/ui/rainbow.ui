@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>427</width>
-    <height>271</height>
+    <width>512</width>
+    <height>326</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,13 +17,30 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Einführungstext</string>
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This demo displays a moving rainbow.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The speed of the movement is defined by the &lt;span style=&quot; font-weight:600;&quot;&gt;Frame Rate&lt;/span&gt; and &lt;span style=&quot; font-weight:600;&quot;&gt;Step&lt;/span&gt; values. Each frame the rainbow is moved one step. The size of this step is given in percent of the number of LEDs in the matrix.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The source code for this demo is available in &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html#rainbow&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Python and C&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -46,7 +63,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Speed (%):</string>
+        <string>Step (%):</string>
        </property>
       </widget>
      </item>
@@ -62,7 +79,7 @@
         <number>5</number>
        </property>
        <property name="value">
-        <number>20</number>
+        <number>50</number>
        </property>
        <property name="tracking">
         <bool>true</bool>
@@ -73,18 +90,18 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSlider" name="slider_speed">
+      <widget class="QSlider" name="slider_step">
        <property name="minimum">
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>100</number>
+        <number>1000</number>
        </property>
        <property name="pageStep">
         <number>5</number>
        </property>
        <property name="value">
-        <number>1</number>
+        <number>2</number>
        </property>
        <property name="tracking">
         <bool>true</bool>
@@ -103,17 +120,20 @@
         <number>100</number>
        </property>
        <property name="value">
-        <number>20</number>
+        <number>50</number>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QSpinBox" name="spinbox_speed">
-       <property name="minimum">
-        <number>0</number>
+      <widget class="QDoubleSpinBox" name="spinbox_step">
+       <property name="decimals">
+        <number>1</number>
        </property>
-       <property name="maximum">
-        <number>100</number>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.200000000000000</double>
        </property>
       </widget>
      </item>
