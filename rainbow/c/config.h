@@ -19,6 +19,6 @@
 
 // Rainbow Parameters
 #define RAINBOW_FRAME_RATE 50 // in Hz, valid range: 10 - 100
-#define RAINBOW_SPEED 0.01 // valid range: 0.0 - 1.0
+#define RAINBOW_STEP 0.002 // valid range: 0.0 - 1.0
 
 #endif // CONFIG_H

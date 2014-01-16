@@ -40,10 +40,10 @@ class RainbowWidget(QWidget, Ui_Rainbow):
         self.setupUi(self)
 
         self.slider_frame_rate.valueChanged.connect(self.slider_frame_rate_changed)
-        self.slider_speed.valueChanged.connect(self.slider_speed_changed)
+        self.slider_step.valueChanged.connect(self.slider_step_changed)
 
         self.spinbox_frame_rate.valueChanged.connect(self.spinbox_frame_rate_changed)
-        self.spinbox_speed.valueChanged.connect(self.spinbox_speed_changed)
+        self.spinbox_step.valueChanged.connect(self.spinbox_step_changed)
 
         self.button_default.pressed.connect(self.default_pressed)
 
@@ -56,7 +56,7 @@ class RainbowWidget(QWidget, Ui_Rainbow):
         self.rainbow = Rainbow(self.app.ipcon)
 
         self.update_frame_rate()
-        self.update_speed()
+        self.update_step()
 
         self.rainbow.frame_rendered(0)
 
@@ -69,19 +69,19 @@ class RainbowWidget(QWidget, Ui_Rainbow):
         self.slider_frame_rate.setValue(frame_rate)
         self.update_frame_rate_timer.start(100)
 
-    def spinbox_speed_changed(self, speed):
-        self.slider_speed.setValue(speed)
-        self.update_speed()
+    def spinbox_step_changed(self, step):
+        self.slider_step.setValue(step * 10)
+        self.update_step()
 
     def slider_frame_rate_changed(self, frame_rate):
         self.spinbox_frame_rate.setValue(frame_rate)
 
-    def slider_speed_changed(self, speed):
-        self.spinbox_speed.setValue(speed)
+    def slider_step_changed(self, step):
+        self.spinbox_step.setValue(step / 10.0)
 
     def default_pressed(self):
         self.spinbox_frame_rate.setValue(50)
-        self.spinbox_speed.setValue(1)
+        self.spinbox_step.setValue(0.2)
 
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
@@ -91,5 +91,5 @@ class RainbowWidget(QWidget, Ui_Rainbow):
         if self.rainbow:
             self.rainbow.update_frame_rate()
 
-    def update_speed(self):
-        config.RAINBOW_SPEED = self.spinbox_speed.value() / 100.0
+    def update_step(self):
+        config.RAINBOW_STEP = self.spinbox_step.value() / 100.0

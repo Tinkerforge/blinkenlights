@@ -69,7 +69,7 @@ void frame_prepare_next(void) {
 	memcpy(leds, &rainbow[offset], count * 3);
 	memcpy(&leds[count], rainbow, offset * 3);
 
-	rainbow_position += (LED_ROWS*LED_COLS) * RAINBOW_SPEED / 4.0;
+	rainbow_position += (LED_ROWS*LED_COLS) * RAINBOW_STEP
 }
 
 // Frame rendered callback, is called when a new frame was rendered

@@ -91,7 +91,7 @@ class Rainbow:
 
     def frame_prepare_next(self):
         self.leds = self.rainbow[int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS):] + self.rainbow[:int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS)]
-        self.rainbow_position += (config.LED_ROWS*config.LED_COLS) * config.RAINBOW_SPEED / 4.0
+        self.rainbow_position += (config.LED_ROWS*config.LED_COLS) * config.RAINBOW_STEP
 
 
 if __name__ == "__main__":
