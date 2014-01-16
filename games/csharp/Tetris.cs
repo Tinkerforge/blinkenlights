@@ -758,27 +758,30 @@ class Tetris
 		{
 			char key = keyPress.ReadSingleKeypress();
 
-			speaker.BeepInput();
-
 			switch (key)
 			{
 			case 'a':
+				speaker.BeepInput();
 				MoveTetromino(0, -1, tetrominoForm);
 				break;
 
 			case 'd':
+				speaker.BeepInput();
 				MoveTetromino(0, 1, tetrominoForm);
 				break;
 
 			case 's':
+				speaker.BeepInput();
 				MoveTetromino(1, 0, tetrominoForm);
 				break;
 
 			case 'k':
+				speaker.BeepInput();
 				MoveTetromino(0, 0, PositiveMod(tetrominoForm - 1, 4));
 				break;
 
 			case 'l':
+				speaker.BeepInput();
 				MoveTetromino(0, 0, PositiveMod(tetrominoForm + 1, 4));
 				break;
 

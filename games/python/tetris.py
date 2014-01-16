@@ -441,17 +441,21 @@ class Tetris:
 
         while self.loop:
             key = self.kp.read_single_keypress()
-            self.speaker.beep_input()
 
             if key == 'a':
+                self.speaker.beep_input()
                 self.move_tetromino(0, -1, self.tetromino_form)
             elif key == 'd':
+                self.speaker.beep_input()
                 self.move_tetromino(0, 1, self.tetromino_form)
             elif key == 's':
+                self.speaker.beep_input()
                 self.move_tetromino(1, 0, self.tetromino_form)
             elif key == 'k':
+                self.speaker.beep_input()
                 self.move_tetromino(0, 0, (self.tetromino_form-1) % 4)
             elif key == 'l':
+                self.speaker.beep_input()
                 self.move_tetromino(0, 0, (self.tetromino_form+1) % 4)
             elif key == 'r':
                 self.init_game()
