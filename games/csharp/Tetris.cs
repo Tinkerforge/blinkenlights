@@ -690,7 +690,7 @@ class Tetris
 			for (int col = 0; col < Config.LED_COLS; ++col)
 			{
 				int k = (gameOverPosition + col) % GAME_OVER_TEXT[0].Length;
-				playfield[7 + row][col] = (byte)(int)GAME_OVER_COLORS[GAME_OVER_TEXT[row][k]];
+				playfield[7 + row][1 + col] = (byte)(int)GAME_OVER_COLORS[GAME_OVER_TEXT[row][k]];
 			}
 		}
 

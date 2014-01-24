@@ -400,7 +400,7 @@ class Tetris:
         for row in range(len(self.GAME_OVER_TEXT)):
             for col in range(config.LED_COLS):
                 k = (self.game_over_position+col) % len(self.GAME_OVER_TEXT[0])
-                self.playfield[7+row][col] = self.GAME_OVER_COLORS[self.GAME_OVER_TEXT[row][k]]
+                self.playfield[7+row][1+col] = self.GAME_OVER_COLORS[self.GAME_OVER_TEXT[row][k]]
 
         self.game_over_position += 1
 
