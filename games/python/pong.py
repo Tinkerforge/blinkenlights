@@ -4,9 +4,6 @@
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 from tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
-from tinkerforge.bricklet_segment_display_4x7 import SegmentDisplay4x7
-from tinkerforge.bricklet_multi_touch import MultiTouch
-from tinkerforge.bricklet_dual_button import DualButton
 
 import random
 import copy
