@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*
 
+HAS_GUI = False
+
 # General
 HOST = 'localhost'
 PORT = 4223

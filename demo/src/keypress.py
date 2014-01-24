@@ -204,8 +204,9 @@ class KeyPress:
     def __init__(self, ipcon):
         self.mti = MultiTouchInput(ipcon, self.key_queue)
         self.dbi = DualButtonInput(ipcon, self.key_queue)
-#       Don't use keyboard input in gui demo
-#       self.kbi = KeyBoardInput(self.key_queue)
+
+        if not config.HAS_GUI:
+            self.kbi = KeyBoardInput(self.key_queue)
 
     def read_single_keypress(self):
         return self.key_queue.get()

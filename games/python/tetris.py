@@ -458,7 +458,7 @@ class Tetris:
                 self.move_tetromino(0, 0, (self.tetromino_form+1) % 4)
             elif key == 'r':
                 self.init_game()
-            elif key == 'q':
+            elif not config.HAS_GUI and key == 'q':
                 break
 
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
