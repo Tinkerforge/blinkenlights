@@ -35,6 +35,7 @@ class MultiTouchInput:
             print("Not Found: Multi Touch ({0})").format(config.UID_MULTI_TOUCH_BRICKLET)
             return
 
+        self.mt.set_electrode_sensitivity(100)
         self.mt.register_callback(self.mt.CALLBACK_TOUCH_STATE, self.cb_touch_state)
 
         self.touch_timer = RepeatedTimer(0.1, self.touch_tick)

@@ -35,6 +35,7 @@ class MultiTouchInput
 			return;
 		}
 
+		multiTouch.SetElectrodeSensitivity(100);
 		multiTouch.TouchState += TouchStateCB;
 
 		touchTimer = new Timer(delegate(object state) { TouchTick(); }, null, 100, 100);
