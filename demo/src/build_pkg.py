@@ -312,6 +312,9 @@ def build_linux_pkg():
         f.write(line)
     f.close()
 
+    os.system('find starter_kit_blinkenlights_demo/usr -type f -path *.pyc -exec rm {} \;')
+    os.system('find starter_kit_blinkenlights_demo/usr -type d -exec chmod 0755 {} \;')
+
     os.system('chown -R root:root starter_kit_blinkenlights_demo/usr')
     os.system('dpkg -b starter_kit_blinkenlights_demo/ starter-kit-blinkenlights-demo-' + config.DEMO_VERSION + '_all.deb')
     os.system('chown -R `logname`:`logname` starter_kit_blinkenlights_demo/usr')
