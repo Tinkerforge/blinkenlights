@@ -16,6 +16,7 @@ import config
 class MultiTouchInput:
     current_state = 0
     current_state_counter = [0]*12
+    touch_timer = None
 
     def __init__(self, ipcon, key_queue):
         if not config.UID_MULTI_TOUCH_BRICKLET:
@@ -39,7 +40,8 @@ class MultiTouchInput:
         self.touch_timer = RepeatedTimer(0.1, self.touch_tick)
 
     def stop(self):
-        self.touch_timer.stop()
+        if self.touch_timer is not None:
+            self.touch_timer.stop()
 
     def state_to_queue(self, state):
         for item in config.KEYMAP_MULTI_TOUCH.items():
@@ -69,6 +71,7 @@ class MultiTouchInput:
 class DualButtonInput:
     current_state = 0
     current_state_counter = [0]*4
+    press_timer = None
 
     def __init__(self, ipcon, key_queue):
         if not config.UID_DUAL_BUTTON_BRICKLET[0]:
@@ -114,7 +117,8 @@ class DualButtonInput:
         self.press_timer = RepeatedTimer(0.1, self.press_tick)
 
     def stop(self):
-        self.press_timer.stop()
+        if self.press_timer is not None:
+            self.press_timer.stop()
 
     def cb_state_changed1(self, button_l, button_r, led_l, led_r):
         l = button_l == DualButton.BUTTON_STATE_PRESSED
@@ -167,7 +171,7 @@ if sys.platform == 'win32':
             self.thread.daemon = True
             self.thread.start()
 
-        def stop():
+        def stop(self):
             self.loop = False
 
         def keyboard_loop(self):
@@ -195,7 +199,7 @@ else:
             self.thread.daemon = True
             self.thread.start()
 
-        def stop():
+        def stop(self):
             self.loop = False
             self.restore_stdin()
 
@@ -254,7 +258,7 @@ class KeyPress:
         self.dbi.stop()
 
         if self.kbi is not None:
-            self.kp.kbi.stop()
+            self.kbi.stop()
 
     def read_single_keypress(self):
         return self.key_queue.get()
