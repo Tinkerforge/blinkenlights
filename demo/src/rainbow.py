@@ -52,7 +52,7 @@ class Rainbow:
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(1000.0 / config.RAINBOW_FRAME_RATE)
+        self.led_strip.set_frame_duration(int(1000.0 / config.RAINBOW_FRAME_RATE))
 
     def frame_rendered(self, _):
         self.frame_upload()

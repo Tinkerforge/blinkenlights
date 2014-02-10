@@ -85,7 +85,7 @@ class Images:
         if not self.okay:
             return
 
-        self.led_strip.set_frame_duration(1000.0 / config.IMAGES_FRAME_RATE)
+        self.led_strip.set_frame_duration(int(1000.0 / config.IMAGES_FRAME_RATE))
 
     def set_new_images(self, image_urls):
         self.images = []
