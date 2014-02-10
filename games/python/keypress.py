@@ -3,8 +3,6 @@
 from tinkerforge.bricklet_multi_touch import MultiTouch
 from tinkerforge.bricklet_dual_button import DualButton
 
-import termios
-import fcntl
 import sys
 import os
 
@@ -156,54 +154,88 @@ class DualButtonInput:
 
         self.state_to_queue(state)
 
-class KeyBoardInput:
-    def __init__(self, key_queue):
-        self.key_queue = key_queue
-        self.fd = sys.stdin.fileno()
-        self.loop = True
 
-        self.prepare_stdin()
+if sys.platform == 'win32':
+    import msvcrt
 
-        self.thread = Thread(target = self.keyboard_loop)
-        self.thread.daemon = True
-        self.thread.start()
+    class GetchKeyBoardInput:
+        def __init__(self, key_queue):
+            self.key_queue = key_queue
+            self.loop = True
 
-    def prepare_stdin(self):
-        # save old state
-        self.flags_save = fcntl.fcntl(self.fd, fcntl.F_GETFL)
-        self.attrs_save = termios.tcgetattr(self.fd)
+            self.thread = Thread(target = self.keyboard_loop)
+            self.thread.daemon = True
+            self.thread.start()
 
-        # copy the stored version to update
-        attrs = list(self.attrs_save)
+        def stop():
+            self.loop = False
 
-        # iflag
-        attrs[0] &= ~(termios.IGNBRK | termios.BRKINT | termios.PARMRK
-                      | termios.ISTRIP | termios.INLCR | termios.IGNCR
-                      | termios.ICRNL | termios.IXON )
+        def keyboard_loop(self):
+            while self.loop:
+                try:
+                    self.key_queue.put(msvcrt.getch().lower()) # read single character
+                except KeyboardInterrupt:
+                    pass
 
-        # cflag
-        attrs[2] &= ~(termios.CSIZE | termios. PARENB)
-        attrs[2] |= termios.CS8
+    KeyBoardInput = GetchKeyBoardInput
 
-        # lflag
-        attrs[3] &= ~(termios.ECHONL | termios.ECHO | termios.ICANON
-                      | termios.ISIG | termios.IEXTEN)
-        termios.tcsetattr(self.fd, termios.TCSANOW, attrs)
+else:
+    import termios
+    import fcntl
 
-        # turn off non-blocking
-        fcntl.fcntl(self.fd, fcntl.F_SETFL, self.flags_save & ~os.O_NONBLOCK)
+    class TermiosKeyBoardInput:
+        def __init__(self, key_queue):
+            self.key_queue = key_queue
+            self.fd = sys.stdin.fileno()
+            self.loop = True
 
-    def restore_stdin(self):
-        self.loop = False
-        termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.attrs_save)
-        fcntl.fcntl(self.fd, fcntl.F_SETFL, self.flags_save)
+            self.prepare_stdin()
 
-    def keyboard_loop(self):
-        while self.loop:
-            try:
-                self.key_queue.put(sys.stdin.read(1).lower()) # read single character
-            except KeyboardInterrupt:
-                pass
+            self.thread = Thread(target = self.keyboard_loop)
+            self.thread.daemon = True
+            self.thread.start()
+
+        def stop():
+            self.loop = False
+            self.restore_stdin()
+
+        def prepare_stdin(self):
+            # save old state
+            self.flags_save = fcntl.fcntl(self.fd, fcntl.F_GETFL)
+            self.attrs_save = termios.tcgetattr(self.fd)
+
+            # copy the stored version to update
+            attrs = list(self.attrs_save)
+
+            # iflag
+            attrs[0] &= ~(termios.IGNBRK | termios.BRKINT | termios.PARMRK
+                          | termios.ISTRIP | termios.INLCR | termios.IGNCR
+                          | termios.ICRNL | termios.IXON )
+
+            # cflag
+            attrs[2] &= ~(termios.CSIZE | termios. PARENB)
+            attrs[2] |= termios.CS8
+
+            # lflag
+            attrs[3] &= ~(termios.ECHONL | termios.ECHO | termios.ICANON
+                          | termios.ISIG | termios.IEXTEN)
+            termios.tcsetattr(self.fd, termios.TCSANOW, attrs)
+
+            # turn off non-blocking
+            fcntl.fcntl(self.fd, fcntl.F_SETFL, self.flags_save & ~os.O_NONBLOCK)
+
+        def restore_stdin(self):
+            termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.attrs_save)
+            fcntl.fcntl(self.fd, fcntl.F_SETFL, self.flags_save)
+
+        def keyboard_loop(self):
+            while self.loop:
+                try:
+                    self.key_queue.put(sys.stdin.read(1).lower()) # read single character
+                except KeyboardInterrupt:
+                    pass
+
+    KeyBoardInput = TermiosKeyBoardInput
 
 class KeyPress:
     key_queue = Queue()
@@ -212,12 +244,17 @@ class KeyPress:
         self.mti = MultiTouchInput(ipcon, self.key_queue)
         self.dbi = DualButtonInput(ipcon, self.key_queue)
 
-        if not config.HAS_GUI:
+        if config.HAS_GUI:
+            self.kbi = None
+        else:
             self.kbi = KeyBoardInput(self.key_queue)
 
     def stop(self):
         self.mti.stop()
         self.dbi.stop()
+
+        if self.kbi is not None:
+            self.kp.kbi.stop()
 
     def read_single_keypress(self):
         return self.key_queue.get()

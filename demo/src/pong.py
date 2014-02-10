@@ -355,6 +355,5 @@ if __name__ == "__main__":
         print('Press q to exit')
 
         pong.run_game_loop()
-        pong.kp.kbi.restore_stdin()
 
     ipcon.disconnect()

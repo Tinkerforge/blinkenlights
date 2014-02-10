@@ -478,6 +478,5 @@ if __name__ == "__main__":
         print('Press q to exit')
 
         tetris.run_game_loop()
-        tetris.kp.kbi.restore_stdin()
 
     ipcon.disconnect()
