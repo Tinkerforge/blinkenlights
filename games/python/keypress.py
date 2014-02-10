@@ -40,6 +40,9 @@ class MultiTouchInput:
 
         self.touch_timer = RepeatedTimer(0.1, self.touch_tick)
 
+    def stop(self):
+        self.touch_timer.stop()
+
     def state_to_queue(self, state):
         for item in config.KEYMAP_MULTI_TOUCH.items():
             if state & (1 << item[0]):
@@ -111,6 +114,9 @@ class DualButtonInput:
             self.db2.register_callback(self.db2.CALLBACK_STATE_CHANGED, self.cb_state_changed2)
 
         self.press_timer = RepeatedTimer(0.1, self.press_tick)
+
+    def stop(self):
+        self.press_timer.stop()
 
     def cb_state_changed1(self, button_l, button_r, led_l, led_r):
         l = button_l == DualButton.BUTTON_STATE_PRESSED
@@ -208,6 +214,10 @@ class KeyPress:
 
         if not config.HAS_GUI:
             self.kbi = KeyBoardInput(self.key_queue)
+
+    def stop(self):
+        self.mti.stop()
+        self.dbi.stop()
 
     def read_single_keypress(self):
         return self.key_queue.get()

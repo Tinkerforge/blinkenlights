@@ -463,6 +463,7 @@ class Tetris:
 
         self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
         self.drop_timer.stop()
+        self.kp.stop()
 
 
 if __name__ == "__main__":
