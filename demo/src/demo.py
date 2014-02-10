@@ -183,10 +183,10 @@ class Blinkenlights(QApplication):
         try:
             self.ipcon.connect(host, port)
         except Error as e:
-            self.error_msg.showMessage('Connection Error: ' + str(e.description) + "\nBrickd installed and running?")
+            self.error_msg.showMessage('Connection Error: ' + str(e.description) + "<br><br>Brickd installed and running?")
             return
         except socket.error as e:
-            self.error_msg.showMessage('Socket error: ' + str(e) + "\nBrickd installed and running?")
+            self.error_msg.showMessage('Socket error: ' + str(e) + "<br><br>Brickd installed and running?")
             return
 
         self.ipcon.register_callback(IPConnection.CALLBACK_ENUMERATE,
