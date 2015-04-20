@@ -25,15 +25,11 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This demo implements a typical &lt;a href=&quot;http://en.wikipedia.org/wiki/Tetris&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Tetris&lt;/span&gt;&lt;/a&gt; game with all specialties. If a &lt;span style=&quot; font-weight:600;&quot;&gt;Piezo Speaker Bricklet&lt;/span&gt; is connected then it will be used for sound effects and if a &lt;span style=&quot; font-weight:600;&quot;&gt;Segment Display 4x7 Bricklet&lt;/span&gt; is connected then it will be used to display the score.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The game can be controlled with the &lt;span style=&quot; font-weight:600;&quot;&gt;Action&lt;/span&gt; buttons on this window, or with the &lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard&lt;/span&gt;, or with a &lt;span style=&quot; font-weight:600;&quot;&gt;Multi Touch Bricklet&lt;/span&gt;.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The source code for this game is available in &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html#tetris&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Python and C#&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;p&gt;This demo implements a typical &lt;a href=&quot;http://en.wikipedia.org/wiki/Tetris&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Tetris&lt;/span&gt;&lt;/a&gt; game with all specialties. If a &lt;b&gt;Piezo Speaker Bricklet&lt;/b&gt; is connected then it will be used for sound effects and if a &lt;b&gt;Segment Display 4x7 Bricklet&lt;/b&gt; is connected then it will be used to display the score.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;The game can be controlled with the &lt;b&gt;Action&lt;/b&gt; buttons on this window, or with the &lt;b&gt;Keyboard&lt;/b&gt;, or with a &lt;b&gt;Multi Touch Bricklet&lt;/b&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;The source code for this game is available in &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html#tetris&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Python and C#&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
