@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #############################################################
-# This file was automatically generated on 2014-01-15.      #
+# This file was automatically generated on 2015-04-20.      #
 #                                                           #
-# Bindings Version 2.0.13                                    #
+# Bindings Version 2.1.4                                    #
 #                                                           #
 # If you have a bugfix for this file and want to commit it, #
 # please fix the bug in the generator. You can find a link  #
-# to the generator git on tinkerforge.com                   #
+# to the generators git repository on tinkerforge.com       #
 #############################################################
 
 try:
@@ -31,6 +31,7 @@ class BrickletSegmentDisplay4x7(Device):
     """
 
     DEVICE_IDENTIFIER = 237
+    DEVICE_DISPLAY_NAME = 'Segment Display 4x7 Bricklet'
 
     CALLBACK_COUNTER_FINISHED = 5
 
@@ -91,11 +92,13 @@ class BrickletSegmentDisplay4x7(Device):
         The *length* of the increment is given in ms.
         
         Example: If you set *from* to 0, *to* to 100, *increment* to 1 and
-        *length* to 1000, a counter that goes from 0 to 100 with 1 second
+        *length* to 1000, a counter that goes from 0 to 100 with one second
         pause between each increment will be started.
         
         The maximum values for *from*, *to* and *increment* is 9999, 
         the minimum value is -999.
+        
+        Using a negative increment allows to count backwards.
         
         You can stop the counter at every time by calling :func:`SetSegments`.
         """
@@ -117,9 +120,8 @@ class BrickletSegmentDisplay4x7(Device):
         
         The position can be 'a', 'b', 'c' or 'd'.
         
-        The device identifiers can be found :ref:`here <device_identifier>`.
-        
-        .. versionadded:: 2.0.0~(Plugin)
+        The device identifier numbers can be found :ref:`here <device_identifier>`.
+        |device_identifier_constant|
         """
         return GetIdentity(*self.ipcon.send_request(self, BrickletSegmentDisplay4x7.FUNCTION_GET_IDENTITY, (), '', '8s 8s c 3B 3B H'))
 

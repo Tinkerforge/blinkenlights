@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #############################################################
-# This file was automatically generated on 2014-01-15.      #
+# This file was automatically generated on 2015-04-20.      #
 #                                                           #
-# Bindings Version 2.0.13                                    #
+# Bindings Version 2.1.4                                    #
 #                                                           #
 # If you have a bugfix for this file and want to commit it, #
 # please fix the bug in the generator. You can find a link  #
-# to the generator git on tinkerforge.com                   #
+# to the generators git repository on tinkerforge.com       #
 #############################################################
 
 try:
@@ -31,6 +31,7 @@ class BrickletLEDStrip(Device):
     """
 
     DEVICE_IDENTIFIER = 231
+    DEVICE_DISPLAY_NAME = 'LED Strip Bricklet'
 
     CALLBACK_FRAME_RENDERED = 6
 
@@ -41,8 +42,13 @@ class BrickletLEDStrip(Device):
     FUNCTION_GET_SUPPLY_VOLTAGE = 5
     FUNCTION_SET_CLOCK_FREQUENCY = 7
     FUNCTION_GET_CLOCK_FREQUENCY = 8
+    FUNCTION_SET_CHIP_TYPE = 9
+    FUNCTION_GET_CHIP_TYPE = 10
     FUNCTION_GET_IDENTITY = 255
 
+    CHIP_TYPE_WS2801 = 2801
+    CHIP_TYPE_WS2811 = 2811
+    CHIP_TYPE_WS2812 = 2812
 
     def __init__(self, uid, ipcon):
         """
@@ -51,7 +57,7 @@ class BrickletLEDStrip(Device):
         """
         Device.__init__(self, uid, ipcon)
 
-        self.api_version = (2, 0, 1)
+        self.api_version = (2, 0, 2)
 
         self.response_expected[BrickletLEDStrip.FUNCTION_SET_RGB_VALUES] = BrickletLEDStrip.RESPONSE_EXPECTED_FALSE
         self.response_expected[BrickletLEDStrip.FUNCTION_GET_RGB_VALUES] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
@@ -61,6 +67,8 @@ class BrickletLEDStrip(Device):
         self.response_expected[BrickletLEDStrip.CALLBACK_FRAME_RENDERED] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_FALSE
         self.response_expected[BrickletLEDStrip.FUNCTION_SET_CLOCK_FREQUENCY] = BrickletLEDStrip.RESPONSE_EXPECTED_FALSE
         self.response_expected[BrickletLEDStrip.FUNCTION_GET_CLOCK_FREQUENCY] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
+        self.response_expected[BrickletLEDStrip.FUNCTION_SET_CHIP_TYPE] = BrickletLEDStrip.RESPONSE_EXPECTED_FALSE
+        self.response_expected[BrickletLEDStrip.FUNCTION_GET_CHIP_TYPE] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
         self.response_expected[BrickletLEDStrip.FUNCTION_GET_IDENTITY] = BrickletLEDStrip.RESPONSE_EXPECTED_ALWAYS_TRUE
 
         self.callback_formats[BrickletLEDStrip.CALLBACK_FRAME_RENDERED] = 'H'
@@ -82,6 +90,8 @@ class BrickletLEDStrip(Device):
         * b to [0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         
         the LED with index 5 will be red, 6 will be green and 7 will be blue.
+        
+        .. note:: Depending on the LED circuitry colors can be permuted.
         
         The colors will be transfered to actual LEDs when the next
         frame duration ends, see :func:`SetFrameDuration`.
@@ -167,11 +177,37 @@ class BrickletLEDStrip(Device):
 
     def get_clock_frequency(self):
         """
-        Returns the currently used clock frequency.
+        Returns the currently used clock frequency as set by :func:`SetClockFrequency`.
         
         .. versionadded:: 2.0.1~(Plugin)
         """
         return self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_CLOCK_FREQUENCY, (), '', 'I')
+
+    def set_chip_type(self, chip):
+        """
+        Sets the type of the led driver chip. We currently support
+        the chips
+        
+        * WS2801 (``chip`` = 2801),
+        * WS2811 (``chip`` = 2811) and
+        * WS2812 (``chip`` = 2812).
+        
+        The WS2812 is sometimes also called "NeoPixel", a name coined by
+        Adafruit.
+        
+        The default value is WS2801 (``chip`` = 2801).
+        
+        .. versionadded:: 2.0.2~(Plugin)
+        """
+        self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_SET_CHIP_TYPE, (chip,), 'H', '')
+
+    def get_chip_type(self):
+        """
+        Returns the currently used chip type as set by :func:`SetChipType`.
+        
+        .. versionadded:: 2.0.2~(Plugin)
+        """
+        return self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_CHIP_TYPE, (), '', 'H')
 
     def get_identity(self):
         """
@@ -181,9 +217,8 @@ class BrickletLEDStrip(Device):
         
         The position can be 'a', 'b', 'c' or 'd'.
         
-        The device identifiers can be found :ref:`here <device_identifier>`.
-        
-        .. versionadded:: 2.0.0~(Plugin)
+        The device identifier numbers can be found :ref:`here <device_identifier>`.
+        |device_identifier_constant|
         """
         return GetIdentity(*self.ipcon.send_request(self, BrickletLEDStrip.FUNCTION_GET_IDENTITY, (), '', '8s 8s c 3B 3B H'))
 

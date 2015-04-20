@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #############################################################
-# This file was automatically generated on 2014-01-15.      #
+# This file was automatically generated on 2015-04-20.      #
 #                                                           #
-# Bindings Version 2.0.13                                    #
+# Bindings Version 2.1.4                                    #
 #                                                           #
 # If you have a bugfix for this file and want to commit it, #
 # please fix the bug in the generator. You can find a link  #
-# to the generator git on tinkerforge.com                   #
+# to the generators git repository on tinkerforge.com       #
 #############################################################
 
 try:
@@ -30,6 +30,7 @@ class BrickletPiezoSpeaker(Device):
     """
 
     DEVICE_IDENTIFIER = 242
+    DEVICE_DISPLAY_NAME = 'Piezo Speaker Bricklet'
 
     CALLBACK_BEEP_FINISHED = 4
     CALLBACK_MORSE_CODE_FINISHED = 5
@@ -39,6 +40,8 @@ class BrickletPiezoSpeaker(Device):
     FUNCTION_CALIBRATE = 3
     FUNCTION_GET_IDENTITY = 255
 
+    BEEP_DURATION_OFF = 0
+    BEEP_DURATION_INFINITE = 4294967295
 
     def __init__(self, uid, ipcon):
         """
@@ -66,7 +69,11 @@ class BrickletPiezoSpeaker(Device):
         the piezo buzzer will beep for one second with a frequency of
         approximately 2 kHz.
         
-        *frequency* can be set between 585 and 7100.
+        .. versionchanged:: 2.0.2~(Plugin)
+           A duration of 0 stops the current beep if any, the frequency parameter is
+           ignored. A duration of 4294967295 results in an infinite beep.
+        
+        The *frequency* parameter can be set between 585 and 7100.
         
         The Piezo Speaker Bricklet can only approximate the frequency, it will play
         the best possible match by applying the calibration (see :func:`Calibrate`).
@@ -110,9 +117,8 @@ class BrickletPiezoSpeaker(Device):
         
         The position can be 'a', 'b', 'c' or 'd'.
         
-        The device identifiers can be found :ref:`here <device_identifier>`.
-        
-        .. versionadded:: 2.0.0~(Plugin)
+        The device identifier numbers can be found :ref:`here <device_identifier>`.
+        |device_identifier_constant|
         """
         return GetIdentity(*self.ipcon.send_request(self, BrickletPiezoSpeaker.FUNCTION_GET_IDENTITY, (), '', '8s 8s c 3B 3B H'))
 

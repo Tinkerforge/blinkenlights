@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #############################################################
-# This file was automatically generated on 2014-01-15.      #
+# This file was automatically generated on 2015-04-20.      #
 #                                                           #
-# Bindings Version 2.0.13                                    #
+# Bindings Version 2.1.4                                    #
 #                                                           #
 # If you have a bugfix for this file and want to commit it, #
 # please fix the bug in the generator. You can find a link  #
-# to the generator git on tinkerforge.com                   #
+# to the generators git repository on tinkerforge.com       #
 #############################################################
 
 try:
@@ -32,6 +32,7 @@ class BrickletDualButton(Device):
     """
 
     DEVICE_IDENTIFIER = 230
+    DEVICE_DISPLAY_NAME = 'Dual Button Bricklet'
 
     CALLBACK_STATE_CHANGED = 4
 
@@ -107,8 +108,6 @@ class BrickletDualButton(Device):
         Sets the state of the selected LED (0 or 1). 
         
         The other LED remains untouched.
-        
-        .. versionadded:: 2.0.0~(Plugin)
         """
         self.ipcon.send_request(self, BrickletDualButton.FUNCTION_SET_SELECTED_LED_STATE, (led, state), 'B B', '')
 
@@ -120,9 +119,8 @@ class BrickletDualButton(Device):
         
         The position can be 'a', 'b', 'c' or 'd'.
         
-        The device identifiers can be found :ref:`here <device_identifier>`.
-        
-        .. versionadded:: 2.0.0~(Plugin)
+        The device identifier numbers can be found :ref:`here <device_identifier>`.
+        |device_identifier_constant|
         """
         return GetIdentity(*self.ipcon.send_request(self, BrickletDualButton.FUNCTION_GET_IDENTITY, (), '', '8s 8s c 3B 3B H'))
 
