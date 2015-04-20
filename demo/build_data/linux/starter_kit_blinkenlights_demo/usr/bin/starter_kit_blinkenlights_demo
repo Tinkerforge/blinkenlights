@@ -1,2 +1,2 @@
 #!/bin/sh
-python /usr/share/starter_kit_blinkenlights_demo/demo.py "$@"
+python /usr/share/starter_kit_blinkenlights_demo/main.py "$@"

@@ -5,7 +5,7 @@ Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
 Copyright (C) 2015 Matthias Bolte <matthias@tinkerforge.com>
 
-demo.py: Entry file for Demo
+main.py: Entry file for Demo
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -55,29 +55,27 @@ def prepare_package(package_name):
 
 prepare_package('starter_kit_blinkenlights_demo')
 
-
-from program_path import ProgramPath
-import config
-
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.ip_connection import Error
-from tinkerforge.bricklet_led_strip import LEDStrip
-from tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
-from tinkerforge.bricklet_segment_display_4x7 import SegmentDisplay4x7
-from tinkerforge.bricklet_multi_touch import MultiTouch
-from tinkerforge.bricklet_dual_button import DualButton
-
-from setup_widget import SetupWidget
-from tetris_widget import TetrisWidget
-from pong_widget import PongWidget
-from fire_widget import FireWidget
-from text_widget import TextWidget
-from images_widget import ImagesWidget
-from rainbow_widget import RainbowWidget
-
-from PyQt4.QtGui import QApplication, QWidget, QErrorMessage, QGridLayout, QIcon
-from PyQt4.QtGui import QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout
 from PyQt4.QtCore import QTimer, pyqtSignal
+from PyQt4.QtGui import QApplication, QWidget, QErrorMessage, QGridLayout, QIcon, \
+                        QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout
+
+from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
+from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import Error
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_segment_display_4x7 import SegmentDisplay4x7
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_multi_touch import MultiTouch
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_dual_button import DualButton
+
+from starter_kit_blinkenlights_demo.setup_widget import SetupWidget
+from starter_kit_blinkenlights_demo.tetris_widget import TetrisWidget
+from starter_kit_blinkenlights_demo.pong_widget import PongWidget
+from starter_kit_blinkenlights_demo.fire_widget import FireWidget
+from starter_kit_blinkenlights_demo.text_widget import TextWidget
+from starter_kit_blinkenlights_demo.images_widget import ImagesWidget
+from starter_kit_blinkenlights_demo.rainbow_widget import RainbowWidget
+from starter_kit_blinkenlights_demo.load_pixmap import load_pixmap
+import starter_kit_blinkenlights_demo.config as config
 
 class MainWindow(QMainWindow):
     def __init__(self, app, parent=None):
@@ -131,7 +129,7 @@ class Blinkenlights(QApplication):
 
     def make_gui(self):
         self.main = MainWindow(self)
-        self.main.setWindowIcon(QIcon(os.path.join(ProgramPath.program_path(), "demo-icon.png")))
+        self.main.setWindowIcon(QIcon(load_pixmap('starter_kit_blinkenlights_demo-icon.png')))
 
         self.tabs = QTabWidget()
 
