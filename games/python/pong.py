@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
+import random
+import copy
+import time
+from threading import Thread
+
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
 from tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
 
-import random
-import copy
-import time
-
 import config
-
-from threading import Thread
-
 from repeated_timer import RepeatedTimer
 from keypress import KeyPress
 

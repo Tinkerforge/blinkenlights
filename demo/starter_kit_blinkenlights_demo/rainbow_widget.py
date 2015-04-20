@@ -2,9 +2,9 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
-Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
+Copyright (C) 2013, 2015 Matthias Bolte <matthias@tinkerforge.com>
 
-images_widget.py: Widget for images example
+rainbow_widget.py: Widget for rainbow example
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -22,16 +22,16 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 
-from PyQt4.QtGui import QWidget, QFileDialog, QErrorMessage
-from PyQt4.QtCore import QDir, QTimer
-from ui_images import Ui_Images
+from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import QTimer
 
-from images import Images
+import starter_kit_blinkenlights_demo.config as config
+from starter_kit_blinkenlights_demo.ui_rainbow import Ui_Rainbow
+from starter_kit_blinkenlights_demo.rainbow import Rainbow
 
-import config
 
-class ImagesWidget(QWidget, Ui_Images):
-    images = None
+class RainbowWidget(QWidget, Ui_Rainbow):
+    rainbow = None
 
     def __init__(self, parent, app):
         super(QWidget, self).__init__()
@@ -39,13 +39,12 @@ class ImagesWidget(QWidget, Ui_Images):
 
         self.setupUi(self)
 
-        self.error_msg = QErrorMessage()
-        self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)
-
         self.slider_frame_rate.valueChanged.connect(self.slider_frame_rate_changed)
+        self.slider_step.valueChanged.connect(self.slider_step_changed)
+
         self.spinbox_frame_rate.valueChanged.connect(self.spinbox_frame_rate_changed)
-        self.button_choose.pressed.connect(self.choose_pressed)
-        self.button_show.pressed.connect(self.show_pressed)
+        self.spinbox_step.valueChanged.connect(self.spinbox_step_changed)
+
         self.button_default.pressed.connect(self.default_pressed)
 
         self.update_frame_rate_timer = QTimer(self)
@@ -54,56 +53,43 @@ class ImagesWidget(QWidget, Ui_Images):
         self.default_pressed()
 
     def start(self):
-        self.images = Images(self.app.ipcon)
+        self.rainbow = Rainbow(self.app.ipcon)
 
         self.update_frame_rate()
+        self.update_step()
 
-        self.images.frame_rendered(0)
+        self.rainbow.frame_rendered(0)
 
     def stop(self):
-        if self.images:
-            self.images.stop_rendering()
-            self.images = None
+        if self.rainbow:
+            self.rainbow.stop_rendering()
+            self.rainbow = None
 
     def spinbox_frame_rate_changed(self, frame_rate):
         self.slider_frame_rate.setValue(frame_rate)
         self.update_frame_rate_timer.start(100)
 
+    def spinbox_step_changed(self, step):
+        self.slider_step.setValue(step * 10)
+        self.update_step()
+
     def slider_frame_rate_changed(self, frame_rate):
         self.spinbox_frame_rate.setValue(frame_rate)
 
-    def show_pressed(self):
-        if self.images:
-            files = unicode(self.text_edit_files.toPlainText()).strip()
-
-            if len(files) > 0:
-                new_images = files.split('\n')
-
-                try:
-                    self.images.set_new_images(new_images)
-                except Exception as e:
-                    self.error_msg.showMessage(str(e))
-
-                self.images.frame_prepare_next()
-                self.images.frame_rendered(0)
-
-    def choose_pressed(self):
-        dialog = QFileDialog()
-        dialog.setDirectory(QDir.homePath())
-        dialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if dialog.exec_():
-            filenames = dialog.selectedFiles()
-            for filename in filenames:
-                self.text_edit_files.append(filename)
+    def slider_step_changed(self, step):
+        self.spinbox_step.setValue(step / 10.0)
 
     def default_pressed(self):
-        self.spinbox_frame_rate.setValue(1)
+        self.spinbox_frame_rate.setValue(50)
+        self.spinbox_step.setValue(0.2)
 
     def update_frame_rate(self):
         self.update_frame_rate_timer.stop()
 
-        config.IMAGES_FRAME_RATE = self.spinbox_frame_rate.value()
+        config.RAINBOW_FRAME_RATE = self.spinbox_frame_rate.value()
 
-        if self.images:
-            self.images.update_frame_rate()
+        if self.rainbow:
+            self.rainbow.update_frame_rate()
+
+    def update_step(self):
+        config.RAINBOW_STEP = self.spinbox_step.value() / 100.0

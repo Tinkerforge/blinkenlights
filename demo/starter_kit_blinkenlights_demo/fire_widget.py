@@ -2,7 +2,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
-Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
+Copyright (C) 2013, 2015 Matthias Bolte <matthias@tinkerforge.com>
 
 fire_widget.py: Widget for fire example
 
@@ -24,11 +24,11 @@ Boston, MA 02111-1307, USA.
 
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QTimer
-from ui_fire import Ui_Fire
 
-from fire import Fire
+import starter_kit_blinkenlights_demo.config as config
+from starter_kit_blinkenlights_demo.ui_fire import Ui_Fire
+from starter_kit_blinkenlights_demo.fire import Fire
 
-import config
 
 class FireWidget(QWidget, Ui_Fire):
     fire = None

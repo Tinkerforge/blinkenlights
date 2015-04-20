@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_led_strip import LEDStrip
-
 import colorsys
 import math
+
+from tinkerforge.ip_connection import IPConnection
+from tinkerforge.bricklet_led_strip import LEDStrip
 
 import config
 

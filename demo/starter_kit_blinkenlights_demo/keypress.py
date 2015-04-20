@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*
 
-from tinkerforge.bricklet_multi_touch import MultiTouch
-from tinkerforge.bricklet_dual_button import DualButton
-
 import sys
 import os
-
 from Queue import Queue
 from threading import Thread
 
-from repeated_timer import RepeatedTimer
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_multi_touch import MultiTouch
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_dual_button import DualButton
 
-import config
+import starter_kit_blinkenlights_demo.config as config
+from starter_kit_blinkenlights_demo.repeated_timer import RepeatedTimer
+
 
 class MultiTouchInput:
     current_state = 0

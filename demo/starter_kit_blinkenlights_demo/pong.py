@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_led_strip import LEDStrip
-from tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
-
 import random
 import copy
 import time
-
-import config
-
 from threading import Thread
 
-from repeated_timer import RepeatedTimer
-from keypress import KeyPress
+from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
+
+import starter_kit_blinkenlights_demo.config as config
+from starter_kit_blinkenlights_demo.repeated_timer import RepeatedTimer
+from starter_kit_blinkenlights_demo.keypress import KeyPress
 
 
 class PongSpeaker:

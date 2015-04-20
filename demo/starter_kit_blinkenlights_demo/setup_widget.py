@@ -2,6 +2,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
+Copyright (C) 2015 Matthias Bolte <matthias@tinkerforge.com>
 
 setup_widget.py: Widget for Blinkenlights setup
 
@@ -22,7 +23,9 @@ Boston, MA 02111-1307, USA.
 """
 
 from PyQt4.QtGui import QWidget
-from ui_setup import Ui_Setup
+
+from starter_kit_blinkenlights_demo.ui_setup import Ui_Setup
+
 
 class SetupWidget(QWidget, Ui_Setup):
     def __init__(self, parent, app):

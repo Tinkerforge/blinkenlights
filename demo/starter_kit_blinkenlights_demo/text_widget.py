@@ -2,7 +2,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
-Copyright (C) 2013 Matthias Bolte <matthias@tinkerforge.com>
+Copyright (C) 2013, 2015 Matthias Bolte <matthias@tinkerforge.com>
 
 text_widget.py: Widget for text example
 
@@ -24,11 +24,11 @@ Boston, MA 02111-1307, USA.
 
 from PyQt4.QtGui import QWidget, QColorDialog, QColor
 from PyQt4.QtCore import QTimer
-from ui_text import Ui_Text
 
-from text import Text
+import starter_kit_blinkenlights_demo.config as config
+from starter_kit_blinkenlights_demo.ui_text import Ui_Text
+from starter_kit_blinkenlights_demo.text import Text
 
-import config
 
 class TextWidget(QWidget, Ui_Text):
     text = None

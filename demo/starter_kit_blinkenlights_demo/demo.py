@@ -3,6 +3,7 @@
 """
 Starter Kit: Blinkenlights Demo Application
 Copyright (C) 2013 Olaf Lüke <olaf@tinkerforge.com>
+Copyright (C) 2015 Matthias Bolte <matthias@tinkerforge.com>
 
 demo.py: Entry file for Demo
 
@@ -28,6 +29,31 @@ import time
 import math
 import signal
 import os
+
+def prepare_package(package_name):
+    # from http://www.py2exe.org/index.cgi/WhereAmI
+    if hasattr(sys, 'frozen'):
+        program_path = os.path.dirname(os.path.realpath(unicode(sys.executable, sys.getfilesystemencoding())))
+    else:
+        program_path = os.path.dirname(os.path.realpath(unicode(__file__, sys.getfilesystemencoding())))
+
+    # add program_path so OpenGL is properly imported
+    sys.path.insert(0, program_path)
+
+    # allow the program to be directly started by calling 'main.py'
+    # without '<package_name>' being in the path already
+    if package_name not in sys.modules:
+        head, tail = os.path.split(program_path)
+
+        if head not in sys.path:
+            sys.path.insert(0, head)
+
+        if not hasattr(sys, 'frozen'):
+            # load and inject in modules list, this allows to have the source in a
+            # directory named differently than '<package_name>'
+            sys.modules[package_name] = __import__(tail, globals(), locals(), [], -1)
+
+prepare_package('starter_kit_blinkenlights_demo')
 
 
 from program_path import ProgramPath

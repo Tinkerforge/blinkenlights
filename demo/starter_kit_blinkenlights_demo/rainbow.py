@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_led_strip import LEDStrip
-
 import colorsys
 import math
 
-import config
+from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip
+
+import starter_kit_blinkenlights_demo.config as config
 
 class Rainbow:
     leds = [x[:] for x in [(0, 0, 0)]*config.LED_ROWS*config.LED_COLS]

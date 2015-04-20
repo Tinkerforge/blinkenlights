@@ -3,13 +3,14 @@
 
 # Loosely based on https://github.com/giladaya/arduino-led-matrix/blob/master/fire/fire.ino
 
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_led_strip import LEDStrip
-
 import colorsys
 import random
 
+from tinkerforge.ip_connection import IPConnection
+from tinkerforge.bricklet_led_strip import LEDStrip
+
 import config
+
 
 class Fire:
     values = [
