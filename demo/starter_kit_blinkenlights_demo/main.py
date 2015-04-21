@@ -57,7 +57,7 @@ prepare_package('starter_kit_blinkenlights_demo')
 
 from PyQt4.QtCore import QTimer, pyqtSignal
 from PyQt4.QtGui import QApplication, QWidget, QErrorMessage, QGridLayout, QIcon, \
-                        QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout
+                        QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout, QFont
 
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import Error
@@ -270,5 +270,18 @@ class Blinkenlights(QApplication):
                     time.sleep(1)
 
 if __name__ == "__main__":
-    blinkenlights = Blinkenlights(sys.argv)
-    sys.exit(blinkenlights.exec_())
+    argv = sys.argv
+
+    if sys.platform == 'win32':
+        argv += ['-style', 'windowsxp']
+
+    if sys.platform == 'darwin':
+        # fix OSX 10.9 font
+        # http://successfulsoftware.net/2013/10/23/fixing-qt-4-for-mac-os-x-10-9-mavericks/
+        # https://bugreports.qt-project.org/browse/QTBUG-32789
+        QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
+        # fix OSX 10.10 font
+        # https://bugreports.qt-project.org/browse/QTBUG-40833
+        QFont.insertSubstitution('.Helvetica Neue DeskInterface', 'Helvetica Neue')
+
+    sys.exit(Blinkenlights(argv).exec_())
