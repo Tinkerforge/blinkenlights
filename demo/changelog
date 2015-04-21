@@ -1,3 +1,4 @@
 1.0.0: Initial version
 1.0.1: Remove fixed font size from GUI texts
        Windows installer is signed now
+       Add workaround for Mac OS X font problem
