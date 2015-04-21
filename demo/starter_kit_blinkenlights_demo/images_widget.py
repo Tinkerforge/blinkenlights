@@ -88,14 +88,8 @@ class ImagesWidget(QWidget, Ui_Images):
                 self.images.frame_rendered(0)
 
     def choose_pressed(self):
-        dialog = QFileDialog()
-        dialog.setDirectory(QDir.homePath())
-        dialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if dialog.exec_():
-            filenames = dialog.selectedFiles()
-            for filename in filenames:
-                self.text_edit_files.append(filename)
+        for filename in QFileDialog.getOpenFileNames(self, 'Choose Images', QDir.homePath()):
+            self.text_edit_files.append(filename)
 
     def default_pressed(self):
         self.spinbox_frame_rate.setValue(1)
