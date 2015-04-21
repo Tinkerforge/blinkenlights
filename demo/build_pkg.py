@@ -160,7 +160,7 @@ def build_macosx_pkg():
     if os.path.exists(dmg_name):
         os.remove(dmg_name)
 
-    system('hdiutil create -fs HFS+ -volname "starter-kit-blinkenlights-demo-{0}" -srcfolder dist {1}'.format(DEMO_VERSION, dmg_name))
+    system('hdiutil create -fs HFS+ -volname "Starter-Kit-Blinkenlights-Demo-{0}" -srcfolder dist {1}'.format(DEMO_VERSION, dmg_name))
 
 
 # https://github.com/rfk/www.rfk.id.au/blob/master/content/blog/entry/code-signing-py2exe/index.html
