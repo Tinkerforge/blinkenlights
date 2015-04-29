@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-DEMO_VERSION = "1.0.1"
+DEMO_VERSION = "1.0.2"
 HAS_GUI = True
 
 # Bricklets
