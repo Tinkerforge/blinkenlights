@@ -22,5 +22,6 @@ const B_INDEX = 0;
 const TEXT_FRAME_RATE = 25; // in Hz, valid range: 10 - 100
 const TEXT_COLOR_R = NULL; const TEXT_COLOR_G = NULL; const TEXT_COLOR_B = NULL; // = rainbow
 //const TEXT_COLOR_R = 255; const TEXT_COLOR_G = 0; const TEXT_COLOR_B = 0; // = red
+const TEXT_TOP_OFFSET = 1;
 
 ?>

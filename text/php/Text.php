@@ -286,9 +286,9 @@ class Text
         for ($col = 0; $col < count($this->textCols); $col++) {
             for ($row = 0; $row < Config\LED_ROWS; $row++) {
                 if ($this->textCols[$col][($this->textPosition+$row) % strlen($this->textCols[0])] == 'X') {
-                    $this->leds[$row][$col + 1] = $rgb;
+                    $this->leds[$row][$col + Config\TEXT_TOP_OFFSET] = $rgb;
                 } else {
-                    $this->leds[$row][$col + 1] = array(0, 0, 0);
+                    $this->leds[$row][$col + Config\TEXT_TOP_OFFSET] = array(0, 0, 0);
                 }
             }
         }

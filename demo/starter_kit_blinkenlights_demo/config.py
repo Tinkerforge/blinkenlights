@@ -51,6 +51,7 @@ FIRE_RAND_VALUE_END = 255 # valid range: 1 - 255
 TEXT_FRAME_RATE = 25 # in Hz, valid range: 10 - 100
 TEXT_COLOR = None # = rainbow
 #TEXT_COLOR = (255, 0, 0) # = red
+TEXT_TOP_OFFSET = 1
 
 # Images Parameters
 IMAGES_FRAME_RATE = 1 # in Hz, valid range: 1 - 100

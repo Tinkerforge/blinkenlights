@@ -20,3 +20,4 @@ B_INDEX = 0
 TEXT_FRAME_RATE = 25 # in Hz, valid range: 10 - 100
 TEXT_COLOR = None # = rainbow
 #TEXT_COLOR = (255, 0, 0) # = red
+TEXT_TOP_OFFSET = 1

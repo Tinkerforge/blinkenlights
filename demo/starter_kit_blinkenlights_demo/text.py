@@ -223,9 +223,9 @@ class Text:
         for col in range(len(self.text_cols)):
             for row in range(config.LED_ROWS):
                 if self.text_cols[col][(self.text_position+row) % len(self.text_cols[0])] == 'X':
-                    self.leds[row][col + 1] = (r, g, b)
+                    self.leds[row][col + config.TEXT_TOP_OFFSET] = (r, g, b)
                 else:
-                    self.leds[row][col + 1] = (0, 0, 0)
+                    self.leds[row][col + config.TEXT_TOP_OFFSET] = (0, 0, 0)
 
         self.text_position += 1
 
