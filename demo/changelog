@@ -1,10 +1,10 @@
-1.0.0:
+2014-02-10: 1.0.0 (999ff10)
 - Initial version
 
-1.0.1:
+2015-04-21: 1.0.1 (c3877bf)
 - Remove fixed font size from GUI texts
 - Windows installer is signed now
 - Add workaround for Mac OS X font problem
 
-1.0.2:
+2015-04-29: 1.0.2 (634704f)
 - Use an icon from the Tango Icon Theme
