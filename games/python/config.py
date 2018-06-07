@@ -7,22 +7,25 @@ HOST = 'localhost'
 PORT = 4223
 
 # Required Bricklets
-UID_LED_STRIP_BRICKLET = 'abc'
+UID_LED_STRIP_BRICKLET = 'Fjy'
 
 # Optional Bricklets (use None as UID if not connected)
-UID_MULTI_TOUCH_BRICKLET = 'pax'
-UID_DUAL_BUTTON_BRICKLET = ('dbb', 'dbc')
-UID_SEGMENT_DISPLAY_4X7_BRICKLET = 'xyz'
-UID_PIEZO_SPEAKER_BRICKLET = 'XYZ'
+UID_MULTI_TOUCH_BRICKLET = None#'pax'
+UID_DUAL_BUTTON_BRICKLET = (None, None)#('dbb', 'dbc')
+UID_SEGMENT_DISPLAY_4X7_BRICKLET = None#'xyz'
+UID_PIEZO_SPEAKER_BRICKLET = None#'XYZ'
+
+# Set this to True if LEDStripV2 Bricklet is used
+IS_LED_STRIP_V2 = True
 
 # Size of LED Pixel matrix
 LED_ROWS = 20
 LED_COLS = 10
 
 # Position of R, G and B pixel on LED Pixel
-R_INDEX = 2
+R_INDEX = 0
 G_INDEX = 1
-B_INDEX = 0
+B_INDEX = 2
 
 # Pong Parameters
 PONG_COLOR_INDEX_PLAYER = (1, 5)

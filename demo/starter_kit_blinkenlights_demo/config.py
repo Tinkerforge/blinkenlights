@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-DEMO_VERSION = "1.0.2"
+DEMO_VERSION = "1.0.3"
 HAS_GUI = True
 
 # Bricklets
@@ -10,14 +10,16 @@ UID_DUAL_BUTTON_BRICKLET = (None, None)
 UID_SEGMENT_DISPLAY_4X7_BRICKLET = None
 UID_PIEZO_SPEAKER_BRICKLET = None
 
+IS_LED_STRIP_V2 = False
+
 # Size of LED Pixel matrix
 LED_ROWS = 20
 LED_COLS = 10
 
 # Position of R, G and B pixel on LED Pixel
-R_INDEX = 2
+R_INDEX = 0
 G_INDEX = 1
-B_INDEX = 0
+B_INDEX = 2
 
 # Pong Parameters
 PONG_COLOR_INDEX_PLAYER = (1, 5)

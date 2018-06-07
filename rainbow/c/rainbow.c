@@ -2,6 +2,7 @@
 
 #include "ip_connection.h"
 #include "bricklet_led_strip.h"
+#include "bricklet_led_strip_v2.h"
 #include "config.h"
 
 uint8_t leds[LED_ROWS*LED_COLS][3] = {{0}};
@@ -62,6 +63,24 @@ void frame_upload(LEDStrip *led_strip) {
 	}
 }
 
+void frame_upload_v2(LEDStripV2 *led_strip_v2) {
+	int i, j;
+	uint8_t frame[LED_ROWS*LED_COLS*3];
+
+	// Reorder LED data into R, G and B channel and make chunks of size 16
+	for(i = 0; i < LED_ROWS*LED_COLS; i++) {
+		j = i * 3;
+
+		frame[j] = leds[i][R_INDEX];
+		j++;
+		frame[j] = leds[i][G_INDEX];
+		j++;
+		frame[j] = leds[i][B_INDEX];
+	}
+
+	led_strip_v2_set_led_values(led_strip_v2, 0, frame, LED_ROWS*LED_COLS*3);
+}
+
 void frame_prepare_next(void) {
 	int offset = (int)rainbow_position % (LED_ROWS*LED_COLS);
 	int count = LED_ROWS*LED_COLS - offset;
@@ -69,16 +88,21 @@ void frame_prepare_next(void) {
 	memcpy(leds, &rainbow[offset], count * 3);
 	memcpy(&leds[count], rainbow, offset * 3);
 
-	rainbow_position += (LED_ROWS*LED_COLS) * RAINBOW_STEP
+	rainbow_position += (LED_ROWS*LED_COLS) * RAINBOW_STEP;
 }
 
 // Frame rendered callback, is called when a new frame was rendered
 void cb_frame_rendered(uint16_t length, void *user_data) {
 	(void)length; // avoid unused parameter warning
 
-	LEDStrip *led_strip = (LEDStrip *)user_data;
+	#if IS_LED_STRIP_V2 != 1
+		LEDStrip *led_strip = (LEDStrip *)user_data;
+		frame_upload(led_strip);
+	#else
+		LEDStripV2 *led_strip_v2 = (LEDStripV2 *)user_data;
+		frame_upload_v2(led_strip_v2);
+	#endif
 
-	frame_upload(led_strip);
 	frame_prepare_next();
 }
 
@@ -88,8 +112,13 @@ int main(void) {
 	ipcon_create(&ipcon);
 
 	// Create device object
-	LEDStrip led_strip;
-	led_strip_create(&led_strip, UID_LED_STRIP_BRICKLET, &ipcon);
+	#if IS_LED_STRIP_V2 != 1
+		LEDStrip led_strip;
+		led_strip_create(&led_strip, UID_LED_STRIP_BRICKLET, &ipcon);
+	#else
+		LEDStripV2 led_strip_v2;
+		led_strip_create(&led_strip_v2, UID_LED_STRIP_BRICKLET, &ipcon);
+	#endif
 
 	// Connect to brickd
 	if(ipcon_connect(&ipcon, HOST, PORT) < 0) {
@@ -99,20 +128,32 @@ int main(void) {
 
 	// Call a getter to check that the Bricklet is avialable
 	uint16_t frame_duration;
-	if(led_strip_get_frame_duration(&led_strip, &frame_duration) < 0) {
-		fprintf(stderr, "Not Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
-		exit(1);
-	}
 
-	printf("Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
-
-	led_strip_set_frame_duration(&led_strip, 1000 / RAINBOW_FRAME_RATE);
-
-	// Register frame rendered callback to function cb_frame_rendered
-	led_strip_register_callback(&led_strip,
-	                            LED_STRIP_CALLBACK_FRAME_RENDERED,
-	                            (void *)cb_frame_rendered,
-	                            (void *)&led_strip);
+	#if IS_LED_STRIP_V2 != 1
+		if(led_strip_get_frame_duration(&led_strip, &frame_duration) < 0) {
+			fprintf(stderr, "Not Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
+			exit(1);
+		}
+		printf("Found: LED Strip (%s)\n", UID_LED_STRIP_BRICKLET);
+		led_strip_set_frame_duration(&led_strip, 1000 / RAINBOW_FRAME_RATE);
+		// Register frame rendered callback to function cb_frame_rendered
+		led_strip_register_callback(&led_strip,
+									LED_STRIP_CALLBACK_FRAME_RENDERED,
+									(void *)cb_frame_rendered,
+									(void *)&led_strip);
+	#else
+		if(led_strip_v2_get_frame_duration(&led_strip_v2, &frame_duration) < 0) {
+			fprintf(stderr, "Not Found: LED Strip V2 (%s)\n", UID_LED_STRIP_BRICKLET);
+			exit(1);
+		}
+		printf("Found: LED Strip V2 (%s)\n", UID_LED_STRIP_BRICKLET);
+		led_strip_v2_set_frame_duration(&led_strip_v2, 1000 / RAINBOW_FRAME_RATE);
+		// Register frame rendered callback to function cb_frame_rendered
+		led_strip_v2_register_callback(&led_strip_v2,
+									   LED_STRIP_V2_CALLBACK_FRAME_STARTED,
+									   (void *)cb_frame_rendered,
+									   (void *)&led_strip_v2);
+	#endif
 
 	int i;
 	for(i = 0; i < LED_ROWS*LED_COLS; ++i) {
@@ -120,7 +161,11 @@ int main(void) {
 	}
 
 	// Start rendering
-	cb_frame_rendered(0, (void *)&led_strip);
+	#if IS_LED_STRIP_V2 != 1
+		cb_frame_rendered(0, (void *)&led_strip);
+	#else
+		cb_frame_rendered(0, (void *)&led_strip_v2);
+	#endif
 
 	printf("Press key to exit\n");
 	getchar();

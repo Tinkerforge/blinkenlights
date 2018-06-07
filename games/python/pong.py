@@ -8,6 +8,7 @@ from threading import Thread
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_led_strip import LEDStrip
+from tinkerforge.bricklet_led_strip_v2 import LEDStripV2
 from tinkerforge.bricklet_piezo_speaker import PiezoSpeaker
 
 import config
@@ -152,16 +153,25 @@ class Pong:
         self.ipcon = ipcon
 
         if not config.UID_LED_STRIP_BRICKLET:
-            print("Not Configured: LED Strip (required)")
+            print("Not Configured: LED Strip or LED Strip V2 (required)")
             return
 
-        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+        else:
+            self.led_strip = LEDStripV2(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            if not config.IS_LED_STRIP_V2:
+                print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            else:
+                print("Found: LED Strip V2 ({0})".format(config.UID_LED_STRIP_BRICKLET))
         except:
-            print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            if not config.IS_LED_STRIP_V2:
+                print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            else:
+                print("Not Found: LED Strip V2({0})".format(config.UID_LED_STRIP_BRICKLET))
             return
 
         self.kp = KeyPress(self.ipcon)
@@ -170,8 +180,13 @@ class Pong:
         self.okay = True
 
         self.led_strip.set_frame_duration(40)
-        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
-                                         self.frame_rendered)
+
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
+                                             self.frame_rendered)
+        else:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
+                                             self.frame_rendered)
 
         self.init_game()
 
@@ -197,6 +212,8 @@ class Pong:
         r = []
         g = []
         b = []
+        frame = []
+
         for row in range(config.LED_ROWS):
             col_range = range(config.LED_COLS)
             if row % 2 == 0:
@@ -205,24 +222,30 @@ class Pong:
                 r.append(self.COLORS[field[row][col]][config.R_INDEX])
                 g.append(self.COLORS[field[row][col]][config.G_INDEX])
                 b.append(self.COLORS[field[row][col]][config.B_INDEX])
+                frame.append(self.COLORS[field[row][col]][config.R_INDEX])
+                frame.append(self.COLORS[field[row][col]][config.G_INDEX])
+                frame.append(self.COLORS[field[row][col]][config.B_INDEX])
 
-        # Make chunks of size 16
-        r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
-        g_chunk = [g[i:i+16] for i in range(0, len(g), 16)]
-        b_chunk = [b[i:i+16] for i in range(0, len(b), 16)]
+        if not config.IS_LED_STRIP_V2:
+            # Make chunks of size 16
+            r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
+            g_chunk = [g[i:i+16] for i in range(0, len(g), 16)]
+            b_chunk = [b[i:i+16] for i in range(0, len(b), 16)]
 
-        for i in range(len(r_chunk)):
-            length = len(r_chunk[i])
+            for i in range(len(r_chunk)):
+                length = len(r_chunk[i])
 
-            # Fill up chunks with zeros
-            r_chunk[i].extend([0]*(16-len(r_chunk[i])))
-            g_chunk[i].extend([0]*(16-len(g_chunk[i])))
-            b_chunk[i].extend([0]*(16-len(b_chunk[i])))
+                # Fill up chunks with zeros
+                r_chunk[i].extend([0]*(16-len(r_chunk[i])))
+                g_chunk[i].extend([0]*(16-len(g_chunk[i])))
+                b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            try:
-                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
-            except:
-                break
+                try:
+                    self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+                except:
+                    break
+        else:
+            self.led_strip.set_led_values(0, frame)
 
     def add_score_to_playfield(self, field):
         for row in range(3):
@@ -336,7 +359,11 @@ class Pong:
             elif not config.HAS_GUI and key == 'q':
                 break
 
-        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED, None)
+        else:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED, None)
+
         self.timer.stop()
         self.kp.stop()
 

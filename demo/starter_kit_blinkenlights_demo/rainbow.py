@@ -6,6 +6,7 @@ import math
 
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
 from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip
+from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip_v2 import LEDStripV2
 
 import starter_kit_blinkenlights_demo.config as config
 
@@ -19,16 +20,25 @@ class Rainbow:
         self.ipcon = ipcon
 
         if not config.UID_LED_STRIP_BRICKLET:
-            print("Not Configured: LED Strip (required)")
+            print("Not Configured: LED Strip or LED Strip V2 (required)")
             return
 
-        self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip = LEDStrip(config.UID_LED_STRIP_BRICKLET, self.ipcon)
+        else:
+            self.led_strip = LEDStripV2(config.UID_LED_STRIP_BRICKLET, self.ipcon)
 
         try:
             self.led_strip.get_frame_duration()
-            print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            if not config.IS_LED_STRIP_V2:
+                print("Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            else:
+                print("Found: LED Strip V2 ({0})".format(config.UID_LED_STRIP_BRICKLET))
         except:
-            print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            if not config.IS_LED_STRIP_V2:
+                print("Not Found: LED Strip ({0})".format(config.UID_LED_STRIP_BRICKLET))
+            else:
+                print("Not Found: LED Strip V2({0})".format(config.UID_LED_STRIP_BRICKLET))
             return
 
         for i in range(config.LED_ROWS*config.LED_COLS):
@@ -38,15 +48,23 @@ class Rainbow:
         self.okay = True
 
         self.update_frame_rate()
-        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
-                                         self.frame_rendered)
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
+                                             self.frame_rendered)
+        else:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
+                                             self.frame_rendered)
 
     def stop_rendering(self):
         if not self.okay:
             return
 
-        self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
-                                         None)
+        if not config.IS_LED_STRIP_V2:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_RENDERED,
+                                             None)
+        else:
+            self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
+                                             None)
 
     def update_frame_rate(self):
         if not self.okay:
@@ -66,28 +84,36 @@ class Rainbow:
         r = []
         g = []
         b = []
+        frame = []
+
         for i in range(config.LED_ROWS*config.LED_COLS):
             r.append(self.leds[i][config.R_INDEX])
             g.append(self.leds[i][config.G_INDEX])
             b.append(self.leds[i][config.B_INDEX])
+            frame.append(self.leds[i][config.R_INDEX])
+            frame.append(self.leds[i][config.G_INDEX])
+            frame.append(self.leds[i][config.B_INDEX])
 
-        # Make chunks of size 16
-        r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
-        g_chunk = [g[i:i+16] for i in range(0, len(g), 16)]
-        b_chunk = [b[i:i+16] for i in range(0, len(b), 16)]
+        if not config.IS_LED_STRIP_V2:
+            # Make chunks of size 16
+            r_chunk = [r[i:i+16] for i in range(0, len(r), 16)]
+            g_chunk = [g[i:i+16] for i in range(0, len(g), 16)]
+            b_chunk = [b[i:i+16] for i in range(0, len(b), 16)]
 
-        for i in range(len(r_chunk)):
-            length = len(r_chunk[i])
+            for i in range(len(r_chunk)):
+                length = len(r_chunk[i])
 
-            # Fill up chunks with zeros
-            r_chunk[i].extend([0]*(16-len(r_chunk[i])))
-            g_chunk[i].extend([0]*(16-len(g_chunk[i])))
-            b_chunk[i].extend([0]*(16-len(b_chunk[i])))
+                # Fill up chunks with zeros
+                r_chunk[i].extend([0]*(16-len(r_chunk[i])))
+                g_chunk[i].extend([0]*(16-len(g_chunk[i])))
+                b_chunk[i].extend([0]*(16-len(b_chunk[i])))
 
-            try:
-                self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
-            except:
-                break
+                try:
+                    self.led_strip.set_rgb_values(i*16, length, r_chunk[i], g_chunk[i], b_chunk[i])
+                except:
+                    break
+        else:
+            self.led_strip.set_led_values(0, frame)
 
     def frame_prepare_next(self):
         self.leds = self.rainbow[int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS):] + self.rainbow[:int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS)]

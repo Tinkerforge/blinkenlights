@@ -1,5 +1,6 @@
 import com.tinkerforge.IPConnection;
 import com.tinkerforge.BrickletLEDStrip;
+import com.tinkerforge.BrickletLEDStripV2;
 import com.tinkerforge.TinkerforgeException;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -85,11 +86,88 @@ class ImagesListener implements BrickletLEDStrip.FrameRenderedListener {
 	}
 }
 
+class ImagesListenerV2 implements BrickletLEDStripV2.FrameStartedListener {
+	private BrickletLEDStripV2 ledStripV2 = null;
+	private short[][][][] images = null;
+	private int imagePosition = 0;
+
+	public ImagesListenerV2(BrickletLEDStripV2 ledStripV2, short[][][][] images) {
+		this.ledStripV2 = ledStripV2;
+		this.images = images;
+	}
+
+	public void frameStarted(int length) {
+		frameUpload();
+		framePrepareNext();
+	}
+
+	private void frameUpload() {
+		int j = 0;
+
+		if (images.length == 0) {
+			return;
+		}
+
+		// Reorder LED data into R, G and B channel
+		short[] r = new short[Config.LED_ROWS*Config.LED_COLS];
+		short[] g = new short[Config.LED_ROWS*Config.LED_COLS];
+		short[] b = new short[Config.LED_ROWS*Config.LED_COLS];
+		int[] frame = new int[Config.LED_ROWS*Config.LED_COLS*3];
+
+		for (int row = 0, i = 0; row < Config.LED_ROWS; ++row) {
+			int colBegin;
+			int colEnd;
+			int colStep;
+
+			if (row % 2 == 0) {
+				colBegin = Config.LED_COLS - 1;
+				colEnd = -1;
+				colStep = -1;
+			} else {
+				colBegin = 0;
+				colEnd = Config.LED_COLS;
+				colStep = 1;
+			}
+
+			for (int col = colBegin; col != colEnd; col += colStep) {
+				j = i * 3;
+
+				r[i] = images[imagePosition][row][col][Config.R_INDEX];
+				g[i] = images[imagePosition][row][col][Config.G_INDEX];
+				b[i] = images[imagePosition][row][col][Config.B_INDEX];
+				frame[j] = images[imagePosition][row][col][Config.R_INDEX];
+				j++;
+				frame[j] = images[imagePosition][row][col][Config.G_INDEX];
+				j++;
+				frame[j] = images[imagePosition][row][col][Config.B_INDEX];
+
+				++i;
+			}
+		}
+
+		try {
+			ledStripV2.setLEDValues(0, frame);
+		} catch (TinkerforgeException e) {
+			return;
+		}
+	}
+
+	private void framePrepareNext() {
+		if (images.length == 0) {
+			return;
+		}
+
+		imagePosition = (imagePosition + 1) % images.length;
+	}
+}
+
 public class Images {
 	private static short[][][][] images = null;
 	private static IPConnection ipcon = null;
 	private static BrickletLEDStrip ledStrip = null;
+	private static BrickletLEDStripV2 ledStripV2 = null;
 	private static ImagesListener imagesListener = null;
+	private static ImagesListenerV2 imagesListenerV2 = null;
 
 	private static BufferedImage resizeImage(BufferedImage image, int width, int height) {
 		BufferedImage resizedImage = new BufferedImage(width, height, image.getType());
@@ -130,13 +208,29 @@ public class Images {
 		ipcon.connect(Config.HOST, Config.PORT);
 
 		// Call a getter to check that the Bricklet is avialable
-		ledStrip = new BrickletLEDStrip(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		if (!Config.IS_LED_STRIP_V2) {
+			ledStrip = new BrickletLEDStrip(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		}
+		else {
+			ledStripV2 = new BrickletLEDStripV2(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		}
 
 		try {
-			ledStrip.getFrameDuration();
-			System.out.println("Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			if (!Config.IS_LED_STRIP_V2) {
+				ledStrip.getFrameDuration();
+				System.out.println("Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			}
+			else {
+				ledStripV2.getFrameDuration();
+				System.out.println("Found: LED Strip V2 " + Config.UID_LED_STRIP_BRICKLET);
+			}
 		} catch (TinkerforgeException e) {
-			System.out.println("Not Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			if (!Config.IS_LED_STRIP_V2) {
+				System.out.println("Not Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
+			}
+			else {
+				System.out.println("Not Found: LED Strip V2 " + Config.UID_LED_STRIP_BRICKLET);
+			}
 			return;
 		}
 
@@ -148,12 +242,23 @@ public class Images {
 		}
 
 		// Set up listener and start rendering
-		ledStrip.setFrameDuration(1000 / Config.IMAGES_FRAME_RATE);
+		if (!Config.IS_LED_STRIP_V2) {
+			ledStrip.setFrameDuration(1000 / Config.IMAGES_FRAME_RATE);
+		}
+		else {
+			ledStripV2.setFrameDuration(1000 / Config.IMAGES_FRAME_RATE);
+		}
 
-		imagesListener = new ImagesListener(ledStrip, images);
-		ledStrip.addFrameRenderedListener(imagesListener);
-
-		imagesListener.frameRendered(0);
+		if (!Config.IS_LED_STRIP_V2) {
+			imagesListener = new ImagesListener(ledStrip, images);
+			ledStrip.addFrameRenderedListener(imagesListener);
+			imagesListener.frameRendered(0);
+		}
+		else {
+			imagesListenerV2 = new ImagesListenerV2(ledStripV2, images);
+			ledStripV2.addFrameStartedListener(imagesListenerV2);
+			imagesListenerV2.frameStarted(0);
+		}
 
 		System.out.println("Press key to exit"); System.in.read();
 		ipcon.disconnect();

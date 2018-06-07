@@ -165,6 +165,7 @@ class Pong
 	};
 
 	private BrickletLEDStrip ledStrip = null;
+	private BrickletLEDStripV2 ledStripV2 = null;
 	private bool okay = false;
 	private bool loop = true;
 	private Timer timer = null;
@@ -185,16 +186,32 @@ class Pong
 		}
 
 		// Call a getter to check that the Bricklet is avialable
-		ledStrip = new BrickletLEDStrip(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		if (!Config.IS_LED_STRIP_V2) {
+			ledStrip = new BrickletLEDStrip(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		}
+		else {
+			ledStripV2 = new BrickletLEDStripV2(Config.UID_LED_STRIP_BRICKLET, ipcon);
+		}
 
 		try
 		{
-			ledStrip.GetFrameDuration();
-			System.Console.WriteLine("Found: LED Strip ({0})", Config.UID_LED_STRIP_BRICKLET);
+			if (!Config.IS_LED_STRIP_V2) {
+				ledStrip.GetFrameDuration();
+				System.Console.WriteLine("Found: LED Strip ({0})", Config.UID_LED_STRIP_BRICKLET);
+			}
+			else {
+				ledStripV2.GetFrameDuration();
+				System.Console.WriteLine("Found: LED Strip V2 ({0})", Config.UID_LED_STRIP_BRICKLET);
+			}
 		}
 		catch (TinkerforgeException)
 		{
-			System.Console.WriteLine("Not Found: LED Strip ({0})", Config.UID_LED_STRIP_BRICKLET);
+			if (!Config.IS_LED_STRIP_V2) {
+				System.Console.WriteLine("Not Found: LED Strip ({0})", Config.UID_LED_STRIP_BRICKLET);
+			}
+			else {
+				System.Console.WriteLine("Not Found: LED Strip V2 ({0})", Config.UID_LED_STRIP_BRICKLET);
+			}
 			return;
 		}
 
@@ -202,8 +219,14 @@ class Pong
 		speaker = new PongSpeaker(ipcon);
 		okay = true;
 
-		ledStrip.SetFrameDuration(40);
-		ledStrip.FrameRendered += FrameRenderedCB;
+		if (!Config.IS_LED_STRIP_V2) {
+			ledStrip.SetFrameDuration(40);
+			ledStrip.FrameRendered += FrameRenderedCB;
+		}
+		else {
+			ledStripV2.SetFrameDuration(40);
+			ledStripV2.FrameStartedCallback += FrameRenderedCBV2;
+		}
 
 		InitGame();
 	}
@@ -228,6 +251,11 @@ class Pong
 		WritePlayfield();
 	}
 
+	private void FrameRenderedCBV2(BrickletLEDStripV2 sender, int length)
+	{
+		WritePlayfield();
+	}
+
 	private static T DeepCopy<T>(T obj)
 	{
 		MemoryStream stream = new MemoryStream();
@@ -241,6 +269,8 @@ class Pong
 
 	private void WritePlayfield()
 	{
+		int j = 0;
+
 		if (!okay)
 		{
 			return;
@@ -256,6 +286,7 @@ class Pong
 		byte[] r = new byte[Config.LED_ROWS * Config.LED_COLS];
 		byte[] g = new byte[Config.LED_ROWS * Config.LED_COLS];
 		byte[] b = new byte[Config.LED_ROWS * Config.LED_COLS];
+		byte[] frame = new byte[Config.LED_ROWS * Config.LED_COLS * 3];
 
 		for (int row = 0, i = 0; row < Config.LED_ROWS; ++row)
 		{
@@ -278,36 +309,48 @@ class Pong
 
 			for (int col = colBegin; col != colEnd; col += colStep, ++i)
 			{
+				j = i * 3;
+
 				r[i] = COLORS[field[row][col]][Config.R_INDEX];
 				g[i] = COLORS[field[row][col]][Config.G_INDEX];
 				b[i] = COLORS[field[row][col]][Config.B_INDEX];
+				frame[j] = COLORS[field[row][col]][Config.R_INDEX];
+				j++;
+				frame[j] = COLORS[field[row][col]][Config.G_INDEX];
+				j++;
+				frame[j] = COLORS[field[row][col]][Config.B_INDEX];
 			}
 		}
 
-		// Make chunks of size 16
-		byte[] rChunk = new byte[CHUNK_SIZE];
-		byte[] gChunk = new byte[CHUNK_SIZE];
-		byte[] bChunk = new byte[CHUNK_SIZE];
+		if (!Config.IS_LED_STRIP_V2) {
+			// Make chunks of size 16
+			byte[] rChunk = new byte[CHUNK_SIZE];
+			byte[] gChunk = new byte[CHUNK_SIZE];
+			byte[] bChunk = new byte[CHUNK_SIZE];
 
-		for (int i = 0; i < Config.LED_ROWS * Config.LED_COLS; i += CHUNK_SIZE)
-		{
-			byte k;
+			for (int i = 0; i < Config.LED_ROWS * Config.LED_COLS; i += CHUNK_SIZE)
+			{
+				byte k;
 
-			for (k = 0; k < CHUNK_SIZE && i + k < Config.LED_ROWS * Config.LED_COLS; ++k)
-			{
-				rChunk[k] = r[i + k];
-				gChunk[k] = g[i + k];
-				bChunk[k] = b[i + k];
-			}
+				for (k = 0; k < CHUNK_SIZE && i + k < Config.LED_ROWS * Config.LED_COLS; ++k)
+				{
+					rChunk[k] = r[i + k];
+					gChunk[k] = g[i + k];
+					bChunk[k] = b[i + k];
+				}
 
-			try
-			{
-				ledStrip.SetRGBValues(i, k, rChunk, gChunk, bChunk);
+				try
+				{
+					ledStrip.SetRGBValues(i, k, rChunk, gChunk, bChunk);
+				}
+				catch (TinkerforgeException)
+				{
+					break;
+				}
 			}
-			catch (TinkerforgeException)
-			{
-				break;
-			}
+		}
+		else {
+			ledStripV2.SetLEDValues(0, frame);
 		}
 	}
 
@@ -443,7 +486,12 @@ class Pong
 
 	public void RunGameLoop()
 	{
-		FrameRenderedCB(ledStrip, 0);
+		if (!Config.IS_LED_STRIP_V2) {
+			FrameRenderedCB(ledStrip, 0);
+		}
+		else {
+			FrameRenderedCBV2(ledStripV2, 0);
+		}
 
 		timer = new Timer(delegate(object state) { Tick(); }, null, 100, 100);
 
@@ -479,7 +527,13 @@ class Pong
 			}
 		}
 
-		ledStrip.FrameRendered -= FrameRenderedCB;
+		if (!Config.IS_LED_STRIP_V2) {
+			ledStrip.FrameRendered -= FrameRenderedCB;
+		}
+		else {
+			ledStripV2.FrameStartedCallback -= FrameRenderedCBV2;
+		}
+
 		timer.Change(Timeout.Infinite, Timeout.Infinite);
 	}
 

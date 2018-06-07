@@ -23,9 +23,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;p&gt;This demo application shows possible applications for the &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Starter Kit: Blinkenlights&lt;/span&gt;&lt;/a&gt;. The &lt;b&gt;LED Strip Bricklet&lt;/b&gt; is required in all of the 6 demos. All other Bricklets are optional.&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;Bricklets connected to this PC will automatically be found. If you want to use Bricklets connected to a different PC you need to change the &lt;b&gt;Host&lt;/b&gt; and click the &lt;b&gt;Reconnect&lt;/b&gt; button.&lt;/p&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This demo application shows possible applications for the &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Starter Kit: Blinkenlights&lt;/span&gt;&lt;/a&gt;. The &lt;span style=&quot; font-weight:600;&quot;&gt;LED Strip Bricklet &lt;/span&gt;or the &lt;span style=&quot; font-weight:600;&quot;&gt;LED Strip V2 Bricklet &lt;/span&gt;is required in all of the 6 demos. All other Bricklets are optional.&lt;/p&gt;&lt;p&gt;Bricklets connected to this PC will automatically be found. If you want to use Bricklets connected to a different PC you need to change the &lt;span style=&quot; font-weight:600;&quot;&gt;Host&lt;/span&gt; and click the &lt;span style=&quot; font-weight:600;&quot;&gt;Reconnect&lt;/span&gt; button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

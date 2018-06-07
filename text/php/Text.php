@@ -2,10 +2,12 @@
 
 require_once('Tinkerforge/IPConnection.php');
 require_once('Tinkerforge/BrickletLEDStrip.php');
+require_once('Tinkerforge/BrickletLEDStripV2.php');
 require_once(__DIR__ . '/Config.php');
 
 use Tinkerforge\IPConnection;
 use Tinkerforge\BrickletLEDStrip;
+use Tinkerforge\BrickletLEDStripV2;
 
 // based on http://web.mit.edu/storborg/Public/hsvtorgb.c
 function hsv2rgb($h, $s, $v)
@@ -161,32 +163,62 @@ class Text
         $this->okay = FALSE;
         $this->ipcon = $ipcon;
 
-        if (!Config\UID_LED_STRIP_BRICKLET) {
-            echo "Not Configured: LED Strip (required)\n";
-            return;
+        if (!Config\IS_LED_STRIP_V2) {
+            if (!Config\UID_LED_STRIP_BRICKLET) {
+                echo "Not Configured: LED Strip (required)\n";
+                return;
+            }
+
+            // Call a getter to check that the Bricklet is avialable
+            $this->ledStrip = new BrickletLEDStrip(Config\UID_LED_STRIP_BRICKLET, $this->ipcon);
+
+            try {
+                $this->ledStrip->getFrameDuration();
+                echo "Found: LED Strip (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
+            } catch (Exception $e) {
+                echo "Not Found: LED Strip (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
+                return;
+            }
         }
+        else {
+            if (!Config\UID_LED_STRIP_BRICKLET) {
+                echo "Not Configured: LED Strip V2(required)\n";
+                return;
+            }
 
-        // Call a getter to check that the Bricklet is avialable
-        $this->ledStrip = new BrickletLEDStrip(Config\UID_LED_STRIP_BRICKLET, $this->ipcon);
+            // Call a getter to check that the Bricklet is avialable
+            $this->ledStripV2 = new BrickletLEDStripV2(Config\UID_LED_STRIP_BRICKLET, $this->ipcon);
 
-        try {
-            $this->ledStrip->getFrameDuration();
-            echo "Found: LED Strip (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
-        } catch (Exception $e) {
-            echo "Not Found: LED Strip (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
-            return;
+            try {
+                $this->ledStripV2->getFrameDuration();
+                echo "Found: LED Strip V2 (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
+            } catch (Exception $e) {
+                echo $e;
+                echo "Not Found: LED Strip V2 (" . Config\UID_LED_STRIP_BRICKLET . ")\n";
+                return;
+            }
         }
 
         $this->okay = TRUE;
 
         $this->frameClear();
 
-        // Set frame duration to 40ms (25 frames per second)
-        $this->ledStrip->setFrameDuration(1000 / Config\TEXT_FRAME_RATE);
+        if (!Config\IS_LED_STRIP_V2) {
+            // Set frame duration to 40ms (25 frames per second)
+            $this->ledStrip->setFrameDuration(1000 / Config\TEXT_FRAME_RATE);
 
-        // Register frame rendered callback to function cb_frame_rendered
-        $this->ledStrip->registerCallback(BrickletLEDStrip::CALLBACK_FRAME_RENDERED,
-                                          array($this, 'cb_frameRendered'));
+            // Register frame rendered callback to function cb_frame_rendered
+            $this->ledStrip->registerCallback(BrickletLEDStrip::CALLBACK_FRAME_RENDERED,
+                                              array($this, 'cb_frameRendered'));
+        }
+        else {
+            // Set frame duration to 40ms (25 frames per second)
+            $this->ledStripV2->setFrameDuration(1000 / Config\TEXT_FRAME_RATE);
+
+            // Register frame rendered callback to function cb_frame_rendered
+            $this->ledStripV2->registerCallback(BrickletLEDStripV2::CALLBACK_FRAME_STARTED,
+                                                array($this, 'cb_frameRendered'));
+        }
     }
 
     // Splits text into characters and looks them up in the letter forms table
@@ -229,6 +261,7 @@ class Text
         $r = array();
         $g = array();
         $b = array();
+        $frame = array();
 
         // Reorder LED data into R, G and B channel
         for ($row = 0; $row < Config\LED_ROWS; $row++) {
@@ -246,29 +279,37 @@ class Text
                 $r[] = $this->leds[$row][$col][Config\R_INDEX];
                 $g[] = $this->leds[$row][$col][Config\G_INDEX];
                 $b[] = $this->leds[$row][$col][Config\B_INDEX];
+                $frame[] = $this->leds[$row][$col][Config\R_INDEX];
+                $frame[] = $this->leds[$row][$col][Config\G_INDEX];
+                $frame[] = $this->leds[$row][$col][Config\B_INDEX];
             }
         }
 
-        // Make chunks of size 16
-        for ($i = 0; $i < Config\LED_ROWS*Config\LED_COLS; $i += Text::CHUNK_SIZE) {
-            $rChunk = array();
-            $gChunk = array();
-            $bChunk = array();
+        if (!Config\IS_LED_STRIP_V2) {
+            // Make chunks of size 16
+            for ($i = 0; $i < Config\LED_ROWS*Config\LED_COLS; $i += Text::CHUNK_SIZE) {
+                $rChunk = array();
+                $gChunk = array();
+                $bChunk = array();
 
-            for ($k = 0; $k < Text::CHUNK_SIZE && $i + $k < Config\LED_ROWS*Config\LED_COLS; $k++) {
-                $rChunk[$k] = $r[$i + $k];
-                $gChunk[$k] = $g[$i + $k];
-                $bChunk[$k] = $b[$i + $k];
+                for ($k = 0; $k < Text::CHUNK_SIZE && $i + $k < Config\LED_ROWS*Config\LED_COLS; $k++) {
+                    $rChunk[$k] = $r[$i + $k];
+                    $gChunk[$k] = $g[$i + $k];
+                    $bChunk[$k] = $b[$i + $k];
+                }
+
+                // Fill up chunks with zeros
+                for ($j = $k; $j < Text::CHUNK_SIZE; $j++) {
+                    $rChunk[$j] = 0;
+                    $gChunk[$j] = 0;
+                    $bChunk[$j] = 0;
+                }
+
+                $this->ledStrip->setRGBValues($i, $k, $rChunk, $gChunk, $bChunk);
             }
-
-            // Fill up chunks with zeros
-            for ($j = $k; $j < Text::CHUNK_SIZE; $j++) {
-                $rChunk[$j] = 0;
-                $gChunk[$j] = 0;
-                $bChunk[$j] = 0;
-            }
-
-            $this->ledStrip->setRGBValues($i, $k, $rChunk, $gChunk, $bChunk);
+        }
+        else {
+            $this->ledStripV2->setLEDValues(0, $frame);
         }
     }
 

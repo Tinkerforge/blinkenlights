@@ -4,7 +4,7 @@ program Fire;
 {$ifdef FPC}{$mode OBJFPC}{$H+}{$endif}
 
 uses
-  SysUtils, Math, Config, IPConnection, BrickletLEDStrip;
+  SysUtils, Math, Config, IPConnection, BrickletLEDStrip, BrickletLEDStripV2;
 
 const
   CHUNK_SIZE = 16;
@@ -40,6 +40,7 @@ type
   private
     ipcon: TIPConnection;
     ledStrip: TBrickletLEDStrip;
+    ledStripV2: TBrickletLEDStripV2;
     line: array [0..(LED_ROWS - 1)] of integer;
     matrix: array [0..(LED_ROWS - 1), 0..(LED_COLS - 1)] of integer;
     leds: array [0..(LED_ROWS - 1), 0..(LED_COLS - 1), 0..2] of byte;
@@ -50,6 +51,7 @@ type
     function Interpolate2(const x, y: integer): integer;
     function Interpolate1(const x: integer): integer;
     procedure FrameRenderedCB(sender: TBrickletLEDStrip; const length: word);
+    procedure FrameRenderedCBV2(sender: TBrickletLEDStripV2; const length: word);
     procedure FrameUpload;
     procedure FramePrepareNext;
     procedure Execute;
@@ -126,13 +128,21 @@ begin
   FramePrepareNext;
 end;
 
+procedure TFire.FrameRenderedCBV2(sender: TBrickletLEDStripV2; const length: word);
+begin
+  FrameUpload;
+  FramePrepareNext;
+end;
+
 procedure TFire.FrameUpload;
 var r, g, b: array [0..(LED_ROWS * LED_COLS - 1)] of byte;
+    frame: array [0..(LED_ROWS * LED_COLS - 1)*3] of byte;
     rChunk, gChunk, bChunk: array [0..(CHUNK_SIZE - 1)] of byte;
-    row, col, colBegin, colEnd, colStep, i, k: integer;
+    row, col, colBegin, colEnd, colStep, i, j, k: integer;
 begin
   { Reorder LED data into R, G and B channel }
   i := 0;
+  j := 0;
   for row := 0 to (LED_ROWS - 1) do begin
     if (row mod 2 = 0) then begin
       colBegin := LED_COLS - 1;
@@ -150,29 +160,42 @@ begin
       r[i] := leds[row, col, R_INDEX];
       g[i] := leds[row, col, G_INDEX];
       b[i] := leds[row, col, B_INDEX];
+
+      frame[j] := leds[row, col, R_INDEX];
+      j += 1;
+      frame[j] := leds[row, col, G_INDEX];
+      j += 1;
+      frame[j] := leds[row, col, B_INDEX];
+      j += 1;
+
       i += 1;
       col += colStep;
     end;
   end;
 
-  { Make chunks of size 16 }
-  i := 0;
-  while (i < LED_ROWS * LED_COLS) do begin
-    k := 0;
-    while ((k < CHUNK_SIZE) and (i + k < LED_ROWS * LED_COLS)) do begin
-      rChunk[k] := r[i + k];
-      gChunk[k] := g[i + k];
-      bChunk[k] := b[i + k];
-      k += 1;
-    end;
+  if not (IS_LED_STRIP_V2) then begin
+    { Make chunks of size 16 }
+    i := 0;
+    while (i < LED_ROWS * LED_COLS) do begin
+      k := 0;
+      while ((k < CHUNK_SIZE) and (i + k < LED_ROWS * LED_COLS)) do begin
+        rChunk[k] := r[i + k];
+        gChunk[k] := g[i + k];
+        bChunk[k] := b[i + k];
+        k += 1;
+      end;
 
-    try
-      ledStrip.SetRGBValues(i, k, rChunk, gChunk, bChunk);
-    except
-      exit;
-    end;
+      try
+          ledStrip.SetRGBValues(i, k, rChunk, gChunk, bChunk);
+      except
+        exit;
+      end;
 
-    i += CHUNK_SIZE;
+      i += CHUNK_SIZE;
+    end;
+  end
+  else begin
+    ledStripV2.SetLEDValues(0, frame);
   end;
 end;
 
@@ -226,23 +249,50 @@ begin
   ipcon.Connect(HOST, PORT);
 
   { Call a getter to check that the Bricklet is avialable }
-  ledStrip := TBrickletLEDStrip.Create(UID_LED_STRIP_BRICKLET, ipcon);
+  if not (IS_LED_STRIP_V2) then begin
+    ledStrip := TBrickletLEDStrip.Create(UID_LED_STRIP_BRICKLET, ipcon);
+  end
+  else begin
+    ledStripV2 := TBrickletLEDStripV2.Create(UID_LED_STRIP_BRICKLET, ipcon);
+  end;
 
   try
-    ledStrip.GetFrameDuration;
-    WriteLn(Format('Found: LED Strip %s', [UID_LED_STRIP_BRICKLET]));
+
+    if not (IS_LED_STRIP_V2) then begin
+      ledStrip.GetFrameDuration;
+      WriteLn(Format('Found: LED Strip %s', [UID_LED_STRIP_BRICKLET]));
+    end
+    else begin
+      ledStripV2.GetFrameDuration;
+      WriteLn(Format('Found: LED Strip V2 %s', [UID_LED_STRIP_BRICKLET]));
+    end;
   except
-    WriteLn(Format('Not Found: LED Strip %s', [UID_LED_STRIP_BRICKLET]));
+    if not (IS_LED_STRIP_V2) then begin
+      WriteLn(Format('Not Found: LED Strip %s', [UID_LED_STRIP_BRICKLET]));
+    end
+    else begin
+      WriteLn(Format('Not Found: LED Strip V2 %s', [UID_LED_STRIP_BRICKLET]));
+    end;
     exit;
   end;
 
-  ledStrip.SetFrameDuration(Floor(1000 / FIRE_FRAME_RATE));
-
   { Register frame rendered callback to function FrameRenderedCB }
-  ledStrip.OnFrameRendered := {$ifdef FPC}@{$endif}FrameRenderedCB;
+  if not (IS_LED_STRIP_V2) then begin
+    ledStrip.SetFrameDuration(Floor(1000 / FIRE_FRAME_RATE));
+    ledStrip.OnFrameRendered := {$ifdef FPC}@{$endif}FrameRenderedCB;
+  end
+  else begin
+    ledStripV2.SetFrameDuration(Floor(1000 / FIRE_FRAME_RATE));
+    ledStripV2.OnFrameStarted := {$ifdef FPC}@{$endif}FrameRenderedCBV2;
+  end;
 
   { Start rendering }
-  FrameRenderedCB(ledStrip, 0);
+  if not (IS_LED_STRIP_V2) then begin
+    FrameRenderedCB(ledStrip, 0);
+  end
+  else begin
+    FrameRenderedCBV2(ledStripV2, 0);
+  end;
 
   WriteLn('Press key to exit');
   ReadLn;

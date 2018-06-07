@@ -1,10 +1,11 @@
 <?php
 
 /*
- * Copyright (c) 2012-2013, Matthias Bolte (matthias@tinkerforge.com)
+ * Copyright (c) 2012-2017, Matthias Bolte <matthias@tinkerforge.com>
  *
  * Redistribution and use in source and binary forms of this file,
- * with or without modification, are permitted.
+ * with or without modification, are permitted. See the Creative
+ * Commons Zero (CC0 1.0) License for more details.
  */
 
 namespace Tinkerforge;
@@ -12,10 +13,6 @@ namespace Tinkerforge;
 
 if (!extension_loaded('bcmath')) {
     throw new \Exception('Required bcmath extension is not available');
-}
-
-if (!extension_loaded('sockets')) {
-    throw new \Exception('Required sockets extension is not available');
 }
 
 
@@ -31,6 +28,10 @@ class Base58
      */
     public static function encode($value)
     {
+        if (bccomp($value, 0) < 0) {
+            throw new \InvalidArgumentException('Cannot encode negative value');
+        }
+
         $encoded = '';
 
         while (bccomp($value, '58') >= 0) {
@@ -55,8 +56,7 @@ class Base58
         $value = '0';
         $base = '1';
 
-        for ($i = $length - 1; $i >= 0; $i--)
-        {
+        for ($i = $length - 1; $i >= 0; $i--) {
             $index = strval(strpos(self::$alphabet, $encoded[$i]));
             $value = bcadd($value, bcmul($index, $base));
             $base = bcmul($base, '58');
@@ -77,6 +77,10 @@ class Base256
      */
     public static function encode($value, $length)
     {
+        if (bccomp($value, 0) < 0) {
+            throw new \InvalidArgumentException('Cannot encode negative value');
+        }
+
         $bytes = array();
 
         while (bccomp($value, '256') >= 0) {
@@ -101,6 +105,20 @@ class Base256
         }
 
         return $packed;
+    }
+
+    public static function encodeAndPackInt64($value)
+    {
+        if (bccomp($value, 0) < 0) {
+            $value = bcadd($value, '18446744073709551616');
+        }
+
+        return self::encodeAndPack($value, 8);
+    }
+
+    public static function encodeAndPackUInt64($value)
+    {
+        return self::encodeAndPack($value, 8);
     }
 
     /**
@@ -154,6 +172,12 @@ class NotSupportedException extends TinkerforgeException
 }
 
 
+class StreamOutOfSyncException extends TinkerforgeException
+{
+
+}
+
+
 abstract class Device
 {
     /**
@@ -161,25 +185,25 @@ abstract class Device
      */
     const RESPONSE_EXPECTED_INVALID_FUNCTION_ID = 0;
     const RESPONSE_EXPECTED_ALWAYS_TRUE = 1; // getter
-    const RESPONSE_EXPECTED_ALWAYS_FALSE = 2; // callback
-    const RESPONSE_EXPECTED_TRUE = 3; // setter
-    const RESPONSE_EXPECTED_FALSE = 4; // setter, default
+    const RESPONSE_EXPECTED_TRUE = 2; // setter
+    const RESPONSE_EXPECTED_FALSE = 3; // setter, default
 
     public $uid = '0'; # Base10
-    public $apiVersion = array(0, 0, 0);
+    public $api_version = array(0, 0, 0);
 
     public $ipcon = NULL;
 
-    public $responseExpected = array();
+    public $response_expected = array();
 
-    public $expectedResponseFunctionID = 0;
-    public $expectedResponseSequenceNumber = 0;
-    public $receivedResponse = NULL;
+    public $expected_response_function_id = 0;
+    public $expected_response_sequence_number = 0;
+    public $received_response = NULL;
 
-    public $registeredCallbacks = array();
-    public $registeredCallbackUserData = array();
-    public $callbackWrappers = array();
-    public $pendingCallbacks = array();
+    public $registered_callbacks = array();
+    public $registered_callback_user_data = array();
+    public $callback_wrappers = array();
+    public $high_level_callbacks = array();
+    public $pending_callbacks = array();
 
     /**
      * Creates the device object with the unique device ID *$uid* and adds
@@ -190,35 +214,32 @@ abstract class Device
      */
     public function __construct($uid, $ipcon)
     {
-        $longUid = Base58::decode($uid);
+        $long_uid = Base58::decode($uid);
 
-        if (bccomp($longUid, '4294967295' /* 0xFFFFFFFF */) > 0) {
+        if (bccomp($long_uid, '4294967295' /* 0xFFFFFFFF */) > 0) {
             // Convert from 64bit to 32bit
-            $value1a = (int)bcmod($longUid, '65536' /* 0x10000 */);
-            $value1b = (int)bcmod(bcdiv($longUid, '65536' /* 0x10000 */), '65536' /* 0x10000 */);
-            $value2a = (int)bcmod(bcdiv($longUid, '4294967296' /* 0x100000000 */), '65536' /* 0x10000 */);
-            $value2b = (int)bcmod(bcdiv($longUid, '281474976710656' /* 0x10000000000 */), '65536' /* 0x10000 */);
+            $value1a = (int)bcmod($long_uid, '65536' /* 0x10000 */);
+            $value1b = (int)bcmod(bcdiv($long_uid, '65536' /* 0x10000 */), '65536' /* 0x10000 */);
+            $value2a = (int)bcmod(bcdiv($long_uid, '4294967296' /* 0x100000000 */), '65536' /* 0x10000 */);
+            $value2b = (int)bcmod(bcdiv($long_uid, '281474976710656' /* 0x10000000000 */), '65536' /* 0x10000 */);
 
-            $shortUid1  =  $value1a & 0x0FFF;
-            $shortUid1 |= ($value1b & 0x0F00) << 4;
+            $short_uid1  =  $value1a & 0x0FFF;
+            $short_uid1 |= ($value1b & 0x0F00) << 4;
 
-            $shortUid2  =  $value2a & 0x003F;
-            $shortUid2 |= ($value2b & 0x000F) << 6;
-            $shortUid2 |= ($value2b & 0x3F00) << 2;
+            $short_uid2  =  $value2a & 0x003F;
+            $short_uid2 |= ($value2b & 0x000F) << 6;
+            $short_uid2 |= ($value2b & 0x3F00) << 2;
 
-            $this->uid = bcadd(bcmul($shortUid2, '65536' /* 0x10000 */), $shortUid1);
+            $this->uid = bcadd(bcmul($short_uid2, '65536' /* 0x10000 */), $short_uid1);
         } else {
-            $this->uid = $longUid;
+            $this->uid = $long_uid;
         }
 
         $this->ipcon = $ipcon;
 
         for ($i = 0; $i < 256; ++$i) {
-            $this->responseExpected[$i] = self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID;
+            $this->response_expected[$i] = self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID;
         }
-
-        $this->responseExpected[IPConnection::FUNCTION_ENUMERATE] = self::RESPONSE_EXPECTED_ALWAYS_FALSE;
-        $this->responseExpected[IPConnection::CALLBACK_ENUMERATE] = self::RESPONSE_EXPECTED_ALWAYS_FALSE;
 
         $ipcon->devices[$this->uid] = $this; // FIXME: use a weakref here
     }
@@ -231,12 +252,12 @@ abstract class Device
      */
     public function getAPIVersion()
     {
-        return $this->apiVersion;
+        return $this->api_version;
     }
 
     /**
      * Returns the response expected flag for the function specified by the
-     * *$functionId* parameter. It is *true* if the function is expected to
+     * $function_id parameter. It is *true* if the function is expected to
      * send a response, *false* otherwise.
      *
      * For getter functions this is enabled by default and cannot be disabled,
@@ -251,24 +272,24 @@ abstract class Device
      * disabled for a setter function then no response is send and errors are
      * silently ignored, because they cannot be detected.
      *
-     * @param int $functionId
+     * @param int $function_id
      *
      * @return boolean
      */
-    public function getResponseExpected($functionID)
+    public function getResponseExpected($function_id)
     {
-        if ($functionID < 0 || $functionID > 255) {
-            throw new \InvalidArgumentException('Function ID ' . $functionID . ' out of range');
+        if ($function_id < 0 || $function_id > 255) {
+            throw new \InvalidArgumentException("Function ID $function_id out of range");
         }
 
-        $flag = $this->responseExpected[$functionID];
+        $flag = $this->response_expected[$function_id];
 
-        if ($flag == self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID) {
-            throw new \InvalidArgumentException('Invalid function ID ' . $functionID);
+        if ($flag === self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID) {
+            throw new \InvalidArgumentException("Invalid function ID $function_id");
         }
 
-        if ($flag == self::RESPONSE_EXPECTED_ALWAYS_TRUE ||
-            $flag == self::RESPONSE_EXPECTED_TRUE) {
+        if ($flag === self::RESPONSE_EXPECTED_ALWAYS_TRUE ||
+            $flag === self::RESPONSE_EXPECTED_TRUE) {
             return TRUE;
         } else {
             return FALSE;
@@ -277,10 +298,9 @@ abstract class Device
 
     /**
      * Changes the response expected flag of the function specified by the
-     * *$functionId* parameter. This flag can only be changed for setter
+     * $function_id parameter. This flag can only be changed for setter
      * (default value: *false*) and callback configuration functions
-     * (default value: *true*). For getter functions it is always enabled
-     * and callbacks it is always disabled.
+     * (default value: *true*). For getter functions it is always enabled.
      *
      * Enabling the response expected flag for a setter function allows to
      * detect timeouts and other error conditions calls of this setter as
@@ -288,50 +308,49 @@ abstract class Device
      * flag is disabled for a setter function then no response is send and
      * errors are silently ignored, because they cannot be detected.
      *
-     * @param int $functionId
-     * @param boolean $responseExpected
+     * @param int $function_id
+     * @param boolean $response_expected
      *
      * @return void
      */
-    public function setResponseExpected($functionID, $responseExpected)
+    public function setResponseExpected($function_id, $response_expected)
     {
-        if ($functionID < 0 || $functionID > 255) {
-            throw new \InvalidArgumentException('Function ID ' . $functionID . ' out of range');
+        if ($function_id < 0 || $function_id > 255) {
+            throw new \InvalidArgumentException("Function ID $function_id out of range");
         }
 
-        $flag = $this->responseExpected[$functionID];
+        $flag = $this->response_expected[$function_id];
 
-        if ($flag == self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID) {
-            throw new \InvalidArgumentException('Invalid function ID ' . $functionID);
+        if ($flag === self::RESPONSE_EXPECTED_INVALID_FUNCTION_ID) {
+            throw new \InvalidArgumentException("Invalid function ID $function_id");
         }
 
-        if ($flag == self::RESPONSE_EXPECTED_ALWAYS_TRUE ||
-            $flag == self::RESPONSE_EXPECTED_ALWAYS_FALSE) {
-            throw new \InvalidArgumentException('Response Expected flag cannot be changed for function ID ' . $functionID);
+        if ($flag === self::RESPONSE_EXPECTED_ALWAYS_TRUE) {
+            throw new \InvalidArgumentException("Response Expected flag cannot be changed for function ID $function_id");
         }
 
-        $this->responseExpected[$functionID] =
-            $responseExpected ? self::RESPONSE_EXPECTED_TRUE
-                              : self::RESPONSE_EXPECTED_FALSE;
+        $this->response_expected[$function_id] =
+            $response_expected ? self::RESPONSE_EXPECTED_TRUE
+                               : self::RESPONSE_EXPECTED_FALSE;
     }
 
     /**
      * Changes the response expected flag for all setter and callback
      * configuration functions of this device at once.
      *
-     * @param boolean $responseExpected
+     * @param boolean $response_expected
      *
      * @return void
      */
-    public function setResponseExpectedAll($responseExpected)
+    public function setResponseExpectedAll($response_expected)
     {
-        $flag = $responseExpected ? self::RESPONSE_EXPECTED_TRUE
-                                  : self::RESPONSE_EXPECTED_FALSE;
+        $flag = $response_expected ? self::RESPONSE_EXPECTED_TRUE
+                                   : self::RESPONSE_EXPECTED_FALSE;
 
         for ($i = 0; $i < 256; ++$i) {
-            if ($this->responseExpected[$i] == self::RESPONSE_EXPECTED_TRUE ||
-                $this->responseExpected[$i] == self::RESPONSE_EXPECTED_FALSE) {
-                $this->responseExpected[$i] = $flag;
+            if ($this->response_expected[$i] === self::RESPONSE_EXPECTED_TRUE ||
+                $this->response_expected[$i] === self::RESPONSE_EXPECTED_FALSE) {
+                $this->response_expected[$i] = $flag;
             }
         }
     }
@@ -341,63 +360,63 @@ abstract class Device
      */
     public function dispatchPendingCallbacks()
     {
-        $pendingCallbacks = $this->pendingCallbacks;
-        $this->pendingCallbacks = array();
+        $pending_callbacks = $this->pending_callbacks;
+        $this->pending_callbacks = array();
 
-        foreach ($pendingCallbacks as $pendingCallback) {
+        foreach ($pending_callbacks as $pending_callback) {
             if ($this->ipcon->socket === FALSE) {
                 break;
             }
 
-            $this->handleCallback($pendingCallback[0], $pendingCallback[1]);
+            $this->handleCallback($pending_callback[0], $pending_callback[1]);
         }
     }
 
     /**
      * @internal
      */
-    protected function sendRequest($functionID, $payload)
+    protected function sendRequest($function_id, $payload)
     {
         if ($this->ipcon->socket === FALSE) {
             throw new NotConnectedException('Not connected');
         }
 
-        $header = $this->ipcon->createPacketHeader($this, 8 + strlen($payload), $functionID);
+        $header = $this->ipcon->createPacketHeader($this, 8 + strlen($payload), $function_id);
         $request = $header[0] . $payload;
-        $sequenceNumber = $header[1];
-        $responseExpected = $header[2];
+        $sequence_number = $header[1];
+        $response_expected = $header[2];
 
-        if ($responseExpected) {
-            $this->expectedResponseFunctionID = $functionID;
-            $this->expectedResponseSequenceNumber = $sequenceNumber;
-            $this->receivedResponse = NULL;
+        if ($response_expected) {
+            $this->expected_response_function_id = $function_id;
+            $this->expected_response_sequence_number = $sequence_number;
+            $this->received_response = NULL;
         }
 
         $this->ipcon->send($request);
 
-        if ($responseExpected) {
+        if ($response_expected) {
             $this->ipcon->receive($this->ipcon->timeout, $this, FALSE /* FIXME: this can delay callback up to the current timeout */);
 
-            $this->expectedResponseFunctionID = 0;
-            $this->expectedResponseSequenceNumber = 0;
+            $this->expected_response_function_id = 0;
+            $this->expected_response_sequence_number = 0;
 
-            if ($this->receivedResponse == NULL) {
-                throw new TimeoutException("Did not receive response in time for function ID $functionID");
+            if ($this->received_response === NULL) {
+                throw new TimeoutException("Did not receive response in time for function ID $function_id");
             }
 
-            $response = $this->receivedResponse;
-            $this->receivedResponse = NULL;
+            $response = $this->received_response;
+            $this->received_response = NULL;
 
-            $errorCode = ($response[0]['errorCodeAndFutureUse'] >> 6) & 0x03;
+            $error_code = ($response[0]['error_code_and_future_use'] >> 6) & 0x03;
 
-            if ($errorCode == 0) {
+            if ($error_code === 0) {
                 // no error
-            } else if ($errorCode == 1) {
-                throw new NotSupportedException("Got invalid parameter for function ID $functionID");
-            } else if ($errorCode == 2) {
-                throw new NotSupportedException("Function ID $functionID is not supported");
+            } else if ($error_code === 1) {
+                throw new NotSupportedException("Got invalid parameter for function ID $function_id");
+            } else if ($error_code === 2) {
+                throw new NotSupportedException("Function ID $function_id is not supported");
             } else {
-                throw new NotSupportedException("Function ID $functionID returned an unknown error");
+                throw new NotSupportedException("Function ID $function_id returned an unknown error");
             }
 
             $payload = $response[1];
@@ -406,6 +425,249 @@ abstract class Device
         }
 
         return $payload;
+    }
+
+    /**
+     * @internal
+     */
+    protected function createChunkData($data, $chunk_offset, $chunk_length, $chunk_padding)
+    {
+        $chunk_data = array_slice($data, $chunk_offset, $chunk_length);
+
+        if (count($chunk_data) < $chunk_length) {
+            $chunk_data = array_pad($chunk_data, $chunk_length, $chunk_padding);
+        }
+
+        return $chunk_data;
+    }
+}
+
+
+/**
+ * @internal
+ */
+class BrickDaemon extends Device
+{
+    const FUNCTION_GET_AUTHENTICATION_NONCE = 1;
+    const FUNCTION_AUTHENTICATE = 2;
+
+    public function __construct($uid, $ipcon)
+    {
+        parent::__construct($uid, $ipcon);
+
+        $this->api_version = array(2, 0, 0);
+
+        $this->response_expected[self::FUNCTION_GET_AUTHENTICATION_NONCE] = self::RESPONSE_EXPECTED_ALWAYS_TRUE;
+        $this->response_expected[self::FUNCTION_AUTHENTICATE] = self::RESPONSE_EXPECTED_TRUE;
+    }
+
+    public function getAuthenticationNonce()
+    {
+        $payload = '';
+
+        $data = $this->sendRequest(self::FUNCTION_GET_AUTHENTICATION_NONCE, $payload);
+
+        $payload = unpack('C4nonce', $data);
+
+        return IPConnection::collectUnpackedArray($payload, 'nonce', 4);
+    }
+
+    public function authenticate($client_nonce, $digest)
+    {
+        $payload = '';
+
+        for ($i = 0; $i < 4; $i++) {
+            $payload .= pack('C', $client_nonce[$i]);
+        }
+
+        for ($i = 0; $i < 20; $i++) {
+            $payload .= pack('C', $digest[$i]);
+        }
+
+        $this->sendRequest(self::FUNCTION_AUTHENTICATE, $payload);
+    }
+}
+
+
+/**
+ * @internal
+ */
+abstract class Socket
+{
+    const RECEIVE_ERROR = 1;
+    const RECEIVE_SHUTDOWN = 2;
+    const RECEIVE_TIMEOUT = 3;
+    const RECEIVE_DATA = 4;
+}
+
+
+/**
+ * @internal
+ */
+class ExtensionSocket extends Socket
+{
+    private $handle = FALSE;
+
+    function __construct($address, $port)
+    {
+        $this->handle = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+
+        if ($this->handle === FALSE) {
+            throw new \Exception('Could not create socket: ' .
+                                 socket_strerror(socket_last_error()));
+        }
+
+        @socket_set_option($this->handle, SOL_TCP, TCP_NODELAY, 1);
+
+        if (!@socket_connect($this->handle, $address, $port)) {
+            $error = socket_strerror(socket_last_error($this->handle));
+
+            socket_close($this->handle);
+            $this->handle = FALSE;
+
+            throw new \Exception("Could not connect socket: $error");
+        }
+    }
+
+    function __destruct()
+    {
+        if ($this->handle !== FALSE) {
+            $this->shutdown();
+            $this->close();
+        }
+    }
+
+    function shutdown()
+    {
+        @socket_shutdown($this->handle, 2);
+    }
+
+    function close()
+    {
+        @socket_close($this->handle);
+        $this->handle = FALSE;
+    }
+
+    function send($data, $length)
+    {
+        return @socket_send($this->handle, $data, $length, 0);
+    }
+
+    function receive(&$data, &$length, $timeout)
+    {
+        $read = array($this->handle);
+        $write = NULL;
+        $except = array($this->handle);
+        $timeout_sec = floor($timeout);
+        $timeout_usec = ceil(($timeout - $timeout_sec) * 1000000);
+        $changed = @socket_select($read, $write, $except, $timeout_sec, $timeout_usec);
+
+        if ($changed === FALSE) {
+            throw new \Exception('Could not receive response: ' .
+                                 socket_strerror(socket_last_error($this->handle)));
+        }
+
+        if ($changed === 0) {
+            return self::RECEIVE_TIMEOUT;
+        }
+
+        if (in_array($this->handle, $except)) {
+            return self::RECEIVE_ERROR;
+        }
+
+        $result = @socket_recv($this->handle, $data, $length, 0);
+
+        if ($result === FALSE || $result === 0) {
+            if ($result === FALSE) {
+                return self::RECEIVE_ERROR;
+            } else {
+                return self::RECEIVE_SHUTDOWN;
+            }
+        }
+
+        $length = $result;
+
+        return self::RECEIVE_DATA;
+    }
+}
+
+
+/**
+ * @internal
+ */
+class StreamSocket extends Socket
+{
+    private $handle = FALSE;
+
+    function __construct($address, $port)
+    {
+        // FIXME: stream sockets don't support TCP_NODELAY, see https://bugs.php.net/bug.php?id=51879
+        $this->handle = stream_socket_client("tcp://$address:$port", $errno, $message);
+
+        if ($this->handle === FALSE) {
+            throw new \Exception("Could not connect socket: $message");
+        }
+    }
+
+    function __destruct()
+    {
+        if ($this->handle !== FALSE) {
+            $this->shutdown();
+            $this->close();
+        }
+    }
+
+    function shutdown()
+    {
+        stream_socket_shutdown($this->handle, STREAM_SHUT_RDWR);
+    }
+
+    function close()
+    {
+        fclose($this->handle);
+        $this->handle = FALSE;
+    }
+
+    function send($data, $length)
+    {
+        return fwrite($this->handle, $data, $length);
+    }
+
+    function receive(&$data, &$length, $timeout)
+    {
+        $read = array($this->handle);
+        $write = NULL;
+        $except = array($this->handle);
+        $timeout_sec = floor($timeout);
+        $timeout_usec = ceil(($timeout - $timeout_sec) * 1000000);
+        $changed = @stream_select($read, $write, $except, $timeout_sec, $timeout_usec);
+
+        if ($changed === FALSE) {
+            throw new \Exception('Could not receive response: ' .
+                                 socket_strerror(socket_last_error($this->handle)));
+        }
+
+        if ($changed === 0) {
+            return self::RECEIVE_TIMEOUT;
+        }
+
+        if (in_array($this->handle, $except)) {
+            return self::RECEIVE_ERROR;
+        }
+
+        $data = fread($this->handle, $length);
+
+        if ($data === FALSE) {
+            return self::RECEIVE_ERROR;
+        }
+
+        $length = strlen($data);
+
+        if ($length === 0) {
+            return self::RECEIVE_SHUTDOWN;
+        }
+
+        return self::RECEIVE_DATA;
     }
 }
 
@@ -441,22 +703,25 @@ class IPConnection
 
     public $timeout = 2.5; // seconds
 
-    private $nextSequenceNumber = 0;
+    private $next_sequence_number = 0;
+    private $next_authentication_nonce = 0;
 
     public $devices = array();
 
-    private $registeredCallbacks = array();
-    private $registeredCallbackUserData = array();
-    private $pendingCallbacks = array();
+    private $registered_callbacks = array();
+    private $registered_callback_user_data = array();
+    private $pending_callbacks = array();
 
     private $host = "";
     private $port = 0;
 
     public $socket = FALSE;
-    private $pendingData = '';
+    private $pending_data = '';
 
-    private $disconnectProbeRequest = '';
-    private $nextDisconnectProbe = 0.0;
+    private $disconnect_probe_request = '';
+    private $next_disconnect_probe = 0.0;
+
+    private $brickd = NULL;
 
     /**
      * Creates an IP Connection object that can be used to enumerate the available
@@ -465,8 +730,10 @@ class IPConnection
     public function __construct()
     {
         $result = $this->createPacketHeader(NULL, 8, self::FUNCTION_DISCONNECT_PROBE);
-        $this->disconnectProbeRequest = $result[0];
-        $this->nextDisconnectProbe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
+        $this->disconnect_probe_request = $result[0];
+        $this->next_disconnect_probe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
+
+        $this->brickd = new BrickDaemon('2', $this);
     }
 
     function __destruct()
@@ -477,7 +744,7 @@ class IPConnection
     }
 
     /**
-     * Creates a TCP/IP connection to the given *$host* and *$port*. The host
+     * Creates a TCP/IP connection to the given $host and $port. The host
      * and port can point to a Brick Daemon or to a WIFI/Ethernet Extension.
      *
      * Devices can only be controlled when the connection was established
@@ -504,41 +771,29 @@ class IPConnection
 
         $address = '';
 
-        if (preg_match('/^\d+\.\d+\.\d+\.\d+$/', $host) == 0) {
+        if (preg_match('/^\d+\.\d+\.\d+\.\d+$/', $host) === 0) {
             $address = gethostbyname($host);
 
-            if ($address == $host) {
+            if ($address === $host) {
                 throw new \Exception('Could not resolve hostname');
             }
         } else {
             $address = $host;
         }
 
-        $this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-
-        if ($this->socket === FALSE) {
-            throw new \Exception('Could not create socket: ' .
-                                 socket_strerror(socket_last_error()));
+        if (extension_loaded('sockets')) {
+            $this->socket = new ExtensionSocket($address, $port);
+        } else {
+            $this->socket = new StreamSocket($address, $port);
         }
 
-        @socket_set_option($this->socket, SOL_TCP, TCP_NODELAY, 1);
-
-        if (!@socket_connect($this->socket, $address, $port)) {
-            $error = socket_strerror(socket_last_error($this->socket));
-
-            socket_close($this->socket);
-            $this->socket = FALSE;
-
-            throw new \Exception('Could not connect socket: ' . $error);
-        }
-
-        if (array_key_exists(self::CALLBACK_CONNECTED, $this->registeredCallbacks)) {
-            call_user_func_array($this->registeredCallbacks[self::CALLBACK_CONNECTED],
+        if (array_key_exists(self::CALLBACK_CONNECTED, $this->registered_callbacks)) {
+            call_user_func_array($this->registered_callbacks[self::CALLBACK_CONNECTED],
                                  array(self::CONNECT_REASON_REQUEST,
-                                       $this->registeredCallbackUserData[self::CALLBACK_CONNECTED]));
+                                       $this->registered_callback_user_data[self::CALLBACK_CONNECTED]));
         }
 
-        $this->nextDisconnectProbe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
+        $this->next_disconnect_probe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
     }
 
     /**
@@ -553,11 +808,56 @@ class IPConnection
             throw new NotConnectedException('Not connected');
         }
 
-        @socket_shutdown($this->socket, 2);
+        $this->socket->shutdown();
 
         $this->disconnectInternal(self::DISCONNECT_REASON_REQUEST);
 
-        $this->pendingData = '';
+        $this->pending_data = '';
+    }
+
+    /**
+     * Performs an authentication handshake with the connected Brick Daemon or
+     * WIFI/Ethernet Extension. If the handshake succeeds the connection switches
+     * from non-authenticated to authenticated state and communication can
+     * continue as normal. If the handshake fails then the connection gets closed.
+     * Authentication can fail if the wrong secret was used or if authentication
+     * is not enabled at all on the Brick Daemon or the WIFI/Ethernet Extension.
+     *
+     * For more information about authentication see
+     * http://www.tinkerforge.com/en/doc/Tutorials/Tutorial_Authentication/Tutorial.html
+     *
+     * @param string $secret
+     *
+     * @return void
+     */
+    public function authenticate($secret)
+    {
+        if ($this->next_authentication_nonce === 0) {
+            $this->next_authentication_nonce = self::getRandomUInt32();
+        }
+
+        $server_nonce = $this->brickd->getAuthenticationNonce();
+        $server_nonce_bytes = pack('C4', $server_nonce[0], $server_nonce[1], $server_nonce[2], $server_nonce[3]);
+
+        $client_nonce_number = $this->next_authentication_nonce;
+        $this->next_authentication_nonce = bcadd($this->next_authentication_nonce, '1');
+
+        // cannot use pack() here because $client_nonce_number might be a number in a string
+        $client_nonce = array((int)bcmod(      $client_nonce_number,              '256'),
+                              (int)bcmod(bcdiv($client_nonce_number,      '256'), '256'),
+                              (int)bcmod(bcdiv($client_nonce_number,    '65536'), '256'),
+                              (int)bcmod(bcdiv($client_nonce_number, '16777216'), '256'));
+        $client_nonce_bytes = pack('C4', $client_nonce[0], $client_nonce[1], $client_nonce[2], $client_nonce[3]);
+
+        $digest_bytes = hash_hmac('sha1', $server_nonce_bytes . $client_nonce_bytes, $secret, true);
+
+        if ($digest_bytes === FALSE) {
+            throw new \Exception('HMAC-SHA1 not avialable');
+        }
+
+        $digest = self::collectUnpackedArray(unpack('C20digest', $digest_bytes), 'digest', 20);
+
+        $this->brickd->authenticate($client_nonce, $digest);
     }
 
     /**
@@ -592,7 +892,7 @@ class IPConnection
      */
     public function setTimeout($seconds)
     {
-        if ($timeout < 0) {
+        if ($seconds < 0) {
             throw new \Exception('Timeout cannot be negative');
         }
 
@@ -656,46 +956,47 @@ class IPConnection
     }
 
     /**
-     * Registers a callback for a given ID.
+     * Registers the given $function with the given $callback_id. The optional
+     * $user_data will be passed as the last parameter to the $function.
      *
-     * @param int $id
-     * @param callable $callback
-     * @param mixed $userData
+     * @param int $callback_id
+     * @param callable $function
+     * @param mixed $user_data
      *
      * @return void
      */
-    public function registerCallback($id, $callback, $userData = NULL)
+    public function registerCallback($callback_id, $function, $user_data = NULL)
     {
-        if (!is_callable($callback)) {
-            throw new \Exception('Callback function is not callable');
+        if (!is_callable($function)) {
+            throw new \Exception('Function is not callable');
         }
 
-        $this->registeredCallbacks[$id] = $callback;
-        $this->registeredCallbackUserData[$id] = $userData;
+        $this->registered_callbacks[$callback_id] = $function;
+        $this->registered_callback_user_data[$callback_id] = $user_data;
     }
 
     /**
      * @internal
      */
-    public function createPacketHeader($device, $length, $functionID)
+    public function createPacketHeader($device, $length, $function_id)
     {
         $uid = '0';
-        $sequenceNumber = $this->nextSequenceNumber + 1;
-        $this->nextSequenceNumber = $sequenceNumber % 15;
-        $responseExpected = 0;
+        $sequence_number = $this->next_sequence_number + 1;
+        $this->next_sequence_number = $sequence_number % 15;
+        $response_expected = 0;
 
-        if ($device != NULL) {
+        if ($device !== NULL) {
             $uid = $device->uid;
 
-            if ($device->getResponseExpected($functionID)) {
-                $responseExpected = 1;
+            if ($device->getResponseExpected($function_id)) {
+                $response_expected = 1;
             }
         }
 
-        $sequenceNumberAndOptions = ($sequenceNumber << 4) | ($responseExpected << 3);
-        $header = Base256::encodeAndPack($uid, 4) . pack('CCCC', $length, $functionID, $sequenceNumberAndOptions, 0);
+        $sequence_number_and_options = ($sequence_number << 4) | ($response_expected << 3);
+        $header = Base256::encodeAndPack($uid, 4) . pack('CCCC', $length, $function_id, $sequence_number_and_options, 0);
 
-        return array($header, $sequenceNumber, $responseExpected);
+        return array($header, $sequence_number, $response_expected);
     }
 
     /**
@@ -703,20 +1004,20 @@ class IPConnection
      */
     public function send($request)
     {
-        if (@socket_send($this->socket, $request, strlen($request), 0) === FALSE) {
+        if ($this->socket->send($request, strlen($request)) === FALSE) {
             $this->disconnectInternal(self::DISCONNECT_REASON_ERROR);
 
             throw new NotConnectedException('Could not send request: ' .
                                             socket_strerror(socket_last_error($this->socket)));
         }
 
-        $this->nextDisconnectProbe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
+        $this->next_disconnect_probe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
     }
 
     /**
      * @internal
      */
-    public function receive($seconds, $device, $directCallbackDispatch)
+    public function receive($seconds, $device, $direct_callback_dispatch)
     {
         if ($seconds < 0) {
             $seconds = 0;
@@ -733,76 +1034,59 @@ class IPConnection
             $now = microtime(true);
 
             // FIXME: this works for timeout < DISCONNECT_PROBE_INTERVAL only
-            if ($this->nextDisconnectProbe < $now ||
-                ($this->nextDisconnectProbe - $now) > self::DISCONNECT_PROBE_INTERVAL) {
-                if (@socket_send($this->socket, $this->disconnectProbeRequest,
-                                 strlen($this->disconnectProbeRequest), 0) === FALSE) {
+            if ($this->next_disconnect_probe < $now ||
+                ($this->next_disconnect_probe - $now) > self::DISCONNECT_PROBE_INTERVAL) {
+                if ($this->socket->send($this->disconnect_probe_request,
+                                        strlen($this->disconnect_probe_request)) === FALSE) {
                     $this->disconnectInternal(self::DISCONNECT_REASON_ERROR);
                     return;
                 }
 
                 $now = microtime(true);
-                $this->nextDisconnectProbe = $now + self::DISCONNECT_PROBE_INTERVAL;
+                $this->next_disconnect_probe = $now + self::DISCONNECT_PROBE_INTERVAL;
             }
 
-            $read = array($this->socket);
-            $write = NULL;
-            $except = array($this->socket);
             $timeout = $end - $now;
 
             if ($timeout < 0) {
                 $timeout = 0;
             }
 
-            $timeout_sec = floor($timeout);
-            $timeout_usec = ceil(($timeout - $timeout_sec) * 1000000);
-            $changed = @socket_select($read, $write, $except, $timeout_sec, $timeout_usec);
+            $data = '';
+            $length = 8192;
+            $result = $this->socket->receive($data, $length, $timeout);
 
-            if ($changed === FALSE) {
-                throw new \Exception('Could not receive response: ' .
-                                     socket_strerror(socket_last_error($this->socket)));
-            } else if ($changed > 0) {
-                if (in_array($this->socket, $except)) {
-                    $this->disconnectInternal(self::DISCONNECT_REASON_ERROR);
-                    return;
-                }
-
-                $data = '';
-                $length = @socket_recv($this->socket, $data, 8192, 0);
-
-                if ($length === FALSE || $length == 0) {
-                    if ($length === FALSE) {
-                        $disconnectReason = self::DISCONNECT_REASON_ERROR;
-                    } else {
-                        $disconnectReason = self::DISCONNECT_REASON_SHUTDOWN;
-                    }
-
-                    $this->disconnectInternal($disconnectReason);
-                    return;
-                }
-
+            if ($result == Socket::RECEIVE_ERROR) {
+                $this->disconnectInternal(self::DISCONNECT_REASON_ERROR);
+                return;
+            } else if ($result == Socket::RECEIVE_SHUTDOWN) {
+                $this->disconnectInternal(self::DISCONNECT_REASON_SHUTDOWN);
+                return;
+            } else if ($result == Socket::RECEIVE_TIMEOUT) {
+                // Do nothing
+            } else if ($result == Socket::RECEIVE_DATA) {
                 $before = microtime(true);
 
-                $this->pendingData .= $data;
+                $this->pending_data .= $data;
 
                 while (TRUE) {
-                    if (strlen($this->pendingData) < 8) {
+                    if (strlen($this->pending_data) < 8) {
                         // Wait for complete header
                         break;
                     }
 
-                    $tmp = unpack('C', substr($this->pendingData, 4));
+                    $tmp = unpack('C', substr($this->pending_data, 4));
                     $length = $tmp[1];
 
-                    if (strlen($this->pendingData) < $length) {
+                    if (strlen($this->pending_data) < $length) {
                         // Wait for complete packet
                         break;
                     }
 
-                    $packet = substr($this->pendingData, 0, $length);
-                    $this->pendingData = substr($this->pendingData, $length);
+                    $packet = substr($this->pending_data, 0, $length);
+                    $this->pending_data = substr($this->pending_data, $length);
 
-                    $this->handleResponse($packet, $directCallbackDispatch);
+                    $this->handleResponse($packet, $direct_callback_dispatch);
                 }
 
                 $after = microtime(true);
@@ -811,7 +1095,7 @@ class IPConnection
                     $end += $after - $before;
                 }
 
-                if ($device != NULL && $device->receivedResponse != NULL) {
+                if ($device !== NULL && $device->received_response !== NULL) {
                     break;
                 }
             }
@@ -823,42 +1107,42 @@ class IPConnection
     /**
      * @internal
      */
-    private function disconnectInternal($disconnectReason)
+    private function disconnectInternal($disconnect_reason)
     {
-        @socket_close($this->socket);
+        $this->socket->close();
         $this->socket = FALSE;
 
-        if (array_key_exists(self::CALLBACK_DISCONNECTED, $this->registeredCallbacks)) {
-            call_user_func_array($this->registeredCallbacks[self::CALLBACK_DISCONNECTED],
-                                 array($disconnectReason,
-                                       $this->registeredCallbackUserData[self::CALLBACK_DISCONNECTED]));
+        if (array_key_exists(self::CALLBACK_DISCONNECTED, $this->registered_callbacks)) {
+            call_user_func_array($this->registered_callbacks[self::CALLBACK_DISCONNECTED],
+                                 array($disconnect_reason,
+                                       $this->registered_callback_user_data[self::CALLBACK_DISCONNECTED]));
         }
     }
 
     /**
      * @internal
      */
-    private function handleResponse($packet, $directCallbackDispatch)
+    private function handleResponse($packet, $direct_callback_dispatch)
     {
         $uid = Base256::decode(self::collectUnpackedArray(unpack('C4uid', $packet), 'uid', 4));
-        $header = unpack('Clength/CfunctionID/CsequenceNumberAndOptions/CerrorCodeAndFutureUse', substr($packet, 4));
+        $header = unpack('Clength/Cfunction_id/Csequence_number_and_options/Cerror_code_and_future_use', substr($packet, 4));
         $header['uid'] = $uid;
-        $functionID = $header['functionID'];
-        $sequenceNumber = ($header['sequenceNumberAndOptions'] >> 4) & 0x0F;
+        $function_id = $header['function_id'];
+        $sequence_number = ($header['sequence_number_and_options'] >> 4) & 0x0F;
         $payload = substr($packet, 8);
 
-        $this->nextDisconnectProbe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
+        $this->next_disconnect_probe = microtime(true) + self::DISCONNECT_PROBE_INTERVAL;
 
-        if ($sequenceNumber == 0 && $functionID == self::CALLBACK_ENUMERATE) {
-            if (array_key_exists(self::CALLBACK_ENUMERATE, $this->registeredCallbacks)) {
-                if ($directCallbackDispatch) {
+        if ($sequence_number === 0 && $function_id === self::CALLBACK_ENUMERATE) {
+            if (array_key_exists(self::CALLBACK_ENUMERATE, $this->registered_callbacks)) {
+                if ($direct_callback_dispatch) {
                     if ($this->socket === FALSE) {
                         return;
                     }
 
                     $this->handleEnumerate($header, $payload);
                 } else {
-                    array_push($this->pendingCallbacks, array($header, $payload));
+                    array_push($this->pending_callbacks, array($header, $payload));
                 }
             }
 
@@ -872,25 +1156,26 @@ class IPConnection
 
         $device = $this->devices[$uid];
 
-        if ($sequenceNumber == 0) {
-            if (array_key_exists($functionID, $device->registeredCallbacks)) {
-                if ($directCallbackDispatch) {
+        if ($sequence_number === 0) {
+            if (array_key_exists($function_id, $device->registered_callbacks) ||
+                array_key_exists(-$function_id, $device->high_level_callbacks)) {
+                if ($direct_callback_dispatch) {
                     if ($this->socket === FALSE) {
                         return;
                     }
 
                     $device->handleCallback($header, $payload);
                 } else {
-                    array_push($device->pendingCallbacks, array($header, $payload));
+                    array_push($device->pending_callbacks, array($header, $payload));
                 }
             }
 
             return;
         }
 
-        if ($device->expectedResponseFunctionID == $functionID &&
-            $device->expectedResponseSequenceNumber == $sequenceNumber) {
-            $device->receivedResponse = array($header, $payload);
+        if ($device->expected_response_function_id === $function_id &&
+            $device->expected_response_sequence_number === $sequence_number) {
+            $device->received_response = array($header, $payload);
             return;
         }
 
@@ -902,24 +1187,24 @@ class IPConnection
      */
     private function handleEnumerate($header, $payload)
     {
-        if (!array_key_exists(self::CALLBACK_ENUMERATE, $this->registeredCallbacks)) {
+        if (!array_key_exists(self::CALLBACK_ENUMERATE, $this->registered_callbacks)) {
             return;
         }
 
-        $payload = unpack('c8uid/c8connectedUid/cposition/C3hardwareVersion/C3firmwareVersion/vdeviceIdentifier/CenumerationType', $payload);
+        $payload = unpack('c8uid/c8connected_uid/cposition/C3hardware_version/C3firmware_version/vdevice_identifier/Cenumeration_type', $payload);
 
         $uid = self::implodeUnpackedString($payload, 'uid', 8);
-        $connectedUid = self::implodeUnpackedString($payload, 'connectedUid', 8);
+        $connected_uid = self::implodeUnpackedString($payload, 'connected_uid', 8);
         $position = chr($payload['position']);
-        $hardwareVersion = self::collectUnpackedArray($payload, 'hardwareVersion', 3);
-        $firmwareVersion = self::collectUnpackedArray($payload, 'firmwareVersion', 3);
-        $deviceIdentifier = $payload['deviceIdentifier'];
-        $enumerationType = $payload['enumerationType'];
+        $hardware_version = self::collectUnpackedArray($payload, 'hardware_version', 3);
+        $firmware_version = self::collectUnpackedArray($payload, 'firmware_version', 3);
+        $device_identifier = $payload['device_identifier'];
+        $enumeration_type = $payload['enumeration_type'];
 
-        call_user_func_array($this->registeredCallbacks[self::CALLBACK_ENUMERATE],
-                             array($uid, $connectedUid, $position, $hardwareVersion,
-                                   $firmwareVersion, $deviceIdentifier, $enumerationType,
-                                   $this->registeredCallbackUserData[self::CALLBACK_ENUMERATE]));
+        call_user_func_array($this->registered_callbacks[self::CALLBACK_ENUMERATE],
+                             array($uid, $connected_uid, $position, $hardware_version,
+                                   $firmware_version, $device_identifier, $enumeration_type,
+                                   $this->registered_callback_user_data[self::CALLBACK_ENUMERATE]));
     }
 
     /**
@@ -927,16 +1212,16 @@ class IPConnection
      */
     private function dispatchPendingCallbacks()
     {
-        $pendingCallbacks = $this->pendingCallbacks;
-        $this->pendingCallbacks = array();
+        $pending_callbacks = $this->pending_callbacks;
+        $this->pending_callbacks = array();
 
-        foreach ($pendingCallbacks as $pendingCallback) {
+        foreach ($pending_callbacks as $pending_callback) {
             if ($this->socket === FALSE) {
                 break;
             }
 
-            if ($pendingCallback[0]['functionID'] == self::CALLBACK_ENUMERATE) {
-                $this->handleEnumerate($pendingCallback[0], $pendingCallback[1]);
+            if ($pending_callback[0]['function_id'] === self::CALLBACK_ENUMERATE) {
+                $this->handleEnumerate($pending_callback[0], $pending_callback[1]);
             }
         }
 
@@ -948,8 +1233,13 @@ class IPConnection
     /**
      * @internal
      */
-    static public function fixUnpackedInt16($value)
+    static public function fixUnpackedInt16($payload, $field)
     {
+        $value = $payload[$field];
+
+        // int16 is unpacked as uint16, but PHP stores it in an int32 or int64
+        // which makes actually negtive values show up as positive values.
+        // detect if this has happend and fix it
         if ($value >= 32768) {
             $value -= 65536;
         }
@@ -960,8 +1250,13 @@ class IPConnection
     /**
      * @internal
      */
-    static public function fixUnpackedInt32($value)
+    static public function fixUnpackedInt32($payload, $field)
     {
+        $value = $payload[$field];
+
+        // int32 is unpacked as uint32, but PHP might store it in an int64
+        // which makes actually negtive values show up as positive values.
+        // detect if this has happend and fix it
         if (bccomp($value, '2147483648') >= 0) {
             $value = bcsub($value, '4294967296');
         }
@@ -972,8 +1267,13 @@ class IPConnection
     /**
      * @internal
      */
-    static public function fixUnpackedUInt32($value)
+    static public function fixUnpackedUInt32($payload, $field)
     {
+        $value = $payload[$field];
+
+        // int32 is unpacked as uint32, but PHP might store it in an int32
+        // which makes values bigger than INT32_MAX overflow into negative
+        // values. detect if this has happend and fix it
         if (bccomp($value, 0) < 0) {
             $value = bcadd($value, '4294967296');
         }
@@ -984,12 +1284,37 @@ class IPConnection
     /**
      * @internal
      */
+    static public function fixUnpackedInt64($payload, $field)
+    {
+        // int64 is unpacked as 8 uint8 values, collect and decode them
+        $value = Base256::decode(self::collectUnpackedArray($payload, $field, 8));
+
+        // the base256 decoder produces and uint64 value, convert back to int64
+        if (bccomp($value, '9223372036854775808') >= 0) {
+            $value = bcsub($value, '18446744073709551616');
+        }
+
+        return $value;
+    }
+
+    /**
+     * @internal
+     */
+    static public function fixUnpackedUInt64($payload, $field)
+    {
+        // uint64 is unpacked as 8 uint8 values, collect and decode them
+        return Base256::decode(self::collectUnpackedArray($payload, $field, 8));
+    }
+
+    /**
+     * @internal
+     */
     static public function collectUnpackedInt16Array($payload, $field, $length)
     {
         $result = array();
 
         for ($i = 1; $i <= $length; $i++) {
-            array_push($result, self::fixUnpackedInt16($payload[$field . $i]));
+            array_push($result, self::fixUnpackedInt16($payload, $field . $i));
         }
 
         return $result;
@@ -1003,7 +1328,7 @@ class IPConnection
         $result = array();
 
         for ($i = 1; $i <= $length; $i++) {
-            array_push($result, self::fixUnpackedInt32($payload[$field . $i]));
+            array_push($result, self::fixUnpackedInt32($payload, $field . $i));
         }
 
         return $result;
@@ -1017,7 +1342,35 @@ class IPConnection
         $result = array();
 
         for ($i = 1; $i <= $length; $i++) {
-            array_push($result, self::fixUnpackedUInt32($payload[$field . $i]));
+            array_push($result, self::fixUnpackedUInt32($payload, $field . $i));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @internal
+     */
+    static public function collectUnpackedInt64Array($payload, $field, $length)
+    {
+        $result = array();
+
+        for ($i = 1; $i <= $length; $i++) {
+            array_push($result, self::fixUnpackedInt64($payload, $field . chr(ord('A') + $i - 1)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @internal
+     */
+    static public function collectUnpackedUInt64Array($payload, $field, $length)
+    {
+        $result = array();
+
+        for ($i = 1; $i <= $length; $i++) {
+            array_push($result, self::fixUnpackedUInt64($payload, $field . chr(ord('A') + $i - 1)));
         }
 
         return $result;
@@ -1028,10 +1381,15 @@ class IPConnection
      */
     static public function collectUnpackedBoolArray($payload, $field, $length)
     {
-        $result = array();
+        $_payload = array_fill(0, ceil($length/8), 0);
+        $result = array_fill(0, $length, (bool)false);
 
-        for ($i = 1; $i <= $length; $i++) {
-            array_push($result, (bool)$payload[$field . $i]);
+        for ($i = 1; $i <= ceil($length/8); $i++) {
+            $_payload[$i - 1] = $payload[$field . $i];
+        }
+
+        for ($i = 0; $i < $length; $i++) {
+            $result[$i] = (($_payload[$i / 8] & (1 << ($i % 8))) != 0);
         }
 
         return $result;
@@ -1047,7 +1405,7 @@ class IPConnection
         for ($i = 1; $i <= $length; $i++) {
             $c = $payload[$field . $i];
 
-            if ($c == 0) {
+            if ($c === 0) {
                 break;
             }
 
@@ -1083,6 +1441,78 @@ class IPConnection
         }
 
         return $result;
+    }
+
+    /**
+     * @internal
+     */
+    static private function readUInt32NonBlocking($filename)
+    {
+        $fp = @fopen($filename, 'rb');
+
+        if ($fp === FALSE) {
+            return FALSE;
+        }
+
+        stream_set_blocking($fp, 0);
+
+        $bytes = @fread($fp, 4);
+
+        @fclose($fp);
+
+        if (strlen($bytes) !== 4) {
+            return FALSE;
+        }
+
+        $data = unpack('V1number', $bytes);
+
+        return self::fixUnpackedUInt32($data, 'number');
+    }
+
+    /**
+     * @internal
+     */
+    static private function getRandomUInt32()
+    {
+        $r = self::readUInt32NonBlocking('/dev/urandom');
+
+        if ($r !== FALSE) {
+            return $r;
+        }
+
+        $r = self::readUInt32NonBlocking('/dev/random');
+
+        if ($r !== FALSE) {
+            return $r;
+        }
+
+        if (function_exists('mcrypt_create_iv')) {
+            $bytes = @mcrypt_create_iv(4, MCRYPT_DEV_URANDOM);
+
+            if ($bytes !== FALSE) {
+                $data = unpack('V1number', $bytes);
+
+                return self::fixUnpackedUInt32($data, 'number');
+            }
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            $strong = false;
+            $bytes = @openssl_random_pseudo_bytes(4, $strong);
+
+            if (!$strong && $bytes !== FALSE) {
+                $data = unpack('V1number', $bytes);
+
+                return self::fixUnpackedUInt32($data, 'number');
+            }
+        }
+
+        $time = gettimeofday();
+        $seconds = $time['sec'];
+        $microseconds = $time['usec'];
+
+        // (($seconds << 26 | $seconds >> 6) + $microseconds + getmypid()) % (1 << 32)
+        return bcmod(bcadd(bcadd(bcadd(bcmul($seconds, '67108864'), bcdiv($seconds, '64')), $microseconds), getmypid()), '4294967296');
     }
 }
 
