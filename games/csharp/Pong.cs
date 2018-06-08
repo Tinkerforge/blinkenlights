@@ -221,10 +221,12 @@ class Pong
 
 		if (!Config.IS_LED_STRIP_V2) {
 			ledStrip.SetFrameDuration(40);
+			ledStrip.SetChannelMapping(Config.CHANNEL_MAPPING);
 			ledStrip.FrameRendered += FrameRenderedCB;
 		}
 		else {
 			ledStripV2.SetFrameDuration(40);
+			ledStripV2.SetChannelMapping(Config.CHANNEL_MAPPING);
 			ledStripV2.FrameStartedCallback += FrameRenderedCBV2;
 		}
 
@@ -311,14 +313,14 @@ class Pong
 			{
 				j = i * 3;
 
-				r[i] = COLORS[field[row][col]][Config.R_INDEX];
-				g[i] = COLORS[field[row][col]][Config.G_INDEX];
-				b[i] = COLORS[field[row][col]][Config.B_INDEX];
-				frame[j] = COLORS[field[row][col]][Config.R_INDEX];
+				r[i] = COLORS[field[row][col]][0];
+				g[i] = COLORS[field[row][col]][1];
+				b[i] = COLORS[field[row][col]][2];
+				frame[j] = COLORS[field[row][col]][0];
 				j++;
-				frame[j] = COLORS[field[row][col]][Config.G_INDEX];
+				frame[j] = COLORS[field[row][col]][1];
 				j++;
-				frame[j] = COLORS[field[row][col]][Config.B_INDEX];
+				frame[j] = COLORS[field[row][col]][2];
 			}
 		}
 
@@ -350,7 +352,14 @@ class Pong
 			}
 		}
 		else {
-			ledStripV2.SetLEDValues(0, frame);
+			try
+			{
+				ledStripV2.SetLEDValues(0, frame);
+			}
+			catch (TinkerforgeException)
+			{
+				return;
+			}
 		}
 	}
 

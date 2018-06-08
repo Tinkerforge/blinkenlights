@@ -188,6 +188,7 @@ class Pong:
             self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
                                              self.frame_rendered)
 
+        self.led_strip.set_channel_mapping(config.CHANNEL_MAPPING)
         self.init_game()
 
     def init_game(self):
@@ -219,12 +220,12 @@ class Pong:
             if row % 2 == 0:
                 col_range = reversed(col_range)
             for col in col_range:
-                r.append(self.COLORS[field[row][col]][config.R_INDEX])
-                g.append(self.COLORS[field[row][col]][config.G_INDEX])
-                b.append(self.COLORS[field[row][col]][config.B_INDEX])
-                frame.append(self.COLORS[field[row][col]][config.R_INDEX])
-                frame.append(self.COLORS[field[row][col]][config.G_INDEX])
-                frame.append(self.COLORS[field[row][col]][config.B_INDEX])
+                r.append(self.COLORS[field[row][col]][0])
+                g.append(self.COLORS[field[row][col]][1])
+                b.append(self.COLORS[field[row][col]][2])
+                frame.append(self.COLORS[field[row][col]][0])
+                frame.append(self.COLORS[field[row][col]][1])
+                frame.append(self.COLORS[field[row][col]][2])
 
         if not config.IS_LED_STRIP_V2:
             # Make chunks of size 16
@@ -245,7 +246,10 @@ class Pong:
                 except:
                     break
         else:
-            self.led_strip.set_led_values(0, frame)
+            try:
+                self.led_strip.set_led_values(0, frame)
+            except:
+                return
 
     def add_score_to_playfield(self, field):
         for row in range(3):

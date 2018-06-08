@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "bricklet_led_strip.h"
+
 // General
 #define HOST "localhost"
 #define PORT 4223
@@ -16,9 +18,7 @@
 #define LED_COLS 10
 
 // Position of R, G and B pixel on LED Pixel
-#define R_INDEX 0
-#define G_INDEX 1
-#define B_INDEX 2
+#define CHANNEL_MAPPING LED_STRIP_CHANNEL_MAPPING_RGB
 
 // Rainbow Parameters
 #define RAINBOW_FRAME_RATE 50 // in Hz, valid range: 10 - 100

@@ -157,15 +157,15 @@ begin
 
     col := colBegin;
     while (col <> colEnd) do begin
-      r[i] := leds[row, col, R_INDEX];
-      g[i] := leds[row, col, G_INDEX];
-      b[i] := leds[row, col, B_INDEX];
+      r[i] := leds[row, col, 0];
+      g[i] := leds[row, col, 1];
+      b[i] := leds[row, col, 2];
 
-      frame[j] := leds[row, col, R_INDEX];
+      frame[j] := leds[row, col, 0];
       j += 1;
-      frame[j] := leds[row, col, G_INDEX];
+      frame[j] := leds[row, col, 1];
       j += 1;
-      frame[j] := leds[row, col, B_INDEX];
+      frame[j] := leds[row, col, 2];
       j += 1;
 
       i += 1;
@@ -195,7 +195,11 @@ begin
     end;
   end
   else begin
-    ledStripV2.SetLEDValues(0, frame);
+    try
+        ledStripV2.SetLEDValues(0, frame);
+    except
+        exit;
+    end;
   end;
 end;
 
@@ -280,10 +284,12 @@ begin
   if not (IS_LED_STRIP_V2) then begin
     ledStrip.SetFrameDuration(Floor(1000 / FIRE_FRAME_RATE));
     ledStrip.OnFrameRendered := {$ifdef FPC}@{$endif}FrameRenderedCB;
+    ledStrip.setChannelMapping(CHANNEL_MAPPING);
   end
   else begin
     ledStripV2.SetFrameDuration(Floor(1000 / FIRE_FRAME_RATE));
     ledStripV2.OnFrameStarted := {$ifdef FPC}@{$endif}FrameRenderedCBV2;
+    ledStripV2.setChannelMapping(CHANNEL_MAPPING);
   end;
 
   { Start rendering }

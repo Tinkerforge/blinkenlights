@@ -340,10 +340,12 @@ class Tetris
 		{
 			if (!Config.IS_LED_STRIP_V2) {
 				ledStrip.GetFrameDuration();
+				ledStrip.SetChannelMapping(Config.CHANNEL_MAPPING);
 				System.Console.WriteLine("Found: LED Strip ({0})", Config.UID_LED_STRIP_BRICKLET);
 			}
 			else {
 				ledStripV2.GetFrameDuration();
+				ledStripV2.SetChannelMapping(Config.CHANNEL_MAPPING);
 				System.Console.WriteLine("Found: LED Strip V2 ({0})", Config.UID_LED_STRIP_BRICKLET);
 			}
 		}
@@ -571,14 +573,14 @@ class Tetris
 			{
 				j = i * 3;
 
-				r[i] = COLORS[field[row][col]][Config.R_INDEX];
-				g[i] = COLORS[field[row][col]][Config.G_INDEX];
-				b[i] = COLORS[field[row][col]][Config.B_INDEX];
-				frame[j] = COLORS[field[row][col]][Config.R_INDEX];
+				r[i] = COLORS[field[row][col]][0];
+				g[i] = COLORS[field[row][col]][1];
+				b[i] = COLORS[field[row][col]][2];
+				frame[j] = COLORS[field[row][col]][0];
 				j++;
-				frame[j] = COLORS[field[row][col]][Config.G_INDEX];
+				frame[j] = COLORS[field[row][col]][1];
 				j++;
-				frame[j] = COLORS[field[row][col]][Config.B_INDEX];
+				frame[j] = COLORS[field[row][col]][2];
 			}
 		}
 
@@ -610,7 +612,14 @@ class Tetris
 			}
 		}
 		else {
-			ledStripV2.SetLEDValues(0, frame);
+			try
+			{
+				ledStripV2.SetLEDValues(0, frame);
+			}
+			catch (TinkerforgeException)
+			{
+				return;
+			}
 		}
 	}
 

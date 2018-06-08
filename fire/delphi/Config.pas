@@ -4,6 +4,9 @@ unit Config;
 
 interface
 
+uses
+  BrickletLEDStrip;
+
 const
   { General }
   HOST = 'localhost';
@@ -20,9 +23,7 @@ const
   LED_COLS = 10;
 
   { Position of R, G and B pixel on LED Pixel }
-  R_INDEX = 0;
-  G_INDEX = 1;
-  B_INDEX = 2;
+  CHANNEL_MAPPING = BRICKLET_LED_STRIP_CHANNEL_MAPPING_RGB;
 
   { Fire Parameters }
   FIRE_FRAME_RATE = 50; { in Hz, valid range: 10 - 100 }

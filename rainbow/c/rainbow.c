@@ -52,9 +52,9 @@ void frame_upload(LEDStrip *led_strip) {
 	// Reorder LED data into R, G and B channel and make chunks of size 16
 	for(i = 0; i < LED_ROWS*LED_COLS; i += CHUNK_SIZE) {
 		for(k = 0; k < CHUNK_SIZE && i + k < LED_ROWS*LED_COLS; ++k) {
-			r_chunk[k] = leds[i + k][R_INDEX];
-			g_chunk[k] = leds[i + k][G_INDEX];
-			b_chunk[k] = leds[i + k][B_INDEX];
+			r_chunk[k] = leds[i + k][0];
+			g_chunk[k] = leds[i + k][1];
+			b_chunk[k] = leds[i + k][2];
 		}
 
 		if (led_strip_set_rgb_values(led_strip, i, k, r_chunk, g_chunk, b_chunk) < 0) {
@@ -71,14 +71,16 @@ void frame_upload_v2(LEDStripV2 *led_strip_v2) {
 	for(i = 0; i < LED_ROWS*LED_COLS; i++) {
 		j = i * 3;
 
-		frame[j] = leds[i][R_INDEX];
+		frame[j] = leds[i][0];
 		j++;
-		frame[j] = leds[i][G_INDEX];
+		frame[j] = leds[i][1];
 		j++;
-		frame[j] = leds[i][B_INDEX];
+		frame[j] = leds[i][2];
 	}
 
-	led_strip_v2_set_led_values(led_strip_v2, 0, frame, LED_ROWS*LED_COLS*3);
+	if (led_strip_v2_set_led_values(led_strip_v2, 0, frame, LED_ROWS*LED_COLS*3) < 0) {
+		return;
+	}
 }
 
 void frame_prepare_next(void) {
@@ -141,6 +143,7 @@ int main(void) {
 									LED_STRIP_CALLBACK_FRAME_RENDERED,
 									(void *)cb_frame_rendered,
 									(void *)&led_strip);
+		led_strip_set_channel_mapping(&led_strip, CHANNEL_MAPPING);
 	#else
 		if(led_strip_v2_get_frame_duration(&led_strip_v2, &frame_duration) < 0) {
 			fprintf(stderr, "Not Found: LED Strip V2 (%s)\n", UID_LED_STRIP_BRICKLET);
@@ -153,6 +156,7 @@ int main(void) {
 									   LED_STRIP_V2_CALLBACK_FRAME_STARTED,
 									   (void *)cb_frame_rendered,
 									   (void *)&led_strip_v2);
+		led_strip_v2_set_channel_mapping(&led_strip_v2, CHANNEL_MAPPING);
 	#endif
 
 	int i;

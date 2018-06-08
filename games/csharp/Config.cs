@@ -1,4 +1,5 @@
 using System.Collections;
+using Tinkerforge;
 
 class Config
 {
@@ -23,9 +24,7 @@ class Config
 	public static int LED_COLS = 10;
 
 	// Position of R, G and B pixel on LED Pixel
-	public static int R_INDEX = 0;
-	public static int G_INDEX = 1;
-	public static int B_INDEX = 2;
+	public static byte CHANNEL_MAPPING = BrickletLEDStrip.CHANNEL_MAPPING_RGB;
 
 	// Pong Parameters
 	public static byte[] PONG_COLOR_INDEX_PLAYER = new byte[] {1, 5};

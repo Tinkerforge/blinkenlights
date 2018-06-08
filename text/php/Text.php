@@ -207,6 +207,8 @@ class Text
             // Set frame duration to 40ms (25 frames per second)
             $this->ledStrip->setFrameDuration(1000 / Config\TEXT_FRAME_RATE);
 
+            $this->ledStrip->setChannelMapping(Config\CHANNEL_MAPPING);
+
             // Register frame rendered callback to function cb_frame_rendered
             $this->ledStrip->registerCallback(BrickletLEDStrip::CALLBACK_FRAME_RENDERED,
                                               array($this, 'cb_frameRendered'));
@@ -214,6 +216,8 @@ class Text
         else {
             // Set frame duration to 40ms (25 frames per second)
             $this->ledStripV2->setFrameDuration(1000 / Config\TEXT_FRAME_RATE);
+
+            $this->ledStripV2->setChannelMapping(Config\CHANNEL_MAPPING);
 
             // Register frame rendered callback to function cb_frame_rendered
             $this->ledStripV2->registerCallback(BrickletLEDStripV2::CALLBACK_FRAME_STARTED,
@@ -276,12 +280,12 @@ class Text
             }
 
             for ($col = $colBegin; $col != $colEnd; $col += $colStep) {
-                $r[] = $this->leds[$row][$col][Config\R_INDEX];
-                $g[] = $this->leds[$row][$col][Config\G_INDEX];
-                $b[] = $this->leds[$row][$col][Config\B_INDEX];
-                $frame[] = $this->leds[$row][$col][Config\R_INDEX];
-                $frame[] = $this->leds[$row][$col][Config\G_INDEX];
-                $frame[] = $this->leds[$row][$col][Config\B_INDEX];
+                $r[] = $this->leds[$row][$col][0];
+                $g[] = $this->leds[$row][$col][1];
+                $b[] = $this->leds[$row][$col][2];
+                $frame[] = $this->leds[$row][$col][0];
+                $frame[] = $this->leds[$row][$col][1];
+                $frame[] = $this->leds[$row][$col][2];
             }
         }
 

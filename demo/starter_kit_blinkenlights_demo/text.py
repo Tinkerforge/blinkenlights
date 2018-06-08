@@ -158,7 +158,7 @@ class Text:
         else:
             self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
                                              self.frame_rendered)
-
+        self.led_strip.set_channel_mapping(config.CHANNEL_MAPPING)
     def stop_rendering(self):
         if not self.okay:
             return
@@ -208,12 +208,12 @@ class Text:
             if row % 2 == 0:
                 col_range = reversed(col_range)
             for col in col_range:
-                r.append(self.leds[row][col][config.R_INDEX])
-                g.append(self.leds[row][col][config.G_INDEX])
-                b.append(self.leds[row][col][config.B_INDEX])
-                frame.append(self.leds[row][col][config.R_INDEX])
-                frame.append(self.leds[row][col][config.G_INDEX])
-                frame.append(self.leds[row][col][config.B_INDEX])
+                r.append(self.leds[row][col][0])
+                g.append(self.leds[row][col][1])
+                b.append(self.leds[row][col][2])
+                frame.append(self.leds[row][col][0])
+                frame.append(self.leds[row][col][1])
+                frame.append(self.leds[row][col][2])
 
         if not config.IS_LED_STRIP_V2:
             # Make chunks of size 16
@@ -234,7 +234,10 @@ class Text:
                 except:
                     break
         else:
-            self.led_strip.set_led_values(0, frame)
+            try:
+                self.led_strip.set_led_values(0, frame)
+            except:
+                return
 
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]

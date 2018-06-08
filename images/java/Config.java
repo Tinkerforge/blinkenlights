@@ -1,3 +1,5 @@
+import com.tinkerforge.BrickletLEDStrip;
+
 public class Config {
 	// General
 	public static final String HOST = "localhost";
@@ -14,9 +16,7 @@ public class Config {
 	public static final int LED_COLS = 10;
 
 	// Position of R, G and B pixel on LED Pixel
-	public static final int R_INDEX = 0;
-	public static final int G_INDEX = 1;
-	public static final int B_INDEX = 2;
+	public static final byte CHANNEL_MAPPING = BrickletLEDStrip.CHANNEL_MAPPING_RGB;
 
 	// Images Parameters
 	public static final int IMAGES_FRAME_RATE = 1; // in Hz, valid range: 1 - 100

@@ -2,6 +2,10 @@
 
 namespace Config;
 
+require_once('Tinkerforge/BrickletLEDStrip.php');
+
+use Tinkerforge\BrickletLEDStrip;
+
 // General
 const HOST = 'localhost';
 const PORT = 4223;
@@ -17,9 +21,7 @@ const LED_ROWS = 20;
 const LED_COLS = 10;
 
 // Position of R, G and B pixel on LED Pixel
-const R_INDEX = 0;
-const G_INDEX = 1;
-const B_INDEX = 2;
+const CHANNEL_MAPPING = BrickletLEDStrip::CHANNEL_MAPPING_RGB;
 
 // Text Parameters
 const TEXT_FRAME_RATE = 25; // in Hz, valid range: 10 - 100

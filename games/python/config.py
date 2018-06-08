@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*
 
+from tinkerforge.bricklet_led_strip import LEDStrip
+
 HAS_GUI = False
 
 # General
@@ -23,9 +25,7 @@ LED_ROWS = 20
 LED_COLS = 10
 
 # Position of R, G and B pixel on LED Pixel
-R_INDEX = 0
-G_INDEX = 1
-B_INDEX = 2
+CHANNEL_MAPPING = LEDStrip.CHANNEL_MAPPING_RGB
 
 # Pong Parameters
 PONG_COLOR_INDEX_PLAYER = (1, 5)

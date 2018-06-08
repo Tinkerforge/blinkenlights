@@ -49,9 +49,9 @@ class ImagesListener implements BrickletLEDStrip.FrameRenderedListener {
 			}
 
 			for (int col = colBegin; col != colEnd; col += colStep) {
-				r[i] = images[imagePosition][row][col][Config.R_INDEX];
-				g[i] = images[imagePosition][row][col][Config.G_INDEX];
-				b[i] = images[imagePosition][row][col][Config.B_INDEX];
+				r[i] = images[imagePosition][row][col][0];
+				g[i] = images[imagePosition][row][col][1];
+				b[i] = images[imagePosition][row][col][2];
 
 				++i;
 			}
@@ -132,14 +132,14 @@ class ImagesListenerV2 implements BrickletLEDStripV2.FrameStartedListener {
 			for (int col = colBegin; col != colEnd; col += colStep) {
 				j = i * 3;
 
-				r[i] = images[imagePosition][row][col][Config.R_INDEX];
-				g[i] = images[imagePosition][row][col][Config.G_INDEX];
-				b[i] = images[imagePosition][row][col][Config.B_INDEX];
-				frame[j] = images[imagePosition][row][col][Config.R_INDEX];
+				r[i] = images[imagePosition][row][col][0];
+				g[i] = images[imagePosition][row][col][1];
+				b[i] = images[imagePosition][row][col][2];
+				frame[j] = images[imagePosition][row][col][0];
 				j++;
-				frame[j] = images[imagePosition][row][col][Config.G_INDEX];
+				frame[j] = images[imagePosition][row][col][1];
 				j++;
-				frame[j] = images[imagePosition][row][col][Config.B_INDEX];
+				frame[j] = images[imagePosition][row][col][2];
 
 				++i;
 			}
@@ -218,10 +218,12 @@ public class Images {
 		try {
 			if (!Config.IS_LED_STRIP_V2) {
 				ledStrip.getFrameDuration();
+				ledStrip.setChannelMapping(Config.CHANNEL_MAPPING);
 				System.out.println("Found: LED Strip " + Config.UID_LED_STRIP_BRICKLET);
 			}
 			else {
 				ledStripV2.getFrameDuration();
+				ledStripV2.setChannelMapping(Config.CHANNEL_MAPPING);
 				System.out.println("Found: LED Strip V2 " + Config.UID_LED_STRIP_BRICKLET);
 			}
 		} catch (TinkerforgeException e) {

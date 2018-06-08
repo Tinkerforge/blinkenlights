@@ -55,6 +55,8 @@ class Rainbow:
             self.led_strip.register_callback(self.led_strip.CALLBACK_FRAME_STARTED,
                                              self.frame_rendered)
 
+        self.led_strip.set_channel_mapping(config.CHANNEL_MAPPING)
+
     def stop_rendering(self):
         if not self.okay:
             return
@@ -87,12 +89,12 @@ class Rainbow:
         frame = []
 
         for i in range(config.LED_ROWS*config.LED_COLS):
-            r.append(self.leds[i][config.R_INDEX])
-            g.append(self.leds[i][config.G_INDEX])
-            b.append(self.leds[i][config.B_INDEX])
-            frame.append(self.leds[i][config.R_INDEX])
-            frame.append(self.leds[i][config.G_INDEX])
-            frame.append(self.leds[i][config.B_INDEX])
+            r.append(self.leds[i][0])
+            g.append(self.leds[i][1])
+            b.append(self.leds[i][2])
+            frame.append(self.leds[i][0])
+            frame.append(self.leds[i][1])
+            frame.append(self.leds[i][2])
 
         if not config.IS_LED_STRIP_V2:
             # Make chunks of size 16
@@ -113,7 +115,10 @@ class Rainbow:
                 except:
                     break
         else:
-            self.led_strip.set_led_values(0, frame)
+            try:
+                self.led_strip.set_led_values(0, frame)
+            except:
+                return
 
     def frame_prepare_next(self):
         self.leds = self.rainbow[int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS):] + self.rainbow[:int(self.rainbow_position) % (config.LED_ROWS*config.LED_COLS)]
