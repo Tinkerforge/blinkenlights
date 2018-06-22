@@ -223,7 +223,7 @@ def build_windows_pkg():
                          '<<DEMO_UNDERSCORE_VERSION>>': DEMO_VERSION.replace('.', '_')})
 
     print('building NSIS installer')
-    system('"C:\\Program Files\\NSIS\\makensis.exe" dist\\nsis\\{0}_installer.nsi'.format(UNDERSCORE_NAME))
+    system('"C:\\Program Files (x86)\\NSIS\\makensis.exe" dist\\nsis\\{0}_installer.nsi'.format(UNDERSCORE_NAME))
     installer = '{0}_windows_{1}.exe'.format(UNDERSCORE_NAME, DEMO_VERSION.replace('.', '_'))
 
     if os.path.exists(installer):
