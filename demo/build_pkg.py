@@ -281,6 +281,10 @@ def build_linux_pkg():
     print('changing directory modes to 0755')
     system('find dist/linux -type d -exec chmod 0755 {} \;')
 
+    print('changing file modes')
+    system('find dist/linux -type f -perm 664 -exec chmod 0644 {} \;')
+    system('find dist/linux -type f -perm 775 -exec chmod 0755 {} \;')
+
     print('changing owner to root')
     system('sudo chown -R root:root dist/linux')
 
@@ -288,10 +292,13 @@ def build_linux_pkg():
     system('dpkg -b dist/linux {0}-{1}_all.deb'.format(UNDERSCORE_NAME.replace('_', '-'), DEMO_VERSION))
 
     print('changing owner back to original user')
-    system('sudo chown -R `logname`:`logname` dist/linux')
+    system('sudo chown -R ${USER}:${USER} dist/linux')
 
-    #print('checking Debian package')
-    #system('lintian --pedantic {0}-{1}_all.deb'.format(UNDERSCORE_NAME.replace('_', '-'), DEMO_VERSION))
+    if os.path.exists('/usr/bin/lintian'):
+        print('checking Debian package')
+        system('lintian --pedantic {0}-{1}_all.deb'.format(UNDERSCORE_NAME.replace('_', '-'), DEMO_VERSION))
+    else:
+        print('skipping lintian check')
 
 
 # run 'python build_pkg.py' to build the windows/linux/macosx package
