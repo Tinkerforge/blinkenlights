@@ -110,6 +110,9 @@ print('removing old dist directory')
 if os.path.exists(dist_path):
     shutil.rmtree(dist_path)
 
+print('Calling build_src.py release')
+system([sys.executable, 'build_ui.py'], stdout=subprocess.DEVNULL)
+
 datas = []
 datas += collect_data(by_ext(['bmp', 'jpg', 'png', 'svg']), root_path)
 excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'wayland', 'xinerama', 'share', 'icons', 'atk', 'pango', 'pil', 'PIL',

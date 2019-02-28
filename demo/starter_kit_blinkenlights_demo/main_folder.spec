@@ -3,7 +3,7 @@
 import os
 import sys
 sys.path.append('..')
-from starter_kit_weather_station_demo.pyinstaller_utils import *
+from starter_kit_blinkenlights_demo.pyinstaller_utils import *
 
 a = Analysis(['main.py'], pathex=pathex, excludes=excludes, hiddenimports=hiddenimports)
 
