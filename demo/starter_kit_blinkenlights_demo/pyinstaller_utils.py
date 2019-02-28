@@ -110,8 +110,10 @@ print('removing old dist directory')
 if os.path.exists(dist_path):
     shutil.rmtree(dist_path)
 
-print('Calling build_src.py release')
-system([sys.executable, 'build_ui.py'], stdout=subprocess.DEVNULL)
+print('Calling build_ui.py release')
+os.chdir(os.path.join(root_path, '..'))
+system([sys.executable, 'build_ui.py', 'release'], stdout=subprocess.DEVNULL)
+os.chdir(root_path)
 
 datas = []
 datas += collect_data(by_ext(['bmp', 'jpg', 'png', 'svg']), root_path)
