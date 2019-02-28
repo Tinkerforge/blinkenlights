@@ -22,8 +22,8 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 
-from PyQt4.QtGui import QWidget, QFileDialog, QErrorMessage
-from PyQt4.QtCore import QDir, QTimer
+from PyQt5.QtWidgets import QWidget, QFileDialog, QErrorMessage
+from PyQt5.QtCore import QDir, QTimer
 
 import starter_kit_blinkenlights_demo.config as config
 from starter_kit_blinkenlights_demo.ui_images import Ui_Images
@@ -74,7 +74,7 @@ class ImagesWidget(QWidget, Ui_Images):
 
     def show_pressed(self):
         if self.images:
-            files = unicode(self.text_edit_files.toPlainText()).strip()
+            files = self.text_edit_files.toPlainText().strip()
 
             if len(files) > 0:
                 new_images = files.split('\n')
@@ -88,7 +88,8 @@ class ImagesWidget(QWidget, Ui_Images):
                 self.images.frame_rendered(0)
 
     def choose_pressed(self):
-        for filename in QFileDialog.getOpenFileNames(self, 'Choose Images', QDir.homePath()):
+        names, selected_filter = QFileDialog.getOpenFileNames(self, 'Choose Images', QDir.homePath())
+        for filename in names:
             self.text_edit_files.append(filename)
 
     def default_pressed(self):

@@ -34,9 +34,9 @@ import os
 def prepare_package(package_name):
     # from http://www.py2exe.org/index.cgi/WhereAmI
     if hasattr(sys, 'frozen'):
-        program_path = os.path.dirname(os.path.realpath(unicode(sys.executable, sys.getfilesystemencoding())))
+        program_path = os.path.dirname(os.path.realpath(sys.executable))
     else:
-        program_path = os.path.dirname(os.path.realpath(unicode(__file__, sys.getfilesystemencoding())))
+        program_path = os.path.dirname(os.path.realpath(__file__))
 
     # add program_path so OpenGL is properly imported
     sys.path.insert(0, program_path)
@@ -52,13 +52,13 @@ def prepare_package(package_name):
         if not hasattr(sys, 'frozen'):
             # load and inject in modules list, this allows to have the source in a
             # directory named differently than '<package_name>'
-            sys.modules[package_name] = __import__(tail, globals(), locals(), [], -1)
+            sys.modules[package_name] = __import__(tail, globals(), locals())
 
 prepare_package('starter_kit_blinkenlights_demo')
 
-from PyQt4.QtCore import QTimer, pyqtSignal
-from PyQt4.QtGui import QApplication, QWidget, QErrorMessage, QGridLayout, QIcon, \
-                        QPalette, QTextFormat, QTabWidget, QMainWindow, QVBoxLayout, QFont
+from PyQt5.QtCore import QTimer, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget, QErrorMessage, QGridLayout, QTabWidget, QMainWindow, QVBoxLayout
+from PyQt5.QtGui import QIcon, QPalette, QTextFormat, QFont
 
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import Error
@@ -86,7 +86,7 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
         try:
-            button = event.text().toAscii()[0]
+            button = event.text()[0]
             # Don't allow quit trigger of games by user input
             if button != 'q':
                 self.app.active_project.button_press(button)
@@ -279,17 +279,5 @@ class Blinkenlights(QApplication):
 
 if __name__ == "__main__":
     argv = sys.argv
-
-    if sys.platform == 'win32':
-        argv += ['-style', 'windowsxp']
-
-    if sys.platform == 'darwin':
-        # fix macOS 10.9 font
-        # http://successfulsoftware.net/2013/10/23/fixing-qt-4-for-mac-os-x-10-9-mavericks/
-        # https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
-        # fix macOS 10.10 font
-        # https://bugreports.qt-project.org/browse/QTBUG-40833
-        QFont.insertSubstitution('.Helvetica Neue DeskInterface', 'Helvetica Neue')
 
     sys.exit(Blinkenlights(argv).exec_())

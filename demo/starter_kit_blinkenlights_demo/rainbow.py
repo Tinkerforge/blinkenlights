@@ -134,6 +134,6 @@ if __name__ == "__main__":
     rainbow = Rainbow(ipcon)
     rainbow.frame_rendered(0)
 
-    raw_input('Press enter to exit\n') # Use input() in Python 3
+    input('Press enter to exit\n') # Use input() in Python 3
 
     ipcon.disconnect()

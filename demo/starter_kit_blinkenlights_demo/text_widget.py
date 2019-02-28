@@ -22,8 +22,9 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 
-from PyQt4.QtGui import QWidget, QColorDialog, QColor
-from PyQt4.QtCore import QTimer
+from PyQt5.QtWidgets import QWidget, QColorDialog
+from PyQt5.QtGui import QColor
+from PyQt5.QtCore import QTimer
 
 import starter_kit_blinkenlights_demo.config as config
 from starter_kit_blinkenlights_demo.ui_text import Ui_Text

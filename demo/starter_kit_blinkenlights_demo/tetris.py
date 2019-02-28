@@ -40,9 +40,9 @@ class TetrisSegmentDisplay:
 
         try:
             self.sd.get_counter_value()
-            print("Found: Segment Display 4x7 ({0})").format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET)
+            print("Found: Segment Display 4x7 ({0})".format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET))
         except:
-            print("Not Found: Segment Display 4x7 ({0})").format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET)
+            print("Not Found: Segment Display 4x7 ({0})".format(config.UID_SEGMENT_DISPLAY_4X7_BRICKLET))
             return
 
         self.okay = True
@@ -61,10 +61,10 @@ class TetrisSegmentDisplay:
             return
 
         segments = (
-            self.DIGITS[self.line_count/1000 % 10],
-            self.DIGITS[self.line_count/100  % 10],
-            self.DIGITS[self.line_count/10   % 10],
-            self.DIGITS[self.line_count/1    % 10]
+            self.DIGITS[self.line_count//1000 % 10],
+            self.DIGITS[self.line_count//100  % 10],
+            self.DIGITS[self.line_count//10   % 10],
+            self.DIGITS[self.line_count//1    % 10]
         )
         self.sd.set_segments(segments, 7, False)
 
@@ -82,9 +82,9 @@ class TetrisSpeaker:
 
         try:
             self.speaker.get_identity()
-            print("Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
+            print("Found: Piezo Speaker ({0})".format(config.UID_PIEZO_SPEAKER_BRICKLET))
         except:
-            print("Not Found: Piezo Speaker ({0})").format(config.UID_PIEZO_SPEAKER_BRICKLET)
+            print("Not Found: Piezo Speaker ({0})".format(config.UID_PIEZO_SPEAKER_BRICKLET))
             return
 
         self.okay = True

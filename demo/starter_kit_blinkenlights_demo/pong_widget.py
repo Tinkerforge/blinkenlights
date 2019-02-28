@@ -24,7 +24,7 @@ Boston, MA 02111-1307, USA.
 
 from threading import Thread
 
-from PyQt4.QtGui import QWidget
+from PyQt5.QtWidgets import QWidget
 
 import starter_kit_blinkenlights_demo.config as config
 from starter_kit_blinkenlights_demo.ui_pong import Ui_Pong

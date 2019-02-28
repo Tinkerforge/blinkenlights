@@ -2,7 +2,7 @@
 
 import sys
 import os
-from Queue import Queue
+from queue import Queue
 from threading import Thread
 
 from starter_kit_blinkenlights_demo.tinkerforge.bricklet_multi_touch import MultiTouch
@@ -28,9 +28,9 @@ class MultiTouchInput:
 
         try:
             self.mt.get_electrode_sensitivity()
-            print("Found: Multi Touch ({0})").format(config.UID_MULTI_TOUCH_BRICKLET)
+            print("Found: Multi Touch ({0})".format(config.UID_MULTI_TOUCH_BRICKLET))
         except:
-            print("Not Found: Multi Touch ({0})").format(config.UID_MULTI_TOUCH_BRICKLET)
+            print("Not Found: Multi Touch ({0})".format(config.UID_MULTI_TOUCH_BRICKLET))
             return
 
         self.mt.set_electrode_sensitivity(100)
@@ -95,18 +95,18 @@ class DualButtonInput:
         if self.db1:
             try:
                 self.db1.get_button_state()
-                print("Found: Dual Button 1 ({0})").format(config.UID_DUAL_BUTTON_BRICKLET[0])
+                print("Found: Dual Button 1 ({0})".format(config.UID_DUAL_BUTTON_BRICKLET[0]))
             except:
                 self.db1 = None
-                print("Not Found: Dual Button 1 ({0})").format(config.UID_DUAL_BUTTON_BRICKLET[0])
+                print("Not Found: Dual Button 1 ({0})".format(config.UID_DUAL_BUTTON_BRICKLET[0]))
 
         if self.db2:
             try:
                 self.db2.get_button_state()
-                print("Found: Dual Button 2 ({0})").format(config.UID_DUAL_BUTTON_BRICKLET[1])
+                print("Found: Dual Button 2 ({0})".format(config.UID_DUAL_BUTTON_BRICKLET[1]))
             except:
                 self.db2 = None
-                print("Not Found: Dual Button 2 ({0})").format(config.UID_DUAL_BUTTON_BRICKLET[1])
+                print("Not Found: Dual Button 2 ({0})".format(config.UID_DUAL_BUTTON_BRICKLET[1]))
 
         if self.db1:
             self.db1.register_callback(self.db1.CALLBACK_STATE_CHANGED, self.cb_state_changed1)
