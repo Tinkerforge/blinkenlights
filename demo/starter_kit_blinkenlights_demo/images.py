@@ -24,7 +24,7 @@ try:
 except:
     pil_available = False
 
-    from PyQt4.QtGui import QImage, QColor
+    from PyQt5.QtGui import QImage, QColor
     class ImageLoaderQt:
         def __init__(self, f):
             self.image = QImage(f)
