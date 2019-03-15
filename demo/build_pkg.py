@@ -137,14 +137,14 @@ def build_linux_pkg():
     system(['sudo', 'chown', '-R', 'root:root', 'dist/linux'])
 
     print('building Debian package')
-    system(['dpkg', '-b', 'dist/linux', '{0}-{1}_all.deb'.format(UNDERSCORE_NAME, DEMO_VERSION)])
+    system(['dpkg', '-b', 'dist/linux', '{0}-{1}_all.deb'.format(UNDERSCORE_NAME.replace('_', '-'), DEMO_VERSION)])
 
     print('changing owner back to original user')
     system(['sudo', 'chown', '-R', '{}:{}'.format(user, group), 'dist/linux'])
 
     if os.path.exists('/usr/bin/lintian'):
         print('checking Debian package')
-        system(['lintian', '--pedantic', '{0}-{1}_all.deb'.format(UNDERSCORE_NAME, DEMO_VERSION)])
+        system(['lintian', '--pedantic', '{0}-{1}_all.deb'.format(UNDERSCORE_NAME.replace('_', '-'), DEMO_VERSION)])
     else:
         print('skipping lintian check')
 
