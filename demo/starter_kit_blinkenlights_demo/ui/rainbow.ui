@@ -27,7 +27,7 @@
 &lt;p&gt;&lt;/p&gt;
 &lt;p&gt;The speed of the movement is defined by the &lt;b&gt;Frame Rate&lt;/b&gt; and &lt;b&gt;Step&lt;/b&gt; values. Each frame the rainbow is moved one step. The size of this step is given in percent of the number of LEDs in the matrix.&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
-&lt;p&gt;The source code for this demo is available in &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html#rainbow&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Python and C&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;</string>
+&lt;p&gt;The source code for this demo is available in &lt;a href=&quot;http://www.tinkerforge.com/en/doc/Kits/Blinkenlights/Blinkenlights.html#moving-rainbow&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Python and C&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
