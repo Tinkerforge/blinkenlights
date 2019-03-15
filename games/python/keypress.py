@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
 
 from tinkerforge.bricklet_multi_touch import MultiTouch
 from tinkerforge.bricklet_dual_button import DualButton

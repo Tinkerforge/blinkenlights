@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
 
 # Loosely based on https://github.com/giladaya/arduino-led-matrix/blob/master/fire/fire.ino
 

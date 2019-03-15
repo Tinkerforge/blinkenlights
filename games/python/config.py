@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
 
 from tinkerforge.bricklet_led_strip import LEDStrip
 
