@@ -95,6 +95,9 @@ def build_linux_pkg():
     if os.path.exists(dist_path):
         shutil.rmtree(dist_path)
 
+    print('calling build_ui.py release')
+    system(['python3', 'build_ui.py'])
+
     print('calling setup.py sdist')
     system(['python3', 'setup.py', 'sdist'])
 
