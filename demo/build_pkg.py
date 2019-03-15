@@ -96,7 +96,7 @@ def build_linux_pkg():
     if os.path.exists(egg_info_path):
         shutil.rmtree(egg_info_path)
 
-    print('calling build_ui.py release')
+    print('calling build_ui.py')
     system(['python3', 'build_ui.py'])
 
     print('calling setup.py sdist')
