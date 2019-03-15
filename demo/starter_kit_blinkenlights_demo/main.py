@@ -85,7 +85,8 @@ import starter_kit_blinkenlights_demo.config as config
 
 class MainWindow(QMainWindow):
     def __init__(self, app, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__(parent)
+
         self.app = app
 
     def keyPressEvent(self, event):
@@ -112,7 +113,7 @@ class Blinkenlights(QApplication):
     error_msg = None
 
     def __init__(self, args):
-        super(QApplication, self).__init__(args)
+        super().__init__(args)
 
         self.error_msg = QErrorMessage()
         self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)

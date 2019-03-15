@@ -36,7 +36,7 @@ class PongWidget(QWidget, Ui_Pong):
     thread = None
 
     def __init__(self, parent, app):
-        super(QWidget, self).__init__()
+        super().__init__()
         self.app = app
 
         self.setupUi(self)

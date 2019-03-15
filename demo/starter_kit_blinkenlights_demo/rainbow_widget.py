@@ -34,7 +34,8 @@ class RainbowWidget(QWidget, Ui_Rainbow):
     rainbow = None
 
     def __init__(self, parent, app):
-        super(QWidget, self).__init__()
+        super().__init__()
+
         self.app = app
 
         self.setupUi(self)

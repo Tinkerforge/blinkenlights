@@ -39,7 +39,8 @@ class TextWidget(QWidget, Ui_Text):
     color_mode = 'rainbow'
 
     def __init__(self, parent, app):
-        super(QWidget, self).__init__()
+        super().__init__()
+
         self.app = app
 
         self.setupUi(self)

@@ -246,7 +246,7 @@ class Text:
     def frame_prepare_next(self):
         self.leds = [x[:] for x in [[(0, 0, 0)]*config.LED_COLS]*config.LED_ROWS]
 
-        if not config.TEXT_COLOR:
+        if config.TEXT_COLOR is None:
             r, g, b = colorsys.hsv_to_rgb(1.0*self.rainbow_index/self.rainbow_length, 1, 0.1)
             r, g, b = int(r*255), int(g*255), int(b*255)
             self.rainbow_index = (self.rainbow_index + 1) % self.rainbow_length

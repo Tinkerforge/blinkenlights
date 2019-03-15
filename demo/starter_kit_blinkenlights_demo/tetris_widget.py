@@ -36,7 +36,8 @@ class TetrisWidget(QWidget, Ui_Tetris):
     thread = None
 
     def __init__(self, parent, app):
-        super(QWidget, self).__init__()
+        super().__init__()
+
         self.app = app
 
         self.setupUi(self)

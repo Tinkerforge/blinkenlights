@@ -29,7 +29,8 @@ from starter_kit_blinkenlights_demo.ui_setup import Ui_Setup
 
 class SetupWidget(QWidget, Ui_Setup):
     def __init__(self, parent, app):
-        super(QWidget, self).__init__()
+        super().__init__()
+
         self.app = app
 
         self.setupUi(self)
