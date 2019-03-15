@@ -95,6 +95,9 @@ def build_linux_pkg():
     if os.path.exists(dist_path):
         shutil.rmtree(dist_path)
 
+    if os.path.exists(egg_info_path):
+        shutil.rmtree(egg_info_path)
+
     print('calling build_ui.py release')
     system(['python3', 'build_ui.py'])
 
@@ -167,7 +170,7 @@ if __name__ == '__main__':
 
         root_path = os.getcwd()
         os.chdir(os.path.join(root_path, UNDERSCORE_NAME))
-        system(['pyinstaller', '--distpath', os.path.join('..', 'dist'), '--workpath', os.path.join('..', 'build'), 'main_folder.spec', '--'] + sys.argv)
+        system(['pyinstaller', '--distpath', '../dist', '--workpath', '../build', 'main_folder.spec', '--'] + sys.argv)
         os.chdir(root_path)
     else:
         print('error: unsupported platform: ' + sys.platform)
