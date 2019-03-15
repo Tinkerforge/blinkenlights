@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
+import sys
+if (sys.hexversion & 0xFF000000) != 0x03000000:
+    print('Python 3.x required')
+    sys.exit(1)
+
 import random
 import copy
 import time

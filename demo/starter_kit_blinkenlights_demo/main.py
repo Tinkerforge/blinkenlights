@@ -24,8 +24,12 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
 
-import socket
 import sys
+if (sys.hexversion & 0xFF000000) != 0x03000000:
+    print('Python 3.x required')
+    sys.exit(1)
+
+import socket
 import time
 import math
 import signal

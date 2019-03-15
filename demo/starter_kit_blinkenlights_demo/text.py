@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*
 
 import sys
+if (sys.hexversion & 0xFF000000) != 0x03000000:
+    print('Python 3.x required')
+    sys.exit(1)
+
 import colorsys
 
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection

@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*
 
 import sys
+if (sys.hexversion & 0xFF000000) != 0x03000000:
+    print('Python 3.x required')
+    sys.exit(1)
 
 from starter_kit_blinkenlights_demo.tinkerforge.ip_connection import IPConnection
 from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip

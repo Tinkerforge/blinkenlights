@@ -26,13 +26,18 @@ Boston, MA 02111-1307, USA.
 
 # Windows:
 #   dependencies:
-#       pythonxy (2.6)
-#       py2exe
+#       python
+#       pyinstaller
+#       PyQt5
 #       nsis
-#       win redistributables vcredist under winxp
+#       universal CRT
+
+import sys
+if (sys.hexversion & 0xFF000000) != 0x03000000:
+    print('Python 3.x required')
+    sys.exit(1)
 
 import os
-import sys
 import base64
 import shutil
 import struct
