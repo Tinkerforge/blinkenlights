@@ -69,7 +69,7 @@ excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'way
 
 patterns = ['qt5qml', 'qt5quick', 'libglesv2', 'libcrypto', 'qt5network', 'qt5dbus',
             'qt5svg', 'qt5websockets', 'd3dcompiler', 'libegl', 'opengl32sw', 'qwebp',
-            'qjpeg', 'qwebgl', 'qminimal', 'qoffscreen', 'qwebgl']
+            'qjpeg', 'qminimal', 'qoffscreen', 'qwebgl']
 
 utils = PyinstallerUtils(['starter', 'kit', 'blinkenlights', 'demo'], DEMO_VERSION)
 utils.prepare(os.path.join(utils.root_path, '..'), 'build_ui.py')
