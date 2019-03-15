@@ -6,6 +6,8 @@ sys.path.append('..')
 from starter_kit_blinkenlights_demo.pyinstaller_utils import *
 from starter_kit_blinkenlights_demo.config import DEMO_VERSION
 
+utils = PyinstallerUtils(['starter', 'kit', 'blinkenlights', 'demo'], DEMO_VERSION)
+utils.prepare(os.path.join(utils.root_path, '..'), 'build_ui.py')
 
 excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'wayland', 'xinerama', 'share', 'icons', 'atk', 'pango', 'pil', 'PIL',
             '_tkagg',
@@ -66,13 +68,9 @@ excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'way
             'PyQt5.QtX11Extras',
             'PyQt5.QtXml',
             'PyQt5.QtXmlPatterns']
-
 patterns = ['qt5qml', 'qt5quick', 'libglesv2', 'libcrypto', 'qt5network', 'qt5dbus',
             'qt5svg', 'qt5websockets', 'd3dcompiler', 'libegl', 'opengl32sw', 'qwebp',
             'qjpeg', 'qminimal', 'qoffscreen', 'qwebgl']
-
-utils = PyinstallerUtils(['starter', 'kit', 'blinkenlights', 'demo'], DEMO_VERSION)
-utils.prepare(os.path.join(utils.root_path, '..'), 'build_ui.py')
 
 a = Analysis(['main.py'], pathex=utils.pathex, excludes=excludes)
 
