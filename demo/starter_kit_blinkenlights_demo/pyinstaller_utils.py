@@ -244,4 +244,4 @@ class PyinstallerUtils:
         os.mkdir(os.path.join(self.dist_path, 'dmg'))
 
         shutil.move(os.path.join(self.dist_path, app_name), os.path.join(self.dist_path, 'dmg'))
-        system(['hdiutil', 'create', '-fs', 'HFS+', '-volname', '{}-{}'.format(self.UNDERSCORE_NAME, self.VERSION), '-srcfolder', os.path.join(self.dist_path, 'dmg'), dmg_path])
+        system(['hdiutil', 'create', '-fs', 'HFS+', '-volname', '{}-{}'.format(self.CAMEL_NAME.replace(" ", "-"), self.VERSION), '-srcfolder', os.path.join(self.dist_path, 'dmg'), dmg_path])
