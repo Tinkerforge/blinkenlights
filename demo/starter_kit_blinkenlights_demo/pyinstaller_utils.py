@@ -172,7 +172,7 @@ class PyinstallerUtils:
             os.remove(installer_target_path)
 
         shutil.move(os.path.join(self.dist_path, 'nsis', installer), installer_target_path)
-        return os.path.join(self.root_path, installer)
+        return os.path.join(self.root_path,'..', installer)
 
     def prepare(self, prepare_script_working_dir=None, prepare_script=None):
         print('removing old dist directory')
