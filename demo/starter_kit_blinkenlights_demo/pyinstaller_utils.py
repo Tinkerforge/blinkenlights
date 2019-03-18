@@ -225,7 +225,7 @@ class PyinstallerUtils:
 
     def post_generate_macos(self):
         build_data = os.path.join(self.mac_build_data_path, '*')
-        app_name = self.UNDERSCORE_NAME + '.app'
+        app_name = self.CAMEL_CASE_NAME + '.app'
         resources_path = os.path.join(self.dist_path, app_name, 'Contents', 'Resources')
         system(['bash', '-c', 'cp -R {} {}'.format(build_data, resources_path)])
 
