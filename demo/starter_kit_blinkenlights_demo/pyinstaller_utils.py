@@ -227,7 +227,7 @@ class PyinstallerUtils:
         build_data = os.path.join(self.mac_build_data_path, '*')
         app_name = self.CAMEL_CASE_NAME + '.app'
         resources_path = os.path.join(self.dist_path, app_name, 'Contents', 'Resources')
-        shutil.copytree(build_data, resources_path)
+        system(['bash', '-c', 'cp -R {} {}'.format(build_data.replace(" ", "\\ "), resources_path.replace(" ", "\\ "))])
 
         if '--no-sign' not in sys.argv:
             system(['bash', '-c', 'security unlock-keychain /Users/$USER/Library/Keychains/login.keychain'])
