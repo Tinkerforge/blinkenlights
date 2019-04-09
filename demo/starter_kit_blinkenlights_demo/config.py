@@ -2,7 +2,7 @@
 
 from starter_kit_blinkenlights_demo.tinkerforge.bricklet_led_strip import LEDStrip
 
-DEMO_VERSION = "1.1.0"
+DEMO_VERSION = "1.1.1"
 HAS_GUI = True
 
 # Bricklets

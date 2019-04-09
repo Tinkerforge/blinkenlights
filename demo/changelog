@@ -12,6 +12,9 @@
 2018-06-22: 1.0.3 (add1786)
 - Add support for LED Strip Bricklet 2.0
 
-2019-03-18: 1.1.0 (<unknown>)
-- Port to Python 3 and PyQt 5
+2019-03-18: 1.1.0 (a1d505a)
+- Port to Python 3 and PyQt 5 (macOS 10.11 or Windows 7 required)
 - Install start menu link for all users on Windows
+
+2019-04-09: 1.1.1 (<unknown>)
+- Add minimum macOS and Windows version checks
