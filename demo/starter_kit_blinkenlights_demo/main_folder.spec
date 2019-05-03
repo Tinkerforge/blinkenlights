@@ -7,7 +7,7 @@ from starter_kit_blinkenlights_demo.pyinstaller_utils import *
 from starter_kit_blinkenlights_demo.config import DEMO_VERSION
 
 utils = PyinstallerUtils(['starter', 'kit', 'blinkenlights', 'demo'], DEMO_VERSION)
-utils.prepare(os.path.join(utils.root_path, '..'), 'build_ui.py')
+utils.prepare(os.path.join(utils.root_path, '..'))
 
 excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'wayland', 'xinerama', 'share', 'icons', 'atk', 'pango', 'pil', 'PIL',
             '_tkagg',
