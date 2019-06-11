@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-brickv (Brick Viewer)
+Starter Kit: Blinkenlights Demo
 Copyright (C) 2019 Erik Fleckstein <erik@tinkerforge.com>
 Copyright (C) 2019 Matthias Bolte <matthias@tinkerforge.com>
 
