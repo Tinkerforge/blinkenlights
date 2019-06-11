@@ -7,7 +7,7 @@ sys.path.insert(0, '..') # Ensure to use the demo source, not an installed versi
 from starter_kit_blinkenlights_demo.pyinstaller_utils import *
 
 utils = PyinstallerUtils(['starter', 'kit', 'blinkenlights', 'demo'])
-utils.prepare(os.path.join(utils.root_path, '..'))
+utils.prepare()
 
 excludes = ['wx', 'gtk+', '_gtkagg', 'gtk', 'gdk', 'gtk2', 'gtk3', 'cairo', 'wayland', 'xinerama', 'share', 'icons', 'atk', 'pango', 'pil', 'PIL',
             '_tkagg',
