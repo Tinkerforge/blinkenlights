@@ -80,8 +80,32 @@ from starter_kit_blinkenlights_demo.fire_widget import FireWidget
 from starter_kit_blinkenlights_demo.text_widget import TextWidget
 from starter_kit_blinkenlights_demo.images_widget import ImagesWidget
 from starter_kit_blinkenlights_demo.rainbow_widget import RainbowWidget
-from starter_kit_blinkenlights_demo.load_pixmap import load_pixmap
+from starter_kit_blinkenlights_demo.load_pixmap import load_pixmap, get_resources_path
 import starter_kit_blinkenlights_demo.config as config
+
+def load_commit_id(name):
+    try:
+        # Don't warn if the file is missing, as it is expected when run from source.
+        path = get_resources_path(name, warn_on_missing_file=False)
+
+        if path is not None:
+            with open(path, 'r') as f:
+                return f.read().strip()
+    except FileNotFoundError:
+        pass
+
+    return None
+
+INTERNAL = load_commit_id('internal')
+
+SNAPSHOT = load_commit_id('snapshot')
+
+DEMO_FULL_VERSION = config.DEMO_VERSION
+
+if INTERNAL != None:
+    DEMO_FULL_VERSION += '+internal~{}'.format(INTERNAL)
+elif SNAPSHOT != None:
+    DEMO_FULL_VERSION += '+snapshot~{}'.format(SNAPSHOT)
 
 class MainWindow(QMainWindow):
     def __init__(self, app, parent=None):
@@ -116,7 +140,7 @@ class Blinkenlights(QApplication):
         super().__init__(args)
 
         self.error_msg = QErrorMessage()
-        self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)
+        self.error_msg.setWindowTitle("Starter Kit: Blinkenlights Demo " + DEMO_FULL_VERSION)
 
         signal.signal(signal.SIGINT, self.exit_demo)
         signal.signal(signal.SIGTERM, self.exit_demo)
@@ -175,7 +199,7 @@ class Blinkenlights(QApplication):
 
         self.tabs.currentChanged.connect(self.tab_changed_slot)
 
-        self.main.setWindowTitle("Starter Kit: Blinkenlights Demo " + config.DEMO_VERSION)
+        self.main.setWindowTitle("Starter Kit: Blinkenlights Demo " + DEMO_FULL_VERSION)
         self.main.show()
 
     def connect(self):
